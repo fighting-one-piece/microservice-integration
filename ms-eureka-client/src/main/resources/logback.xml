@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    
+     <root level="INFO"/>
+    
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.springboot.sample" level="INFO" />
+ 
+    <springProfile name="development">
+        <logger name="org.springboot.sample" level="INFO" />
+    </springProfile>
+ 
+    <springProfile name="test">
+        <logger name="org.springboot.sample" level="INFO" />
+    </springProfile>
+    
+    <springProfile name="production">
+        <logger name="org.springboot.sample" level="INFO" />
+    </springProfile>
+</configuration>

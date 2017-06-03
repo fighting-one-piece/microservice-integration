@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    
+    <root level="INFO"/>
+    
+    <logger name="org.springframework.web" level="ERROR"/>
+    <logger name="org.springboot.sample" level="TRACE" />
+    <logger name="com.thinkaurelius.titan" level="ERROR"/>
+    <logger name="org.apache.zookeeper" level="ERROR"/>
+ 
+    <springProfile name="development">
+        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="com.thinkaurelius.titan" level="ERROR"/>
+    	<logger name="org.apache.zookeeper" level="ERROR"/>
+    </springProfile>
+ 
+    <springProfile name="test">
+        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="com.thinkaurelius.titan" level="ERROR"/>
+    	<logger name="org.apache.zookeeper" level="ERROR"/>
+    </springProfile>
+    
+    <springProfile name="production">
+        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="com.thinkaurelius.titan" level="ERROR"/>
+    	<logger name="org.apache.zookeeper" level="ERROR"/>
+    </springProfile>
+</configuration>

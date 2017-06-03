@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.address.dao.AdministrativeDivisionDAO">
+
+	<resultMap type="AdministrativeDivision" id="administrativeDivisionResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="region" column="REGION"/>
+        <result property="code" column="CODE"/>  
+        <result property="parentCode" column="PARENT_CODE"/>  
+    </resultMap>
+    
+    <sql id="columnClause">
+    	ID, REGION, CODE, PARENT_CODE
+    </sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.region != null and condition.region != ''">
+    			AND REGION = #{condition.region}
+    		</if>
+    		<if test="condition.code != null and condition.code != ''">
+    			AND CODE = #{condition.code}
+    		</if>
+    		<if test="condition.parentCode != null and condition.parentCode != ''">
+    			AND PARENT_CODE = #{condition.parentCode}
+    		</if>
+    	</where>
+    </sql>
+    
+    <insert id="insert" keyProperty="id" parameterType="AdministrativeDivision">
+	    INSERT INTO T_ADMINISTRATIVE_DIVISION(REGION, CODE, PARENT_CODE) 
+	    VALUES(#{region},#{code},#{parentCode})  
+    </insert>
+    
+    <insert id="insertBatch" parameterType="List">
+    	INSERT IGNORE INTO T_ADMINISTRATIVE_DIVISION (REGION, CODE, PARENT_CODE)
+    	VALUES
+    	<foreach collection="list" index="index" item="item" separator=",">
+    		(#{item.region},#{item.code},#{item.parentCode})
+    	</foreach>
+    </insert>
+    
+    <update id="update" parameterType="AdministrativeDivision">
+    	UPDATE T_ADMINISTRATIVE_DIVISION
+    	<set>
+    		<if test="region != null">
+    			REGION = #{region},
+    		</if>
+    		<if test="code != null">
+    			CODE = #{code},
+    		</if>
+    		<if test="parentCode != null">
+    			PARENT_CODE = #{parentCode},
+    		</if>
+    	</set>
+    	WHERE ID=#{id}
+    </update>
+    
+    <select id="readDataByPK" resultMap="administrativeDivisionResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ADMINISTRATIVE_DIVISION WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="administrativeDivisionResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ADMINISTRATIVE_DIVISION
+        <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="administrativeDivisionResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ADMINISTRATIVE_DIVISION
+        <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="administrativeDivisionResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_ADMINISTRATIVE_DIVISION
+        ]]>   
+    </select>
+    
+</mapper>
