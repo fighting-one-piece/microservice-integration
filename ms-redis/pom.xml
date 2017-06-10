@@ -19,8 +19,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jedis.version>2.9.0</jedis.version>
+		<commons.lang.version>2.6</commons.lang.version>
 		<logback.version>1.1.7</logback.version>
+		<jedis.version>2.9.0</jedis.version>
 	</properties>
 
 	<dependencies>
@@ -44,6 +45,12 @@
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-redis</artifactId>
+		    <version>1.4.7.RELEASE</version>
 		</dependency>
 		
 		<!--Commons Lang依赖包 -->
@@ -89,6 +96,12 @@
 			<version>0.1.4</version>
 		</dependency>
 		
+		<!-- Gson依赖包 -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		
 		<!-- Redis客户端库 -->
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -99,7 +112,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>ms-base</finalName>
+		<finalName>ms-redis</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -179,7 +192,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/base</warSourceDirectory>
+					<warSourceDirectory>target/ms-redis</warSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
