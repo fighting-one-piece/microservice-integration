@@ -1,6 +1,7 @@
 # repository-msplat
 microservice project integrate technology include:
 Mybatis
+Swagger
 Mongodb
 Redis
 Rabbitmq
