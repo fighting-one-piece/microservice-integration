@@ -37,6 +37,9 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.any()) //对所有api进行监控 RequestHandlerSelectors.basePackage(basePackage)
                 .paths(PathSelectors.any()) //对所有路径进行监控
                 .build()
+                .enableUrlTemplating(true)
+                .forCodeGeneration(true)
+                .pathMapping("/api/v1")
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, responseMessages);
     }
