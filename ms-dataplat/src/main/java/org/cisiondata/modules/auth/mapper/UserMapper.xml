@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.UserDAO">
+
+	<resultMap type="User" id="userResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>  
+    </resultMap>
+    
+    <sql id="columnClause">
+    	ID, USERNAME, PASSWORD
+    </sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.username != null and condition.username != ''">
+    			AND USERNAME = #{condition.username}
+    		</if>
+    		<if test="condition.password != null and condition.password != ''">
+    			AND PASSWORD = #{condition.password}
+    		</if>
+    	</where>
+    </sql>
+    
+    <insert id="insert" keyProperty="id" parameterType="User">
+	    INSERT INTO T_USER(ID, USERNAME, PASSWORD) 
+	    VALUES(#{id},#{username},#{password})  
+    </insert>
+    
+    <select id="readDataListByCondition" resultMap="userResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_USER
+        <include refid="whereClause"/>
+    </select>
+    
+</mapper>
