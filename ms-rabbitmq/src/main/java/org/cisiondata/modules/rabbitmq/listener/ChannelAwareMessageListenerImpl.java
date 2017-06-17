@@ -22,7 +22,7 @@ public class ChannelAwareMessageListenerImpl implements ChannelAwareMessageListe
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); //确认消息成功消费  
 		MessageProperties properties = message.getMessageProperties();
 		String routingKey = properties.getReceivedRoutingKey();
-		System.out.println("routingKey: " + routingKey);
+		System.out.println("listener receive routingKey: " + routingKey);
 		if (StringUtils.isBlank(routingKey)) return;
 		for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
 			consumerServiceList.get(i).handleMessage(routingKey, 

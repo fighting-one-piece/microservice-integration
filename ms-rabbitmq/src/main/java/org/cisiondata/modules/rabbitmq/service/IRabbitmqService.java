@@ -4,7 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 
-public interface IRabbitService {
+public interface IRabbitmqService {
 	
 	/**
 	 * 定义声明Exchange

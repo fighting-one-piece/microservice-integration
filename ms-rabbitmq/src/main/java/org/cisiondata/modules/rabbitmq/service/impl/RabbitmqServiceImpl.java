@@ -1,7 +1,7 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
 import org.cisiondata.modules.bootstrap.config.RabbitmqConfiguration;
-import org.cisiondata.modules.rabbitmq.service.IRabbitService;
+import org.cisiondata.modules.rabbitmq.service.IRabbitmqService;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -12,8 +12,8 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("rabbitService")
-public class RabbitServiceImpl implements IRabbitService {
+@Service("rabbitmqService")
+public class RabbitmqServiceImpl implements IRabbitmqService {
 	
 	@Autowired
 	private AmqpAdmin amqpAdmin = null;
