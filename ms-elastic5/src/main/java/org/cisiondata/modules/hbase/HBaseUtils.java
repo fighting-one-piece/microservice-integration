@@ -49,15 +49,13 @@ public class HBaseUtils {
 	}
 	
 	private static void initializeConfig() {
-		System.setProperty("hadoop.home.dir", "F:/develop/hadoop/hadoop-2.7.2");
-		System.setProperty("HADOOP_MAPRED_HOME", "F:/develop/hadoop/hadoop-2.7.2");
+		/** System.setProperty("hadoop.home.dir", "F:/develop/hadoop/hadoop-2.7.2"); */
+		/** System.setProperty("HADOOP_MAPRED_HOME", "F:/develop/hadoop/hadoop-2.7.2"); */
 		configuration = new Configuration();
 		/** 与hbase/conf/hbase-site.xml中hbase.master配置的值相同 */
-//		configuration.set("hbase.master", "192.168.0.115:60000");
-		configuration.set("hbase.master", "192.168.0.15:60000");
+		configuration.set("hbase.master", "172.20.100.10:60000");
 		/** 与hbase/conf/hbase-site.xml中hbase.zookeeper.quorum配置的值相同 */
-//		configuration.set("hbase.zookeeper.quorum", "192.168.0.115");
-		configuration.set("hbase.zookeeper.quorum", "192.168.0.15,192.168.0.16,192.168.0.17");
+		configuration.set("hbase.zookeeper.quorum", "172.20.100.10,172.20.100.11,172.20.100.12,172.20.100.13,172.20.100.14");
 		/** 与hbase/conf/hbase-site.xml中hbase.zookeeper.property.clientPort配置的值相同 */
 		configuration.set("hbase.zookeeper.property.clientPort", "2181");
 		//configuration = HBaseConfiguration.create(configuration);
@@ -132,6 +130,22 @@ public class HBaseUtils {
 			LOG.info("insert recored " + rowKey + " to table " + tableName + " success.");
 		} catch (IOException e) {
 			LOG.info(e.getMessage(), e);
+		}
+	}
+	
+	/** 插入一行记录*/
+	public static void insertRecord(String tableName, Put put) {
+		HTable table = null;
+		try {
+			table = (HTable) connection.getTable(TableName.valueOf(tableName));
+			table.put(put);
+		} catch (IOException e) {
+			LOG.info(e.getMessage(), e);
+			try {
+				table.flushCommits();
+			} catch (Exception e1) {
+				LOG.info(e1.getMessage(), e1);
+			}
 		}
 	}
 	

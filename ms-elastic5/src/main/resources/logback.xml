@@ -2,24 +2,28 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml" />
     
-     <root level="ERROR"/>
+    <root level="INFO"/>
     
-    <logger name="org.springframework.web" level="ERROR"/>
-    <logger name="org.springboot.sample" level="TRACE" />
+    <logger name="org.cisiondata" level="INFO" />
+    <logger name="org.springframework" level="ERROR"/>
     <logger name="org.apache.zookeeper" level="ERROR"/>
  
     <springProfile name="development">
-        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>
  
     <springProfile name="test">
-        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>
     
     <springProfile name="production">
-        <logger name="org.springboot.sample" level="ERROR" />
+        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>
+    
 </configuration>

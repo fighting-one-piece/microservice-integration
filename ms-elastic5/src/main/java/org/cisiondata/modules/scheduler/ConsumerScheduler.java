@@ -25,25 +25,25 @@ public class ConsumerScheduler implements Runnable {
     private int batchNum = 1000;
     private ExecutorService executor = null;
     private ConsumerConnector consumer = null;
-    private IConsumeService consumeService = null;
+    private List<IConsumeService> consumeServiceList = null;
     private List<ConsumerTask> tasks = new ArrayList<ConsumerTask>();
  
-    public ConsumerScheduler(String topic, int threadNum, IConsumeService consumeService) {
+    public ConsumerScheduler(String topic, int threadNum, List<IConsumeService> consumeServiceList) {
     	this.topic = topic;
     	this.threadNum = threadNum;
-        this.consumeService = consumeService;
+        this.consumeServiceList = consumeServiceList;
     }
     
-    public ConsumerScheduler(String topic, int threadNum, int batchNum, IConsumeService consumeService) {
+    public ConsumerScheduler(String topic, int threadNum, int batchNum, List<IConsumeService> consumeServiceList) {
     	this.topic = topic;
     	this.threadNum = threadNum;
     	this.batchNum = batchNum;
-        this.consumeService = consumeService;
+        this.consumeServiceList = consumeServiceList;
     }
     
     public ConsumerConfig createConsumerConfig() {
     	Properties properties = new Properties();
-		properties.put("zookeeper.connect", "192.168.0.15:2181,192.168.0.16:2181,192.168.0.17:2181/kafka");
+		properties.put("zookeeper.connect", "172.20.100.10:2181,172.20.100.11:2181,172.20.100.12:2181,172.20.100.13:2181,172.20.100.14:2181/kafka");
 		properties.put("zookeeper.session.timeout.ms", "4000");
 		properties.put("zookeeper.sync.time.ms", "200");
 		properties.put("enable.auto.commit", "true");
@@ -69,7 +69,7 @@ public class ConsumerScheduler implements Runnable {
         executor = Executors.newFixedThreadPool(threadNum);
  
         for (int i = 0, len = streams.size(); i < len; i++) {
-        	ConsumerTask task = new ConsumerTask(streams.get(i), batchNum, consumeService);
+        	ConsumerTask task = new ConsumerTask(streams.get(i), batchNum, consumeServiceList);
         	executor.submit(task);
         	tasks.add(task);
         }
@@ -100,13 +100,13 @@ class ConsumerTask implements Runnable {
 	
 	private KafkaStream<byte[], byte[]> kafkaStream = null;
 	private int batchNum = 1000;
-	private IConsumeService consumeService = null;
+	private List<IConsumeService> consumeServiceList = null;
 	private List<String> messages = new ArrayList<String>();
  
-    public ConsumerTask(KafkaStream<byte[], byte[]> kafkaStream, int batchNum, IConsumeService consumeService) {
+    public ConsumerTask(KafkaStream<byte[], byte[]> kafkaStream, int batchNum, List<IConsumeService> consumeServiceList) {
         this.kafkaStream = kafkaStream;
         this.batchNum = batchNum;
-        this.consumeService = consumeService;
+        this.consumeServiceList = consumeServiceList;
     }
     
     @Override
@@ -115,11 +115,15 @@ class ConsumerTask implements Runnable {
 		while (iterator.hasNext()) {
 			MessageAndMetadata<byte[], byte[]> mam = iterator.next();
 			String message = new String(mam.message());
+			/**
 			System.out.println(Thread.currentThread().getName() + ": partition[" + mam.partition() + "]," 
 					+ "offset[" + mam.offset() + "], " + message); 
+			*/
 			messages.add(message);
 			if (messages.size() == batchNum) {
-				consumeService.handle(messages);
+				for (int i = 0, len = consumeServiceList.size(); i < len; i++) {
+					consumeServiceList.get(i).handle(messages);
+				}
 				messages.clear();
 			}
 		}
@@ -130,7 +134,11 @@ class ConsumerTask implements Runnable {
     }
     
     public void shutdown() {
-    	if (messages.size() > 0) consumeService.handle(messages);
+    	if (messages.size() > 0) {
+    		for (int i = 0, len = consumeServiceList.size(); i < len; i++) {
+				consumeServiceList.get(i).handle(messages);
+			}
+    	}
     }
     
 }

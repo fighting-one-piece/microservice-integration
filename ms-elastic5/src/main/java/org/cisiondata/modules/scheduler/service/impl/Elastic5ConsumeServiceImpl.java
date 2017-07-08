@@ -69,9 +69,10 @@ public class Elastic5ConsumeServiceImpl implements IConsumeService {
 		}
 		BulkResponse bulkResponse = bulkRequestBuilder.execute().actionGet();
 		if (bulkResponse.hasFailures()) {
-			LOG.info(bulkResponse.buildFailureMessage());
+			LOG.error(bulkResponse.buildFailureMessage());
 		}
 		System.out.println("elastic5 insert " + messages.size() + " records finish!");
+		LOG.info("elastic5 insert {} records finish!", messages.size());
 	}
 	
 	private Map<String, Object> removeNotNeedSearchColumn(Map<String, Object> map) {

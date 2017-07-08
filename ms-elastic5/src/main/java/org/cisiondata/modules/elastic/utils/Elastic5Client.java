@@ -36,11 +36,13 @@ public class Elastic5Client {
 	}
 	
 	private void initClient() {
-        Settings settings = Settings.builder().put("cluster.name", "cisiondata")
+        Settings settings = Settings.builder().put("cluster.name", "cisiondata-cluster")
         		.put("client.transport.sniff", true).build();
         client = new PreBuiltTransportClient(settings);
         List<EsServerAddress> esServerAddress = new ArrayList<EsServerAddress>();
-		esServerAddress.add(new EsServerAddress("192.168.0.115", 9300));
+		esServerAddress.add(new EsServerAddress("172.20.100.15", 9030));
+		esServerAddress.add(new EsServerAddress("172.20.100.16", 9030));
+		esServerAddress.add(new EsServerAddress("172.20.100.17", 9030));
 		for (EsServerAddress address : esServerAddress) {
 			client.addTransportAddress(new InetSocketTransportAddress(
 					new InetSocketAddress(address.getHost(), address.getPort())));
