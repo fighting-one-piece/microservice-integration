@@ -11,8 +11,8 @@ import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.elastic.entity.SearchParams;
-import org.cisiondata.modules.elastic.service.IElastic5Service;
-import org.cisiondata.modules.elastic.utils.Elastic5Client;
+import org.cisiondata.modules.elastic.service.IElasticService;
+import org.cisiondata.modules.elastic.utils.ElasticClient;
 import org.cisiondata.modules.hbase.service.IHBaseService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.idgen.MD5Utils;
@@ -31,10 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Service("elastic5Service")
-public class Elastic5ServiceImpl extends Elastic5AbstractServiceImpl implements IElastic5Service {
+@Service("elasticService")
+public class ElasticServiceImpl extends ElasticAbstractServiceImpl implements IElasticService {
 	
-	private Logger LOG = LoggerFactory.getLogger(Elastic5ServiceImpl.class);
+	private Logger LOG = LoggerFactory.getLogger(ElasticServiceImpl.class);
 	
 	@SuppressWarnings("unused")
 	private static final String CN_REG = "[\\u4e00-\\u9fa5]+";
@@ -61,15 +61,15 @@ public class Elastic5ServiceImpl extends Elastic5AbstractServiceImpl implements 
 		ParamsUtils.checkNotNull(types, "types is null");
 		ParamsUtils.checkNotNull(keywords, "keywords is null");
 		SearchParams params = new SearchParams(indices, types, keywords, highLight, currentPageNum, rowNumPerPage);
+		QueryResult<Map<String, Object>> qr = null;
 		try {
-			QueryResult<Map<String, Object>> qr = readDataList(params);
-			boolean isPagination = params.isPagination();
-			if (!isPagination) return qr.getResultList();
-			return qr.getPaginationResultList(currentPageNum, rowNumPerPage);
+			qr = readDataList(params);
+			if (!params.isPagination()) return qr.getResultList();
+			qr.setResultList(qr.getPaginationResultList(currentPageNum, rowNumPerPage));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
-		return null;
+		return qr;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public class Elastic5ServiceImpl extends Elastic5AbstractServiceImpl implements 
 			return (QueryResult<Map<String, Object>>) cacheObject;
 		} 
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		SearchRequestBuilder searchRequestBuilder = Elastic5Client.getInstance().getClient()
+		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
 				.prepareSearch(params.indices()).setTypes(params.types());
 		searchRequestBuilder.setQuery(buildBoolQuery(params.keywords()));
 		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);

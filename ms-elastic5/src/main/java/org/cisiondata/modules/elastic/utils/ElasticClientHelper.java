@@ -64,9 +64,9 @@ import com.carrotsearch.hppc.ObjectLookupContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 
-public class Elastic5ClientHelper {
+public class ElasticClientHelper {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(Elastic5ClientHelper.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ElasticClientHelper.class);
 	
 	/**
 	 * 创建索引
@@ -75,7 +75,7 @@ public class Elastic5ClientHelper {
 	 * @param replicasNum 备份数
 	 */
 	public static void createIndex(String index, int shardsNum, int replicasNum) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		try {
 			XContentBuilder builder = XContentFactory
 			            .jsonBuilder()
@@ -96,7 +96,7 @@ public class Elastic5ClientHelper {
 	 * @param index
 	 */
 	public static void deleteIndex(String index) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		try {
 			DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
 			ActionFuture<DeleteIndexResponse> response = 
@@ -114,7 +114,7 @@ public class Elastic5ClientHelper {
 	 * @param builder
 	 */
 	public static void createIndexType(String index, String type, XContentBuilder builder) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		PutMappingRequest mapping = Requests.putMappingRequest(index).type(type).source(builder);
 		PutMappingResponse response = client.admin().indices().putMapping(mapping).actionGet();
 		System.out.println(response.isAcknowledged());
@@ -127,7 +127,7 @@ public class Elastic5ClientHelper {
 	 * @param fileName
 	 */
 	public static void createIndexType(String index, String type, String fileName) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		PutMappingRequest mapping = Requests.putMappingRequest(index)
 				.type(type).source(readSource(fileName), XContentType.JSON);
 		PutMappingResponse response = client.admin().indices().putMapping(mapping).actionGet();
@@ -144,7 +144,7 @@ public class Elastic5ClientHelper {
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
 		try {
-			in = Elastic5ClientHelper.class.getClassLoader().getResourceAsStream("mapping/" + fileName);
+			in = ElasticClientHelper.class.getClassLoader().getResourceAsStream("mapping/" + fileName);
 			br = new BufferedReader(new InputStreamReader(in));
 			String line = null;
 			while (null != (line = br.readLine())) {
@@ -173,7 +173,7 @@ public class Elastic5ClientHelper {
 	 * @param type
 	 */
 	public static void deleteIndexTypeAllData(String index, String type) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery()).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setScroll(new TimeValue(60000)).setSize(10000).setExplain(false).execute().actionGet();
@@ -202,7 +202,7 @@ public class Elastic5ClientHelper {
 	 * @param type
 	 */
 	public static void deleteIndexTypeAllDataWithProcessor(String index, String type) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery()).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setScroll(new TimeValue(60000)).setSize(10000).setExplain(false).execute().actionGet();
@@ -260,7 +260,7 @@ public class Elastic5ClientHelper {
 	 * @param id
 	 */
 	public static void deleteIndexTypeDataById(String index, String type, String id) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		DeleteResponse response = client.prepareDelete().setIndex(index)
 				.setType(type).setId(id).execute().actionGet();
 		System.out.println(response.getResult());
@@ -273,7 +273,7 @@ public class Elastic5ClientHelper {
 	 * @param query
 	 */
 	public static void deleteIndexTypeDatasByQuery(String index, String type, QueryBuilder query) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchResponse response = client.prepareSearch(index).setTypes(type).setQuery(query)
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setScroll(new TimeValue(60000))
 					.setSize(1000).setExplain(false).execute().actionGet();
@@ -305,7 +305,7 @@ public class Elastic5ClientHelper {
 	 * @return
 	 */
 	public static List<Map<String, Object>> readIndexTypeDatasByQuery(String index, String type, QueryBuilder query) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchResponse response = client.prepareSearch(index).setTypes(type).setQuery(query)
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setScroll(new TimeValue(60000))
 					.setSize(1000).setExplain(false).execute().actionGet();
@@ -334,7 +334,7 @@ public class Elastic5ClientHelper {
 	 */
 	public static List<Map<String, Object>> readIndexTypeDatasByQueryWithPagination(String index, String type, 
 			QueryBuilder query, String scrollId, int size) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchResponse response = client.prepareSearch(index).setTypes(type).setQuery(query)
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setScroll(TimeValue.timeValueMinutes(3))
 					.setSize(size).setExplain(false).execute().actionGet();
@@ -359,7 +359,7 @@ public class Elastic5ClientHelper {
 	 */
 	public static void readIndexTypeDatasWithGroup(String index, String type, String groupFieldName) {
 		String groupFieldAgg = groupFieldName + "Agg";
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
 				.size(Integer.MAX_VALUE).field(groupFieldName);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
@@ -386,7 +386,7 @@ public class Elastic5ClientHelper {
 			String subGroupFieldName) {
 		String groupFieldAgg = groupFieldName + "Agg";
 		String subGroupFieldAgg = subGroupFieldName + "Agg";
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		AggregationBuilder subTermsBuilder = AggregationBuilders.terms(subGroupFieldAgg)
 				.size(Integer.MAX_VALUE).field(subGroupFieldName);
 		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
@@ -420,7 +420,7 @@ public class Elastic5ClientHelper {
 	 * @return
 	 */
 	public static double readIndexTypeFieldValueWithAvg(String index, String type, String avgField) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		String avgName = avgField + "Avg";
 		AggregationBuilder aggregation = AggregationBuilders.avg(avgName).field(avgField);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
@@ -438,7 +438,7 @@ public class Elastic5ClientHelper {
 	 * @return
 	 */
 	public static double readIndexTypeFieldValueWithSum(String index, String type, String sumField) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		String sumName = sumField + "Sum";
 		AggregationBuilder aggregation = AggregationBuilders.sum(sumName).field(sumField);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
@@ -455,7 +455,7 @@ public class Elastic5ClientHelper {
 	 * @return
 	 */
 	public static long readIndicesTypesDatasCount(String[] indices, String types) {
-		Client client= Elastic5Client.getInstance().getClient();
+		Client client= ElasticClient.getInstance().getClient();
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch(indices).setTypes(types);
 		searchRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
 		searchRequestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
@@ -469,7 +469,7 @@ public class Elastic5ClientHelper {
 	@SuppressWarnings("unchecked")
 	public static void readIndicesTypesMappingsMetadata() {
 		try {
-			Client client= Elastic5Client.getInstance().getClient();
+			Client client= ElasticClient.getInstance().getClient();
 			IndicesAdminClient indicesAdminClient = client.admin().indices();
 			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
 			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
@@ -532,7 +532,7 @@ public class Elastic5ClientHelper {
 	 * @param text
 	 */
 	public static void analyze(String index, String text) {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		AnalyzeRequestBuilder request = new AnalyzeRequestBuilder(client, AnalyzeAction.INSTANCE, index, text);
 		request.setAnalyzer("ik");
 		List<AnalyzeToken> analyzeTokens = request.execute().actionGet().getTokens();
@@ -543,7 +543,7 @@ public class Elastic5ClientHelper {
 	}
 	
 	public static void test01() {
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("resume-v1").setTypes("resume");
 //		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 //		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("city", "成都"));
@@ -586,7 +586,7 @@ public class Elastic5ClientHelper {
 			qqNumList3.add(String.valueOf(qqNum3 + i));
 		}
 		
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		long startTime1 = System.currentTimeMillis();
 		MultiSearchRequestBuilder msrb = client.prepareMultiSearch();
 		for (int i = 0, len = qqNumList1.size(); i < len; i++) {

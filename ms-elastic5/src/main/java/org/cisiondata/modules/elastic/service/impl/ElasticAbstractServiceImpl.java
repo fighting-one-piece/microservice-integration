@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.cisiondata.modules.elastic.utils.Elastic5Client;
+import org.cisiondata.modules.elastic.utils.ElasticClient;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
@@ -23,7 +23,7 @@ import com.carrotsearch.hppc.ObjectLookupContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 
-public class Elastic5AbstractServiceImpl {
+public class ElasticAbstractServiceImpl {
 	
 	protected Logger LOG = LoggerFactory.getLogger(getClass());
 
@@ -77,7 +77,7 @@ public class Elastic5AbstractServiceImpl {
 	@SuppressWarnings("unchecked")
 	private void initESIndicesTypesAttributesCache() {
 		try {
-			IndicesAdminClient indicesAdminClient = Elastic5Client.getInstance().getClient().admin().indices();
+			IndicesAdminClient indicesAdminClient = ElasticClient.getInstance().getClient().admin().indices();
 			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
 			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
 					getMappingsResponse.getMappings();
@@ -127,7 +127,7 @@ public class Elastic5AbstractServiceImpl {
 	protected boolean indicesExists(String... indices) {
 		if (null == indices || indices.length == 0) return false;
 		IndicesExistsRequest indicesExistsRequest = new IndicesExistsRequest(indices);
-		IndicesExistsResponse indicesExistsResponse = Elastic5Client.getInstance().getClient()
+		IndicesExistsResponse indicesExistsResponse = ElasticClient.getInstance().getClient()
 				.admin().indices().exists(indicesExistsRequest).actionGet();
 		return indicesExistsResponse.isExists();
 	}

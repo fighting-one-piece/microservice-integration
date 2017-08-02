@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.elastic.utils.Elastic5Client;
+import org.cisiondata.modules.elastic.utils.ElasticClient;
 import org.cisiondata.modules.scheduler.service.IConsumeService;
 import org.cisiondata.utils.json.GsonUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -16,16 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Service("elastic5ConsumeService")
-public class Elastic5ConsumeServiceImpl implements IConsumeService {
+@Service("elasticConsumeService")
+public class ElasticConsumeServiceImpl implements IConsumeService {
 	
-	private Logger LOG = LoggerFactory.getLogger(Elastic5ConsumeServiceImpl.class);
+	private Logger LOG = LoggerFactory.getLogger(ElasticConsumeServiceImpl.class);
 	
 	@Override
 	public void handle(String message) throws RuntimeException {
 		if (StringUtils.isBlank(message)) return;
 		Map<String, Object> source = GsonUtils.fromJsonToMap(message);
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		IndexRequestBuilder irb = null;
 		String index = String.valueOf(source.remove("index"));
 		String type = String.valueOf(source.remove("type"));
@@ -45,7 +45,7 @@ public class Elastic5ConsumeServiceImpl implements IConsumeService {
 	@Override
 	public void handle(List<String> messages) throws RuntimeException {
 		if (null == messages || messages.size() == 0) return;
-		Client client = Elastic5Client.getInstance().getClient();
+		Client client = ElasticClient.getInstance().getClient();
 		BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
 		try {
 			IndexRequestBuilder irb = null;
@@ -71,8 +71,8 @@ public class Elastic5ConsumeServiceImpl implements IConsumeService {
 		if (bulkResponse.hasFailures()) {
 			LOG.error(bulkResponse.buildFailureMessage());
 		}
-		System.out.println("elastic5 insert " + messages.size() + " records finish!");
-		LOG.info("elastic5 insert {} records finish!", messages.size());
+		System.out.println("elastic insert " + messages.size() + " records finish!");
+		LOG.info("elastic insert {} records finish!", messages.size());
 	}
 	
 	private Map<String, Object> removeNotNeedSearchColumn(Map<String, Object> map) {
