@@ -12,8 +12,6 @@ public class QueryResult<Entity> implements Serializable {
 	private List<Entity> resultList = null;
 	/** 总行数*/
 	private long totalRowNum = 0;
-	/** ES Scroll Id*/
-	private String scrollId = null;
 
 	public QueryResult() {
 	}
@@ -23,25 +21,8 @@ public class QueryResult<Entity> implements Serializable {
 		this.resultList = resultList;
 	}
 
-	public QueryResult(int currentPageNum, int rowNumPerPage, List<Entity> resultList) {
-		this.totalRowNum = resultList.size();
-		this.resultList = resultList;
-
-		int firstRowNum = getFirstRowNum(currentPageNum, rowNumPerPage);
-		int lastRowNum = firstRowNum + rowNumPerPage;
-
-		List<Entity> list = new ArrayList<Entity>();
-		for (int i = firstRowNum, rowNum = resultList.size(); i < rowNum && i < lastRowNum; i++) {
-			list.add(resultList.get(i));
-		}
-		this.resultList.clear();
-		this.resultList = list;
-	}
-
 	public List<Entity> getResultList() {
-		if (resultList == null) {
-			resultList = new ArrayList<Entity>();
-		}
+		if (resultList == null) resultList = new ArrayList<Entity>();
 		return resultList;
 	}
 
@@ -65,21 +46,20 @@ public class QueryResult<Entity> implements Serializable {
 	}
 
 	public int getFirstRowNum(int currentPageNum, int rowNumPerPage) {
-		if (currentPageNum <= 1) {
-			currentPageNum = 1;
-		}
+		if (currentPageNum <= 1) currentPageNum = 1;
 		if (currentPageNum > getTotalPageNum(rowNumPerPage)) {
 			currentPageNum = getTotalPageNum(rowNumPerPage);
 		}
-		return (currentPageNum -1) * rowNumPerPage;
+		return (currentPageNum - 1) * rowNumPerPage;
 	}
 	
-	public String getScrollId() {
-		return scrollId;
+	public List<Entity> getPaginationResultList(int currentPageNum, int rowNumPerPage) {
+		if (getResultList().isEmpty()) return new ArrayList<Entity>();
+		if (currentPageNum <= 1) currentPageNum = 1;
+		int fromIndex = (currentPageNum - 1) * rowNumPerPage;
+		if (fromIndex > totalRowNum) return new ArrayList<Entity>();
+		int toIndex = (fromIndex + rowNumPerPage) > totalRowNum ? (int) totalRowNum : (fromIndex + rowNumPerPage);
+		return fromIndex <= toIndex ? resultList.subList(fromIndex, toIndex) : new ArrayList<Entity>();
 	}
-
-	public void setScrollId(String scrollId) {
-		this.scrollId = scrollId;
-	}
-
+	
 }
