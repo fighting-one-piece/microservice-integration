@@ -1,0 +1,461 @@
+{
+	"dynamic": "strict",
+	"properties": {
+		"vipId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"logisticsOrderNumber": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"taobaoLogisticsOrderNumber": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"waybillNumber": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"logisticsCompanyName": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cancelOrder": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"whetherPart": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkCityId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"originalLinkRegion": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"objectiveRegion": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cancelOrderTime": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cancelOrderReason": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cancelOrderPerson": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cancelOrderList": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"businessPlatform": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receivingClerkInformation": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"businessOperationDate": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"businessOperationsPerson": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"orderType": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"volume": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receivingPointList": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"connectSingle": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"pieceTime": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receivingClerk": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"embracePerson": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receivingPoint": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"theRecipientCompany": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"piePoint": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"serviceType": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"expressCompanyId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"shipmentWarehouse": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"taobaoOrderId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"monthlyStatement": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receiptCompany": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"site": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"carriage": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"paymentWay": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"destination": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"recipientsHome": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"logisticsState": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"senderHome": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"begainTime": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkName": {
+			"index": "not_analyzed",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkNameAlias": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkSex": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkMobilePhone": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkTelePhone": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkIdCard": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkEmail": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkProvince": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkCity": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkCounty": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkAddress": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkZipCode": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"sendCompany": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"name": {
+			"index": "not_analyzed",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"nameAlias": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"nickname": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"sex": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"mobilePhone": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"telePhone": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"province": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"city": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"county": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"address": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"provinceId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cityId": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"zipCode": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"idCard": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"email": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cardNo": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"recipientCode": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"networkCode": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"endTime": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"receiver": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"price": {
+			"type": "double"
+		},
+		"commodity": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"commodityModel": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"commodityNumber": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"expressContent": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"orderDate": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"orderTime": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"cnote": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"agencyFund": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"weight": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"despatchMember": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"linkClientCode": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"originalLinkAddress": {
+			"analyzer": "ik_smart",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"inputPerson": {
+			"index": "not_analyzed",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"sourceFile": {
+			"index": "not_analyzed",
+			"term_vector": "with_positions_offsets",
+			"type": "text"
+		},
+		"insertTime": {
+			"type": "date",
+			"format": "yyyy-MM-dd HH:mm:ss"
+		},
+		"updateTime": {
+			"type": "date",
+			"format": "yyyy-MM-dd HH:mm:ss"
+		}
+	}
+}
