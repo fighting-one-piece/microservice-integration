@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,55 +25,59 @@ public class ElasticV2AbstractServiceImpl {
 
 	/** ES INDEX */
 	protected static Set<String> indices = new HashSet<String>();
-	/** ES TYPE */
-	protected static Set<String> types = new HashSet<String>();
 	
-	/** ES INDEX TYPE 映射关系*/
-	protected static Map<String, String> index_type_mapping = new HashMap<String, String>();
-	
-	/** ES TYPE INDEX 映射关系*/
-	protected static Map<String, String> type_index_mapping = new HashMap<String, String>();
+	/** ES INDEX TYPES 映射关系*/
+	protected static Map<String, Set<String>> index_types_mapping = new HashMap<>();
 	
 	/** ES TYPE ATTRIBUTES 映射关系*/
 	protected static Map<String, Map<String, Set<String>>> type_attributes_mapping = 
 			new HashMap<String, Map<String, Set<String>>>();
 	
-	/** ES 搜索属性字段*/
-	protected static Set<String> i_attributes = new HashSet<String>();
-	protected static Set<String> ni_attributes = new HashSet<String>();
-	
-	public ElasticV2AbstractServiceImpl() {
-		initESIndicesTypesAttributesCache();
-	}
-	
 	@PostConstruct
 	public void postConstruct() {
-		initESIndicesTypesAttributesCache();
+		initESIndicesTypesAttributesCache("elastic/search_attributes_1.txt");
+		initESIndicesTypesAttributesCache("elastic/search_attributes_2.txt");
 	}
 	
-	private void initESIndicesTypesAttributesCache() {
+	protected String[] extractIndicesAndTypes(String[] qindices, String[] qtypes) {
+		List<String> resultList = new ArrayList<String>();
+		for (int i = 0, iLen = qindices.length; i < iLen; i++) {
+			String index = qindices[i];
+			if (!indices.contains(index)) continue;
+			for (int j = 0, jLen = qtypes.length; j < jLen; j++) {
+				String type = qtypes[j];
+				if (index_types_mapping.get(index).contains(type)) {
+					resultList.add(index);
+					resultList.add(type);
+				}
+			}
+		}
+		return resultList.toArray(new String[0]);
+	}
+	
+	private void initESIndicesTypesAttributesCache(String fileName) {
 		InputStream in = null;
 		BufferedReader br = null;
 		try {
-			in = ElasticV2AbstractServiceImpl.class.getClassLoader().getResourceAsStream("elastic/search_attributes.txt");
+			in = ElasticV2AbstractServiceImpl.class.getClassLoader().getResourceAsStream(fileName);
 			br = new BufferedReader(new InputStreamReader(in));
 			String line = null;
 			while (null != (line = br.readLine())) {
 				String[] columns = line.split(",");
 				String index = columns[0];
 				String type = columns[1];
-				String attribute = columns[2];
-				int identity = Integer.parseInt(columns[3]);
 				indices.add(index);
-				types.add(type);
-				if (-1 != index.indexOf("-v")) {
-					index_type_mapping.put(index, type);
+				Set<String> types = index_types_mapping.get(index);
+				if (null == types) {
+					types = new HashSet<String>();
+					index_types_mapping.put(index, types);
 				}
-				type_index_mapping.put(type, index);
-				Map<String, Set<String>> attributes = type_attributes_mapping.get(type);
+				types.add(type);
+				String itype = index + "_" + type;
+				Map<String, Set<String>> attributes = type_attributes_mapping.get(itype);
 				if (null == attributes) {
 					attributes = new HashMap<String, Set<String>>();
-					type_attributes_mapping.put(type, attributes);
+					type_attributes_mapping.put(itype, attributes);
 				}
 				Set<String> iattributes = attributes.get(I_ATTRIBUTES);
 				if (null == iattributes) {
@@ -83,17 +89,15 @@ public class ElasticV2AbstractServiceImpl {
 					niattributes = new HashSet<String>();
 					attributes.put(NI_ATTRIBUTES, niattributes);
 				}
+				String attribute = columns[2];
+				int identity = Integer.parseInt(columns[4]);
 				if (identity == 1) {
-					iattributes.add(attribute);
-					i_attributes.add(attribute);
-				} else if (identity == 2) {
 					niattributes.add(attribute);
-					ni_attributes.add(attribute);
+				} else if (identity == 2) {
+					iattributes.add(attribute);
 				} else if (identity == 3) {
 					iattributes.add(attribute);
 					niattributes.add(attribute);
-					i_attributes.add(attribute);
-					ni_attributes.add(attribute);
 				}
 			}
 		} catch (Exception e) {
@@ -105,20 +109,6 @@ public class ElasticV2AbstractServiceImpl {
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
 			}
-		}
-	}
-	
-	public static void main(String[] args) {
-		ElasticV2AbstractServiceImpl a = new ElasticV2AbstractServiceImpl();
-		a.initESIndicesTypesAttributesCache();
-		System.out.println("indices: " + indices.size());
-		System.out.println("types: " + types.size());
-		System.out.println("index_type_mapping: " + index_type_mapping);
-		System.out.println("type_index_mapping: " + type_index_mapping);
-		System.out.println("type_attributes_mapping: " + type_attributes_mapping.size());
-		for (Map.Entry<String, Map<String, Set<String>>> entry : type_attributes_mapping.entrySet()) {
-			System.err.println(entry.getKey());
-			System.err.println(entry.getValue());
 		}
 	}
 	

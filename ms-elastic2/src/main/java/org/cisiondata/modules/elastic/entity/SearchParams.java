@@ -1,5 +1,7 @@
 package org.cisiondata.modules.elastic.entity;
 
+import org.apache.commons.lang.StringUtils;
+
 public class SearchParams {
 	
 	private String indices = null;
@@ -84,10 +86,6 @@ public class SearchParams {
 		return keywords.trim().indexOf(" ") == -1 ? new String[]{keywords} : keywords.split(" ");
 	}
 	
-	public boolean hasFields() {
-		return null == fields || fields.length() == 0 ? false : true;
-	}
-	
 	public boolean isHighLight() {
 		return highLight == 0 ? false : true;
 	}
@@ -96,8 +94,16 @@ public class SearchParams {
 		return null == currentPageNum ? false : true;
 	}
 	
+	public boolean isFields() {
+		return StringUtils.isBlank(fields) ? false : true;
+	}
+	
+	public boolean isJson() {
+		return StringUtils.isNotBlank(keywords) && keywords.startsWith("{") ? true : false;
+	}
+	
 	public boolean isScroll() {
-		return null == scrollId || "".equalsIgnoreCase(scrollId) ? false : true;
+		return StringUtils.isBlank(scrollId) ? false : true;
 	}
 
 	public int getCurrentPageNum() {
@@ -108,8 +114,13 @@ public class SearchParams {
 		return null == rowNumPerPage ? 10 : rowNumPerPage;
 	}
 	
+	public String getKeywords() {
+		return keywords;
+	}
+
 	public String getScrollId() {
 		return scrollId;
 	}
+	
 
 }
