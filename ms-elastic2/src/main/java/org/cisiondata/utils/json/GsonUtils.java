@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.cisiondata.modules.elastic.entity.Condition;
 import org.cisiondata.utils.reflect.ReflectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,11 @@ public class GsonUtils {
 	
 	static {
 		gson = new GsonBuilder()
-				.serializeSpecialFloatingPointValues()
 				.setDateFormat("yyyy-MM-dd HH:mm:ss")
+				.serializeSpecialFloatingPointValues()
 				.registerTypeAdapter(new TypeToken<List<Object>>(){}.getType(), new ListDeserializer())
 				.registerTypeAdapter(new TypeToken<Map<String, Object>>(){}.getType(), new MapDeserializer())
+				.registerTypeAdapter(new TypeToken<Condition>(){}.getType(), new ConditionDeserializer())
 				.create();
 	}
 	

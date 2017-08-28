@@ -8,6 +8,7 @@ import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.elastic.service.IElasticV2Service;
 import org.cisiondata.modules.elastic.service.IElasticV3Service;
+import org.cisiondata.modules.elastic.service.IElasticV4Service;
 import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ public class ElasticController {
 	
 	@Resource(name = "elasticV3Service")
 	private IElasticV3Service elasticV3Service = null;
+	
+	@Resource(name = "elasticV4Service")
+	private IElasticV4Service elasticV4Service = null;
 	
 	@ResponseBody
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -68,6 +72,23 @@ public class ElasticController {
 		WebResult result = new WebResult();
 		try {
 			result.setData(elasticV3Service.readDataList(q));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (BusinessException be) {
+			result.setCode(be.getCode());
+			result.setFailure(be.getMessage());
+		} catch (Exception e) {
+			result.setResultCode(ResultCode.FAILURE);
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/sf/search", method = RequestMethod.GET)
+	public WebResult search(String i, String t, String q, Integer d) {
+		WebResult result = new WebResult();
+		try {
+			result.setData(elasticV4Service.readDataList(i, t, URLDecoder.decode(q, "UTF-8"), null == d ? 0 : d));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (BusinessException be) {
 			result.setCode(be.getCode());

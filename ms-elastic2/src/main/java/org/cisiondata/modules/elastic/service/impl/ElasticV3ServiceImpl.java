@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.elastic.service.IElasticV3Service;
 import org.cisiondata.modules.elastic.utils.ElasticClient;
+import org.cisiondata.utils.exception.BusinessException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -34,7 +35,7 @@ public class ElasticV3ServiceImpl extends ElasticV3AbstractServiceImpl implement
 	private static final String DIGITAL_REG = "^\\d{1,}$";
 
 	@Override
-	public QueryResult<Map<String, Object>> readDataList(String keywords) throws RuntimeException {
+	public QueryResult<Map<String, Object>> readDataList(String keywords) throws BusinessException {
 		if (StringUtils.isBlank(keywords)) throw new RuntimeException("keywords is null");
 		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
 		String[] types = defaultTypes();

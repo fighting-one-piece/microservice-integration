@@ -11,14 +11,13 @@ public final class SerializerUtils {
 
 	/**
 	 * 序列化
+	 * 
 	 * @param object
 	 * @return
 	 * @throws java.io.IOException
 	 */
 	public static byte[] write(Object object) {
-		if (null == object) {
-			return null;
-		}
+		if (null == object) return null;
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream baos = null;
 		try {
@@ -40,24 +39,23 @@ public final class SerializerUtils {
 
 	/**
 	 * 反序列化
+	 * 
 	 * @param bytes
 	 * @return
 	 * @throws java.io.IOException
 	 */
 	public static Object read(byte[] bytes) {
-		if (bytes == null) {
-			return null;
-		}
+		if (bytes == null) return null;
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 		Object object = null;
 		try {
-			 bais = new ByteArrayInputStream(bytes);
-			 ois = new ObjectInputStream(bais);
+			bais = new ByteArrayInputStream(bytes);
+			ois = new ObjectInputStream(bais);
 			object = ois.readObject();
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return null;
+			LOG.error(e.getMessage());
+			return bytes;
 		} finally {
 			try {
 				if (bais != null) bais.close();

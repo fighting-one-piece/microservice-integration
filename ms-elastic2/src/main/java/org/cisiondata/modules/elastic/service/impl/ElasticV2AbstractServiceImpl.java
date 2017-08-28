@@ -40,19 +40,30 @@ public class ElasticV2AbstractServiceImpl {
 	}
 	
 	protected String[] extractIndicesAndTypes(String[] qindices, String[] qtypes) {
-		List<String> resultList = new ArrayList<String>();
+		int qindicesLength = qindices.length, qtypesLength = qtypes.length;
+		if (qindicesLength != qtypesLength) return new String[0];
+		String[] indicesTypes = new String[qindicesLength + qtypesLength];
+		for (int i = 0, j = 0, len = qindicesLength; i < len; i++) {
+			indicesTypes[j++] = qindices[i];
+			indicesTypes[j++] = qtypes[i];
+		}
+		return indicesTypes;
+	}
+	
+	protected String[] judgeAndExtractIndicesAndTypes(String[] qindices, String[] qtypes) {
+		List<String> indicesTypes = new ArrayList<String>();
 		for (int i = 0, iLen = qindices.length; i < iLen; i++) {
 			String index = qindices[i];
 			if (!indices.contains(index)) continue;
 			for (int j = 0, jLen = qtypes.length; j < jLen; j++) {
 				String type = qtypes[j];
 				if (index_types_mapping.get(index).contains(type)) {
-					resultList.add(index);
-					resultList.add(type);
+					indicesTypes.add(index);
+					indicesTypes.add(type);
 				}
 			}
 		}
-		return resultList.toArray(new String[0]);
+		return indicesTypes.toArray(new String[0]);
 	}
 	
 	private void initESIndicesTypesAttributesCache(String fileName) {

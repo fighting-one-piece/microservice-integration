@@ -57,8 +57,9 @@ public class QueryResult<Entity> implements Serializable {
 		if (getResultList().isEmpty()) return new ArrayList<Entity>();
 		if (currentPageNum <= 1) currentPageNum = 1;
 		int fromIndex = (currentPageNum - 1) * rowNumPerPage;
-		if (fromIndex > totalRowNum) return new ArrayList<Entity>();
-		int toIndex = (fromIndex + rowNumPerPage) > totalRowNum ? (int) totalRowNum : (fromIndex + rowNumPerPage);
+		long lastRowNum = Math.min(totalRowNum, resultList.size());
+		if (fromIndex > lastRowNum) return new ArrayList<Entity>();
+		int toIndex = (fromIndex + rowNumPerPage) > lastRowNum ? (int) lastRowNum : (fromIndex + rowNumPerPage);
 		return fromIndex <= toIndex ? resultList.subList(fromIndex, toIndex) : new ArrayList<Entity>();
 	}
 	
