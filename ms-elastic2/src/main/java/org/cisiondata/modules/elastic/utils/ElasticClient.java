@@ -27,12 +27,12 @@ public class ElasticClient {
 		initClient();
 	}
 	
-	private static class ESClientHolder {
+	private static class ElasticClientHolder {
 		private static final ElasticClient INSTANCE = new ElasticClient();
 	}
 	
 	public static final ElasticClient getInstance() {
-		return ESClientHolder.INSTANCE;
+		return ElasticClientHolder.INSTANCE;
 	}
 	
 	public Client getClient() {

@@ -12,7 +12,7 @@ import org.wltea.analyzer.core.Lexeme;
 
 public class IKTokenizer extends Tokenizer {
 
-	private IKSegmenter _IKImplement;
+	private IKSegmenter _IKImplement = null;
 
 	private final CharTermAttribute termAtt;
 	

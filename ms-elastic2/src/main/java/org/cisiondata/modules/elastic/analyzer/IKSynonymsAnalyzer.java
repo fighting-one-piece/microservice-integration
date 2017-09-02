@@ -43,5 +43,4 @@ public class IKSynonymsAnalyzer extends Analyzer {
 		return new TokenStreamComponents(tokenizer, factory.create(tokenizer));  
 	} 
 	
-
 }
