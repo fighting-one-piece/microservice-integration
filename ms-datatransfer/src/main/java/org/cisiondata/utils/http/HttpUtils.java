@@ -76,9 +76,9 @@ public class HttpUtils {
      * @param params 请求参数
      * @return URL 所代表远程资源的响应结果
      */
-    public static String sendGet(String url, Map<String, Object> params, String... headers) {
+    public static String sendGet(String url, Map<String, ?> params, String... headers) {
     	StringBuffer sb = new StringBuffer();
-		for (Map.Entry<String, Object> entry : params.entrySet()) {
+		for (Map.Entry<String, ?> entry : params.entrySet()) {
 			sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
 		}
 		if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);

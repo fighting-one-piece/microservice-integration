@@ -25,7 +25,9 @@ public class TEventHandler implements EventHandler {
 			Kind<?> kind = event.getEventKind();
 			if (kind.equals(StandardWatchEventKinds.ENTRY_CREATE)) {
 				File file = event.getPath().toFile();
-				parserService.parse(file);
+				if (file.getName().endsWith(".xml")) {
+					parserService.parse(file);
+				}
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

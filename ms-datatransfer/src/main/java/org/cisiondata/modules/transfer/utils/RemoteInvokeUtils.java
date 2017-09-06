@@ -15,9 +15,8 @@ public class RemoteInvokeUtils {
 	
 	private static final String LOGISTICS_URL = PREFIX + "labels/indices/financial/types/logistics?query=%s&scrollId=%s&rowNumPerPage=%s&accessId=%s&token=%s";
 	
-	public void readLogisticsDataList() {
-		
-		
+	public static String readLogisticsDataList() {
+		return null;
 	}
 	
 	public static void main(String[] args) {

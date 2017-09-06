@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<XmlSet QUERY="[(${query})]" TOTALROWNUM="[[${totalRowNum}]]" >
+${query}
+#{query}
+[[${query}]]
+[# th:text="${query}"]
+[(${query})]
+</XmlSet>

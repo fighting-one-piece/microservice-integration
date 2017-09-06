@@ -84,7 +84,6 @@ public class FsWatcher {
 						List<WatchEvent<?>> events = watchKey.pollEvents();
 						for (WatchEvent<?> event : events) {
 							String fpath = path.toString() + File.separator + ((Path) event.context()).toString();
-							System.err.println("fpath: " + fpath);
 							PathEvent pathEvent = new PathEvent(Paths.get(fpath), event.kind());
 							eventBus.post(pathEvent);
 						}

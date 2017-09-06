@@ -56,14 +56,13 @@ public class TempTest {
 
 	@Test
 	public void t3() throws Exception {
-		InputStream in = new FileInputStream(new File("F:\\document\\doc\\201708\\1\\t.xml"));
+		InputStream in = new FileInputStream(new File("F:\\a.xml"));
 		SAXReader reader = new SAXReader(false);
 		Document document = reader.read(in);
 		OutputFormat format = OutputFormat.createPrettyPrint();
 		format.setEncoding("UTF-8");
 		XMLWriter writer = new XMLWriter(new OutputStreamWriter(
-				new FileOutputStream(new File("F:\\document\\doc\\201708\\1\\to.xml")), "UTF-8"),
-				format);
+				new FileOutputStream(new File("F:\\b.xml")), "UTF-8"), format);
 		writer.write(document);
 		writer.close();
 	}
