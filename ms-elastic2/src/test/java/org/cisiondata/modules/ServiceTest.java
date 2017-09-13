@@ -20,7 +20,7 @@ public class ServiceTest {
 	
 	@Resource(name = "elasticV2Service")
 	private IElasticV2Service elasticV2Service = null;
-
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void t1() {

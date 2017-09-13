@@ -22,10 +22,13 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptService.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
@@ -108,6 +111,12 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
 					.prepareSearch(index).setTypes(type);
 			Set<String> attributes = new HashSet<String>();
+			/**
+			ScoreFunctionBuilder scoreFunctionBuilder = 
+					ScoreFunctionBuilders.fieldValueFactorFunction("expressId");
+			searchRequestBuilder.setQuery(QueryBuilders.functionScoreQuery(
+					buildQuery(params.getKeywords(), attributes), scoreFunctionBuilder));
+			*/
 			searchRequestBuilder.setQuery(buildQuery(params.getKeywords(), attributes));
 			searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
 			searchRequestBuilder.setSize(200);
@@ -115,6 +124,7 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			if (params.isHighLight()) buildHighLight(searchRequestBuilder, attributes);
 			return buildQueryResult(searchRequestBuilder, params);
 		} catch (Exception e) {
+			LOG.error("index: {} type: {} query: {}", index, type, params.getKeywords());
 			LOG.error(e.getMessage(), e);
 		}
 		return new QueryResult<Map<String, Object>>();
@@ -126,14 +136,34 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			if (attributes.size() == 0) return new QueryResult<Map<String, Object>>();
 			SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
 					.prepareSearch(index).setTypes(type);
+//			ScoreFunctionBuilder scoreFunctionBuilder = 
+//					ScoreFunctionBuilders.fieldValueFactorFunction("expressId");
+//			ScoreFunctionBuilders.fieldValueFactorFunction("").factor(2).modifier(Modifier.LOG2P).missing(0);
+//		    String inlineScript = "diff= Date.parse(doc['updateTime'].value).getTime();"  
+//					  + "return (diff/ System.currentTimeMillis())";  
+		    String inlineScript = "c46 = (null == _source.c46 ? \"1970-01-01 12:00:00\" : _source.c46); println doc['n1'].value + \" : \" + c46;"
+		    		+ "d = Date.parse(\"yyyy-MM-dd HH:mm:ss\", c46).getTime();"  
+		    		+ "return _score.doubleValue()*(d/new Date().time)";  
+//		    String inlineScript = "diff = Long.parseLong(doc['expressId'].value != null ? doc['expressId'].value : 1);"  
+//		    		+ "println diff/1000 + \" - \" + _score.doubleValue() * diff / 1000; return diff / 1000 * _score.doubleValue()";  
+			Map<String, Object> sparams = new HashMap<>();  
+			Script script = new Script(inlineScript, ScriptType.INLINE, "groovy", sparams);  
+			ScoreFunctionBuilder scoreFunctionBuilder = ScoreFunctionBuilders.scriptFunction(script);  
+			searchRequestBuilder.setQuery(QueryBuilders.functionScoreQuery(
+					buildBoolQuery(params.keywords(), attributes), scoreFunctionBuilder));
+			/**
 			searchRequestBuilder.setQuery(buildBoolQuery(params.keywords(), attributes));
+			*/
 			searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+			/**
 			searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
+			*/
 			searchRequestBuilder.setSize(200);
 			searchRequestBuilder.setExplain(false);
 			if (params.isHighLight()) buildHighLight(searchRequestBuilder, attributes);
 			return buildQueryResult(searchRequestBuilder, params);
 		} catch (Exception e) {
+			LOG.error("index: {} type: {} query: {}", index, type, params.getKeywords());
 			LOG.error(e.getMessage(), e);
 		}
 		return new QueryResult<Map<String, Object>>();
@@ -298,6 +328,8 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 		for (int i = 0, len = hits.length; i < len; i++) {
 			SearchHit hit = hits[i];
 			source = hit.getSource();
+			source.put("score", hit.getScore());
+			for (Object obj : hit.getSortValues()) System.err.println("sv: " + obj);
 			if (params.isHighLight()) wrapperHighLight(source, hit.getHighlightFields());
 			qr.getResultList().add(source);
 		}
