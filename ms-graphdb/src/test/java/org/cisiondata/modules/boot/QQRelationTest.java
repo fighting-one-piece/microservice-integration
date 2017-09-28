@@ -10,7 +10,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
 import org.cisiondata.modules.qqrelation.service.IQQGraphService;
-import org.cisiondata.modules.qqrelation.service.impl.QQGraphServiceImpl;
+import org.cisiondata.modules.qqrelation.service.impl.QQGraphV1ServiceImpl;
+import org.cisiondata.modules.qqrelation.service.impl.QQGraphV2ServiceImpl;
 import org.cisiondata.modules.qqrelation.utils.ESClient;
 import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.http.HttpUtils;
@@ -65,7 +66,7 @@ public class QQRelationTest {
 		map.put("ipAddress", "浙江省金华市电信");
 		map.put("_id", "f14d3c672cf40a52ff1748bbea98a3e5");
 		String nodeJSON = GsonUtils.fromMapToJson(map);
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
+		IQQGraphService qqRelationService = new QQGraphV1ServiceImpl();
 		qqRelationService.insertQQNode(nodeJSON);
 	}
 	
@@ -83,14 +84,22 @@ public class QQRelationTest {
 		}
 	}
 	
-	public static void t4() throws IOException {
-		List<String> lines = FileUtils.readLines(new File("F:\\document\\doc\\201704\\qqdata10000"));
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
-		qqRelationService.insertQQNodes(lines);
-//		for (String line : lines) {
-//			IQQGraphService qqRelationService = new QQGraphServiceImpl();
-//			qqRelationService.insertQQNode(line);
-//		}
+	@Test
+	public void t4_1() throws IOException {
+		QQGraphV2ServiceImpl qqGraphService = new QQGraphV2ServiceImpl();
+		List<String> lines0 = FileUtils.readLines(new File("F:\\result\\Desktop\\qq.txt"));
+		qqGraphService.insertQQNodes(lines0);
+		List<String> lines1 = FileUtils.readLines(new File("F:\\result\\Desktop\\qun.txt"));
+		qqGraphService.insertQQQunNodes(lines1);
+		TitanUtils.getInstance().closeGraph();
+	}
+	
+	@Test
+	public void t4_2() throws IOException {
+		QQGraphV2ServiceImpl qqGraphService = new QQGraphV2ServiceImpl();
+		List<String> lines2 = FileUtils.readLines(new File("F:\\result\\Desktop\\qqqun.txt"));
+		qqGraphService.insertQQQunRelations(lines2);
+		TitanUtils.getInstance().closeGraph();
 	}
 	
 	public static void t5() throws InterruptedException, ExecutionException {
@@ -118,17 +127,25 @@ public class QQRelationTest {
 	
 	@Test
 	public void t6() {
+		IQQGraphService qqRelationService = new QQGraphV2ServiceImpl();
 		long start = System.currentTimeMillis();
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
-		List<Map<String, Object>> qqNodes = qqRelationService.readQQNodeDataList("1002754876");
+		List<Map<String, Object>> qqNodes = qqRelationService.readQQNodeDataList("10024041");
 		qqNodes.forEach(qq -> System.out.println(qq));
 		System.out.println("spend time " + (System.currentTimeMillis() - start)/1000 + " s");
 		TitanUtils.getInstance().closeGraph();
 	}
 	
-	public static void main(String[] args) throws Exception {
-//		t4();
+	@Test
+	public void t7() {
+		IQQGraphService qqRelationService = new QQGraphV2ServiceImpl();
+		long start = System.currentTimeMillis();
+		List<Map<String, Object>> qunNodes = qqRelationService.readQunNodeDataList("11112201");
+		System.out.println("spend time " + (System.currentTimeMillis() - start)/1000 + " s");
+		qunNodes.forEach(qun -> System.out.println(qun));
 		TitanUtils.getInstance().closeGraph();
+	}
+	
+	public static void main(String[] args) throws Exception {
 	}
 
 }

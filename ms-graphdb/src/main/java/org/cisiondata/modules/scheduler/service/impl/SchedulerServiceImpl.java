@@ -36,7 +36,6 @@ public class SchedulerServiceImpl implements ISchedulerService {
 			scheduler = new ConsumerScheduler("qqrelation", 6, 1000, qqRelationNodeConsumeService);
 		}
 		scheduler.startup();
-//		new Thread(scheduler).start();
 		schedulers.put(topic, scheduler);
 	}
 

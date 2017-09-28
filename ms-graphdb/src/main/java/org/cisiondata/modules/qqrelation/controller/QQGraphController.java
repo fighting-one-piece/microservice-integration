@@ -18,7 +18,7 @@ public class QQGraphController {
 	
 	private Logger LOG = LoggerFactory.getLogger(QQGraphController.class);
 
-	@Resource(name = "qqGraphService")
+	@Resource(name = "qqGraphV2Service")
 	private IQQGraphService qqGraphService = null;
 	
 	@ResponseBody

@@ -1,4 +1,4 @@
-package org.cisiondata.modules.qqrelation.service;
+package org.cisiondata.modules.qqrelation.utils;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;

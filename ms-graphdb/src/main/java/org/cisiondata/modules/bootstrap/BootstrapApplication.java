@@ -30,7 +30,7 @@ public class BootstrapApplication {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(BootstrapApplication.class, args);
-		LOG.info("Server Bootstrap");
+		LOG.info("QQGraph Server Bootstrap");
 	}
 	
 }
