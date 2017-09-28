@@ -33,10 +33,15 @@ public class ElasticV2AbstractServiceImpl {
 	protected static Map<String, Map<String, Set<String>>> type_attributes_mapping = 
 			new HashMap<String, Map<String, Set<String>>>();
 	
+	protected static Map<String, String> type_time_mapping = new HashMap<>();
+	
 	@PostConstruct
 	public void postConstruct() {
 		initESIndicesTypesAttributesCache("elastic/search_attributes_1.txt");
 		initESIndicesTypesAttributesCache("elastic/search_attributes_2.txt");
+		/**
+		initESTypeTimeMapping();
+		**/
 	}
 	
 	protected String[] extractIndicesAndTypes(String[] qindices, String[] qtypes) {
@@ -64,6 +69,10 @@ public class ElasticV2AbstractServiceImpl {
 			}
 		}
 		return indicesTypes.toArray(new String[0]);
+	}
+	
+	protected String getTypeTimeField(String type) {
+		return type_time_mapping.get(type);
 	}
 	
 	private void initESIndicesTypesAttributesCache(String fileName) {
@@ -121,6 +130,27 @@ public class ElasticV2AbstractServiceImpl {
 				LOG.error(e.getMessage(), e);
 			}
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void initESTypeTimeMapping() {
+		type_time_mapping.put("house", "c10");
+		type_time_mapping.put("car", "d18,d9");
+		type_time_mapping.put("contact", "d6");
+		type_time_mapping.put("telecom", "c15");
+		type_time_mapping.put("cybercafe", "d13");
+		type_time_mapping.put("finance", "c10,c9");
+		type_time_mapping.put("hotel", "c105,c111");
+		type_time_mapping.put("bocai", "d19,c8,c9");
+		type_time_mapping.put("qqdata", "loginTime");
+		type_time_mapping.put("socialsecurity", "c9");
+		type_time_mapping.put("oldweakyoung", "d5,d6");
+		type_time_mapping.put("qqqundata", "createDate");
+		type_time_mapping.put("resume", "d15,d2,c13,c46");
+		type_time_mapping.put("accumulationfund", "d12,d11");
+		type_time_mapping.put("humanresources", "c8,c17,c13");
+		type_time_mapping.put("business", "setupDate,openDate");
+		type_time_mapping.put("logistics", "orderDate,orderTime,begainTime,endTime");
 	}
 	
 }

@@ -12,6 +12,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.shield.ShieldPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +67,8 @@ public class ElasticClient {
 				esServerAddress.add(new EsServerAddress(ipAndPort[0], Integer.parseInt(ipAndPort[1])));
 			}
 			Settings settings = Settings.builder().put("cluster.name", clusterName)
-					.put("client.transport.sniff", true).build();
-			client = TransportClient.builder().settings(settings).build();
+					.put("shield.user","guest:@#guest123").put("client.transport.sniff", true).build();
+			client = TransportClient.builder().addPlugin(ShieldPlugin.class).settings(settings).build();
 			for (EsServerAddress address : esServerAddress) {
 				client.addTransportAddress(new InetSocketTransportAddress(
 					new InetSocketAddress(address.getHost(), address.getPort())));
