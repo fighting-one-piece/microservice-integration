@@ -1,6 +1,7 @@
 package org.cisiondata.modules.qqrelation.service.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,11 +26,14 @@ import org.springframework.stereotype.Service;
 import com.thinkaurelius.titan.core.TitanEdge;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
+import com.thinkaurelius.titan.core.TitanVertex;
 
 @Service("qqGraphV2Service")
 public class QQGraphV2ServiceImpl implements IQQGraphService {
 	
 	private Logger LOG = LoggerFactory.getLogger(QQGraphV2ServiceImpl.class);
+	
+	private static final boolean INDEX_QUERY = true;
 	
 	/**
 	 * i4 QQ号 i6 邮箱 i60 邮箱密码 i61 QQ密码 c1 年龄 c3 性别
@@ -56,7 +60,11 @@ public class QQGraphV2ServiceImpl implements IQQGraphService {
 	private static final String QUN_TYPE = "o35";
 	private static final String QUN_CT = "d21";
 	
+	private static final String QQNUM_QUERY = "v.i4:%s";
+	private static final String QUNNUM_QUERY = "v.i50:%s";
 	private static final String NICKNAME_QUERY = "e.o23:(%s)";
+	private static final String QUNNAME_QUERY = "v.o46:(%s)";
+	private static final String QUNDESC_QUERY = "v.o34:(%s)";
 	
 	private static Set<String> QQ_KEYS = new HashSet<String>();
 	private static Set<String> QUN_KEYS = new HashSet<String>();
@@ -248,6 +256,62 @@ public class QQGraphV2ServiceImpl implements IQQGraphService {
 	
 	@Override
 	public List<Map<String, Object>> readQQNodeDataList(String qqNum) throws BusinessException {
+		return INDEX_QUERY ? readIndexedQQNodeDataList(qqNum) : readNoIndexedQQNodeDataList(qqNum);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readQQNodeDataListByNickname(String nickname) throws BusinessException {
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanEdge>> iterator = graph.indexQuery("relationedge", String.format(
+			NICKNAME_QUERY, nickname)).offset(0).limit(100).edges().iterator();
+		while (iterator.hasNext()) {
+			Result<TitanEdge> result = iterator.next();
+			TitanEdge edge = result.getElement();
+			Iterator<Property<Object>> edgeProperties = edge.properties();
+			Map<String, Object> finalResult = new HashMap<String, Object>();
+			while (edgeProperties.hasNext()) {
+				Property<Object> ep = edgeProperties.next();
+				finalResult.put(ep.key(), ep.value());
+			}
+			Iterator<Vertex> vertices = edge.bothVertices();
+			while (vertices.hasNext()) {
+				Iterator<VertexProperty<Object>> inVertexProperties = vertices.next().properties();
+				while (inVertexProperties.hasNext()) {
+					VertexProperty<Object> ivp = inVertexProperties.next();
+					finalResult.put(ivp.key(), ivp.value());
+				}
+			}
+			finalResult.put("score", result.getScore());
+			resultList.add(finalResult);
+		}
+		return resultList;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readQunNodeDataList(String qunNum) throws BusinessException {
+		return INDEX_QUERY ? readIndexedQunNodeDataList(qunNum) : readNoIndexedQunNodeDataList(qunNum);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataList(String keyword) throws BusinessException {
+		List<Map<String, Object>> r1 = readEdgeDataList("relationedge", String.format(NICKNAME_QUERY, keyword));
+		List<Map<String, Object>> r2 = readQunDataList("qunvertex", String.format(QUNNAME_QUERY, keyword));
+		List<Map<String, Object>> r3 = readQunDataList("qunvertex", String.format(QUNDESC_QUERY, keyword));
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		if (r1.size() > 0) resultList.addAll(r1);
+		if (r2.size() > 0) resultList.addAll(r2);
+		if (r3.size() > 0) resultList.addAll(r3);
+		resultList.sort(new Comparator<Map<String, Object>>() {
+			@Override
+			public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+				return -((Double) o1.get("score")).compareTo((Double) o2.get("score"));
+			}
+		});
+		return resultList;
+	}
+	
+	private List<Map<String, Object>> readNoIndexedQQNodeDataList(String qqNum) throws BusinessException {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		TitanGraph graph = TitanUtils.getInstance().getGraph();
 		GraphTraversal<Vertex, Vertex> gt = graph.traversal().V().has(QQ_NUM, qqNum);
@@ -282,37 +346,45 @@ public class QQGraphV2ServiceImpl implements IQQGraphService {
 		return resultList;
 	}
 	
-	@Override
-	public List<Map<String, Object>> readQQNodeDataListByNickname(String nickname) throws BusinessException {
+	private List<Map<String, Object>> readIndexedQQNodeDataList(String qqNum) throws BusinessException {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		TitanGraph graph = TitanUtils.getInstance().getGraph();
-		Iterator<Result<TitanEdge>> iterator = graph.indexQuery("relationedge", String.format(
-			NICKNAME_QUERY, nickname)).offset(0).limit(50).edges().iterator();
+		Iterator<Result<TitanVertex>> iterator = graph.indexQuery("qqvertex", 
+			String.format(QQNUM_QUERY, qqNum)).vertices().iterator();
 		while (iterator.hasNext()) {
-			Result<TitanEdge> result = iterator.next();
-			TitanEdge edge = result.getElement();
-			Iterator<Property<Object>> edgeProperties = edge.properties();
-			Map<String, Object> finalResult = new HashMap<String, Object>();
-			while (edgeProperties.hasNext()) {
-				Property<Object> ep = edgeProperties.next();
-				finalResult.put(ep.key(), ep.value());
+        	Map<String, Object> finalResult = new HashMap<String, Object>();
+        	Result<TitanVertex> result = iterator.next();
+        	TitanVertex vertex = result.getElement();
+			Iterator<VertexProperty<Object>> vertexProperties = vertex.properties();
+			while (vertexProperties.hasNext()) {
+				VertexProperty<Object> vp = vertexProperties.next();
+				finalResult.put(vp.key(), vp.value());
 			}
-			Iterator<Vertex> vertices = edge.bothVertices();
-			while (vertices.hasNext()) {
-				Iterator<VertexProperty<Object>> inVertexProperties = vertices.next().properties();
-				while (inVertexProperties.hasNext()) {
-					VertexProperty<Object> ivp = inVertexProperties.next();
-					finalResult.put(ivp.key(), ivp.value());
+			List<Map<String, Object>> qunResultList = new ArrayList<Map<String, Object>>();
+			Iterator<Edge> edgeIterator = vertex.edges(Direction.IN);
+			while (edgeIterator.hasNext()) {
+				Map<String, Object> qunResult = new HashMap<String, Object>();
+				Edge edge = edgeIterator.next();
+				Iterator<Property<Object>> edgeProperties = edge.properties();
+				while (edgeProperties.hasNext()) {
+					Property<Object> ep = edgeProperties.next();
+					qunResult.put(ep.key(), ep.value());
 				}
+				Iterator<VertexProperty<Object>> outVertexProperties = edge.outVertex().properties();
+				while (outVertexProperties.hasNext()) {
+					VertexProperty<Object> ivp = outVertexProperties.next();
+					qunResult.put(ivp.key(), ivp.value());
+				}
+				qunResultList.add(qunResult);
 			}
+			finalResult.put("quns", qunResultList);
 			finalResult.put("score", result.getScore());
 			resultList.add(finalResult);
-		}
+        }
 		return resultList;
 	}
 	
-	@Override
-	public List<Map<String, Object>> readQunNodeDataList(String qunNum) throws BusinessException {
+	private List<Map<String, Object>> readNoIndexedQunNodeDataList(String qunNum) throws BusinessException {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		TitanGraph graph = TitanUtils.getInstance().getGraph();
 		GraphTraversal<Vertex, Vertex> gt = graph.traversal().V().has(QUN_NUM, qunNum);
@@ -344,6 +416,110 @@ public class QQGraphV2ServiceImpl implements IQQGraphService {
 			result.put("qqs:", qqResultList);
 			resultList.add(result);
         }
+		return resultList;
+	}
+	
+	private List<Map<String, Object>> readIndexedQunNodeDataList(String qunNum) throws BusinessException {
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanVertex>> iterator = graph.indexQuery("qunvertex", 
+			String.format(QUNNUM_QUERY, qunNum)).vertices().iterator();
+		while (iterator.hasNext()) {
+        	Map<String, Object> finalResult = new HashMap<String, Object>();
+        	Result<TitanVertex> result = iterator.next();
+        	TitanVertex vertex = result.getElement();
+			Iterator<VertexProperty<Object>> vertexProperties = vertex.properties();
+			while (vertexProperties.hasNext()) {
+				VertexProperty<Object> vp = vertexProperties.next();
+				finalResult.put(vp.key(), vp.value());
+			}
+			Iterator<Edge> edgeIterator = vertex.edges(Direction.OUT);
+			List<Map<String, Object>> qqResultList = new ArrayList<Map<String, Object>>();
+			while (edgeIterator.hasNext()) {
+				Map<String, Object> qqResult = new HashMap<String, Object>();
+				Edge edge = edgeIterator.next();
+				Iterator<Property<Object>> edgeProperties = edge.properties();
+				while (edgeProperties.hasNext()) {
+					Property<Object> ep = edgeProperties.next();
+					qqResult.put(ep.key(), ep.value());
+				}
+				Iterator<VertexProperty<Object>> inVertexProperties = edge.inVertex().properties();
+				while (inVertexProperties.hasNext()) {
+					VertexProperty<Object> ivp = inVertexProperties.next();
+					qqResult.put(ivp.key(), ivp.value());
+				}
+				qqResultList.add(qqResult);
+			}
+			finalResult.put("qqs:", qqResultList);
+			finalResult.put("score", result.getScore());
+			resultList.add(finalResult);
+        }
+		return resultList;
+	}
+	
+	private List<Map<String, Object>> readQunDataList(String indexName, String query) throws BusinessException {
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanVertex>> iterator = graph.indexQuery(indexName, query)
+			.offset(0).limit(50).vertices().iterator();
+		while (iterator.hasNext()) {
+        	Map<String, Object> finalResult = new HashMap<String, Object>();
+        	Result<TitanVertex> result = iterator.next();
+        	TitanVertex vertex = result.getElement();
+			Iterator<VertexProperty<Object>> vertexProperties = vertex.properties();
+			while (vertexProperties.hasNext()) {
+				VertexProperty<Object> vp = vertexProperties.next();
+				finalResult.put(vp.key(), vp.value());
+			}
+			Iterator<Edge> edgeIterator = vertex.edges(Direction.OUT);
+			List<Map<String, Object>> qqResultList = new ArrayList<Map<String, Object>>();
+			while (edgeIterator.hasNext()) {
+				Map<String, Object> qqResult = new HashMap<String, Object>();
+				Edge edge = edgeIterator.next();
+				Iterator<Property<Object>> edgeProperties = edge.properties();
+				while (edgeProperties.hasNext()) {
+					Property<Object> ep = edgeProperties.next();
+					qqResult.put(ep.key(), ep.value());
+				}
+				Iterator<VertexProperty<Object>> inVertexProperties = edge.inVertex().properties();
+				while (inVertexProperties.hasNext()) {
+					VertexProperty<Object> ivp = inVertexProperties.next();
+					qqResult.put(ivp.key(), ivp.value());
+				}
+				qqResultList.add(qqResult);
+			}
+			finalResult.put("qqs:", qqResultList);
+			finalResult.put("score", result.getScore());
+			resultList.add(finalResult);
+        }
+		return resultList;
+	}
+	
+	private List<Map<String, Object>> readEdgeDataList(String indexName, String query) throws BusinessException {
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanEdge>> iterator = graph.indexQuery(indexName, query)
+			.offset(0).limit(50).edges().iterator();
+		while (iterator.hasNext()) {
+			Result<TitanEdge> result = iterator.next();
+			TitanEdge edge = result.getElement();
+			Iterator<Property<Object>> edgeProperties = edge.properties();
+			Map<String, Object> finalResult = new HashMap<String, Object>();
+			while (edgeProperties.hasNext()) {
+				Property<Object> ep = edgeProperties.next();
+				finalResult.put(ep.key(), ep.value());
+			}
+			Iterator<Vertex> vertices = edge.bothVertices();
+			while (vertices.hasNext()) {
+				Iterator<VertexProperty<Object>> inVertexProperties = vertices.next().properties();
+				while (inVertexProperties.hasNext()) {
+					VertexProperty<Object> ivp = inVertexProperties.next();
+					finalResult.put(ivp.key(), ivp.value());
+				}
+			}
+			finalResult.put("score", result.getScore());
+			resultList.add(finalResult);
+		}
 		return resultList;
 	}
 	

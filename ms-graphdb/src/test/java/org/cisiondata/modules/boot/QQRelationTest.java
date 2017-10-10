@@ -4,11 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.structure.Property;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.cisiondata.modules.qqrelation.service.IQQGraphService;
 import org.cisiondata.modules.qqrelation.service.impl.QQGraphV1ServiceImpl;
 import org.cisiondata.modules.qqrelation.service.impl.QQGraphV2ServiceImpl;
@@ -26,6 +31,10 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.junit.Test;
+
+import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
+import com.thinkaurelius.titan.core.TitanVertex;
 
 public class QQRelationTest {
 	
@@ -145,7 +154,37 @@ public class QQRelationTest {
 		TitanUtils.getInstance().closeGraph();
 	}
 	
-	public static void main(String[] args) throws Exception {
+	@Test
+	public void t8() {
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		GraphTraversal<Vertex, Vertex> gt = graph.traversal().V().has("o46", "疯狂ING2");
+		while (gt.hasNext()) {
+        	Map<String, Object> result = new HashMap<String, Object>();
+			Vertex vertex = gt.next();
+			Iterator<VertexProperty<Object>> vertexProperties = vertex.properties();
+			while (vertexProperties.hasNext()) {
+				VertexProperty<Object> vp = vertexProperties.next();
+				result.put(vp.key(), vp.value());
+			}
+			System.err.println(result);
+        }
+	}
+	
+	@Test
+	public void t9() {
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanVertex>> iterator = graph.indexQuery("qunvertex", "v.o34:(娱乐)").offset(0).limit(50).vertices().iterator();
+		while (iterator.hasNext()) {
+			Result<TitanVertex> result = iterator.next();
+			TitanVertex vertex = result.getElement();
+			Iterator<VertexProperty<Object>> edgeProperties = vertex.properties();
+			Map<String, Object> finalResult = new HashMap<String, Object>();
+			while (edgeProperties.hasNext()) {
+				Property<Object> ep = edgeProperties.next();
+				finalResult.put(ep.key(), ep.value());
+			}
+			System.err.println(finalResult);
+		}
 	}
 
 }

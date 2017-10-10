@@ -28,12 +28,12 @@ public class SchedulerServiceImpl implements ISchedulerService {
 	@Override
 	public void startupScheduler(String topic) throws BusinessException {
 		ConsumerScheduler scheduler = null;
-		if ("qqnode".equalsIgnoreCase(topic)) {
-			scheduler = new ConsumerScheduler("qqnode", 6, 1000, qqNodeConsumeService);
-		} else if ("qunnode".equalsIgnoreCase(topic)) {
-			scheduler = new ConsumerScheduler("qunnode", 6, 1000, qunNodeConsumeService);
-		} else if ("qqrelation".equalsIgnoreCase(topic)) {
-			scheduler = new ConsumerScheduler("qqrelation", 6, 1000, qqRelationNodeConsumeService);
+		if ("qq".equalsIgnoreCase(topic)) {
+			scheduler = new ConsumerScheduler("qq", 6, 1, qqNodeConsumeService);
+		} else if ("qun".equalsIgnoreCase(topic)) {
+			scheduler = new ConsumerScheduler("qun", 6, 1, qunNodeConsumeService);
+		} else if ("qqqun".equalsIgnoreCase(topic)) {
+			scheduler = new ConsumerScheduler("qqqun", 6, 1, qqRelationNodeConsumeService);
 		}
 		scheduler.startup();
 		schedulers.put(topic, scheduler);

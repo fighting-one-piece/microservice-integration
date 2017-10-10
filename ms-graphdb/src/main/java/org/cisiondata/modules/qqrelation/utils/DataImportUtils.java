@@ -19,8 +19,10 @@ public class DataImportUtils {
 	
 	public static void produce(List<String> messages) {
 		Properties properties = new Properties();  
-//        properties.put("bootstrap.servers", "192.168.0.115:9092");  
+        properties.put("bootstrap.servers", "192.168.0.124:9092");  
+        /**
         properties.put("bootstrap.servers", "192.168.0.15:9092,192.168.0.16:9092,192.168.0.17:9092");  
+        **/
         properties.put("producer.type", "sync");  
         properties.put("request.required.acks", "1");  
         properties.put("serializer.class", "kafka.serializer.DefaultEncoder");  
@@ -43,8 +45,10 @@ public class DataImportUtils {
 	
 	public static void produce(List<String> messages, String topic, int partitions) {
 		Properties properties = new Properties();  
-//        properties.put("bootstrap.servers", "192.168.0.115:9092");  
+        properties.put("bootstrap.servers", "192.168.0.124:9092");  
+        /**
         properties.put("bootstrap.servers", "192.168.0.15:9092,192.168.0.16:9092,192.168.0.17:9092");  
+        **/
         properties.put("producer.type", "sync");  
         properties.put("request.required.acks", "1");  
         properties.put("serializer.class", "kafka.serializer.DefaultEncoder");  
@@ -53,7 +57,8 @@ public class DataImportUtils {
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
         for (int i = 0, len = messages.size(); i < len; i++) {
         	String message = messages.get(i);
-        	producer.send(new ProducerRecord<String, String>(topic, i % partitions, "" + i, message), new Callback() {
+        	producer.send(new ProducerRecord<String, String>(topic, partitions == 1 ? 0 : 
+        		i % partitions, "" + i, message), new Callback() {
         		
         		@Override
         		public void onCompletion(RecordMetadata metadata, Exception exception) {
@@ -67,28 +72,8 @@ public class DataImportUtils {
 	
 	public static void insertKafkaDatas() {
 		try {
-//			List<String> lines = FileUtils.readFromAbsolute("F:\\document\\doc\\201704\\logistics", new DefaultLineHandler());
-			List<String> lines = FileUtils.readFromAbsolute("F:\\document\\doc\\201704\\gongjijin\\gjj_01.txt", new DefaultLineHandler());
-			produce(lines);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void insertKafkaElasticDatas() {
-		try {
-			List<String> lines = FileUtils.readFromAbsolute("F:\\document\\doc\\201705\\internet.txt", new DefaultLineHandler());
-			produce(lines, "elastic5", 12);
-			System.out.println(lines.size() + " records produce finish!!!");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void insertKafkaQQNodeDatas() {
-		try {
-			List<String> lines = FileUtils.readFromAbsolute("F:\\document\\doc\\201705\\qq20000.txt", new DefaultLineHandler());
-			produce(lines, "qqnode", 6);
+			List<String> lines = FileUtils.readFromAbsolute("F:\\result\\Desktop\\qq.txt", new DefaultLineHandler());
+			produce(lines, "qq", 1);
 			System.out.println(lines.size() + " records produce finish!!!");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -110,7 +95,7 @@ public class DataImportUtils {
 	}
 	
 	public static void main(String[] args) {
-		insertKafkaQQNodeDatas();
+		insertKafkaDatas();
 //		testKafkaElasticDatas();
 	}
 	

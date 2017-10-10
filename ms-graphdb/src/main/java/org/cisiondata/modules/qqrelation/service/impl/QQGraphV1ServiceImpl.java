@@ -286,6 +286,11 @@ public class QQGraphV1ServiceImpl implements IQQGraphService {
 		return resultList;
 	}
 	
+	@Override
+	public List<Map<String, Object>> readDataList(String keyword) throws BusinessException {
+		return null;
+	}
+	
 	private synchronized void updateESNodeCnoteData(String index, String type, String uniqueid, String cnote) {
 		try {
 			Client client = ESClient.getInstance().getClient();
