@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<XmlSet ACCESSID="[(${accessId})]" QUERY="[(${query})]" SCROLLID="[(${scrollId})]" ROWNUMPERPAGE="[(${rowNumPerPage})]" TOKEN="[(${token})]" LX="[(${lx})]" >
+<XmlTable QUERY="[(${query})]"  TOTALROWNUM="[(${totalRowNum})]" SCROLLID="[(${nextScrollId})]" LX="[(${lx})]" >
+<error>
+	<code>[(${code})]</code>
+	<failure>[(${failure})]</failure>
+</error>
+</XmlTable>
+</XmlSet>

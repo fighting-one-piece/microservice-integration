@@ -76,9 +76,7 @@ public class ParserServiceImpl implements IParserService {
 		}
 		String fileName = "CD-Q-" + lx.toUpperCase() + "-" + params.get("query") + ".xml";
 		String path = directory + File.separator + fileName;
-		String content = templateEngine.process(template, context);
-		System.err.println(content);
-		FileUtils.write(path, content);
+		FileUtils.write(path, templateEngine.process(template, context));
 	}
 	
 	@SuppressWarnings("unchecked")
