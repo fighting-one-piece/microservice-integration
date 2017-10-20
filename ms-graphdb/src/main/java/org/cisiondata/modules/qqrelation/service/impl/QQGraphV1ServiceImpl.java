@@ -33,10 +33,10 @@ import org.springframework.stereotype.Service;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 
-@Service("qqGraphService")
-public class QQGraphServiceImpl implements IQQGraphService {
+@Service("qqGraphV1Service")
+public class QQGraphV1ServiceImpl implements IQQGraphService {
 	
-	private Logger LOG = LoggerFactory.getLogger(QQGraphServiceImpl.class);
+	private Logger LOG = LoggerFactory.getLogger(QQGraphV1ServiceImpl.class);
 	
 	private static final String NODE_QQ = "qq";
 	private static final String NODE_QUN = "qun";
@@ -92,7 +92,6 @@ public class QQGraphServiceImpl implements IQQGraphService {
 			graph.tx().commit();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			insertQQNodes(nodes);
 		}
 	}
 	
@@ -285,6 +284,11 @@ public class QQGraphServiceImpl implements IQQGraphService {
 			resultList.add(result);
         }
 		return resultList;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataList(String keyword) throws BusinessException {
+		return null;
 	}
 	
 	private synchronized void updateESNodeCnoteData(String index, String type, String uniqueid, String cnote) {

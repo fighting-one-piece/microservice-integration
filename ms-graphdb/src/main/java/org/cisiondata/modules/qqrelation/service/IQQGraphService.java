@@ -72,5 +72,13 @@ public interface IQQGraphService {
 	 * @throws BusinessException
 	 */
 	public List<Map<String, Object>> readQunNodeDataList(String qunNum) throws BusinessException;
+	
+	/**
+	 * 根据关键字读取数据列表
+	 * @param keyword
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataList(String keyword) throws BusinessException;
 
 }

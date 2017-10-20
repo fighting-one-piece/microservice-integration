@@ -43,7 +43,7 @@ public class ConsumerScheduler implements Runnable {
     
     public ConsumerConfig createConsumerConfig() {
     	Properties properties = new Properties();
-		properties.put("zookeeper.connect", "192.168.0.15:2181,192.168.0.16:2181,192.168.0.17:2181/kafka");
+		properties.put("zookeeper.connect", "192.168.0.124:2181/kafka");
 		properties.put("zookeeper.session.timeout.ms", "4000");
 		properties.put("zookeeper.sync.time.ms", "200");
 		properties.put("enable.auto.commit", "true");

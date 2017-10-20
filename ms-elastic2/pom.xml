@@ -83,9 +83,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.5.6.RELEASE</spring.boot.version>
 		<elasticsearch.version>2.4.1</elasticsearch.version>
+		<elasticsearch.shield.version>2.4.1</elasticsearch.shield.version>
+		<jedis.version>2.9.0</jedis.version>
 		<hbase.version>1.2.3</hbase.version>
 		<kafka.version>0.10.0.0</kafka.version>
-		<jedis.version>2.9.0</jedis.version>
+		<dubbo.version>2.5.4</dubbo.version>
+		<zookeeper.version>3.4.8</zookeeper.version>
+		<zkclient.version>0.1</zkclient.version>
 	</properties>
  
 	<dependencies>
@@ -245,6 +249,13 @@
 	        <version>${elasticsearch.version}</version>  
 		</dependency>
 		
+		<dependency>
+		    <groupId>org.elasticsearch.plugin</groupId>
+		    <artifactId>shield</artifactId>
+		    <version>${elasticsearch.shield.version}</version>
+		    <scope>provided</scope>
+		</dependency>
+		
 	    <!-- HBase依赖报 --> 
         <dependency>
             <groupId>org.apache.hbase</groupId>
@@ -329,6 +340,32 @@
 		    <groupId>com.janeluo</groupId>
 		    <artifactId>ikanalyzer</artifactId>
 		    <version>2012_u6</version>
+		</dependency>
+		
+		<!-- Dubbo依赖包 -->
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>dubbo</artifactId>
+		    <version>${dubbo.version}</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+		    	</exclusion>
+		    </exclusions>
+		</dependency> 
+		
+		<!-- Zookeeper依赖包 -->
+		<dependency>
+		    <groupId>org.apache.zookeeper</groupId>
+		    <artifactId>zookeeper</artifactId>
+		    <version>${zookeeper.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.sgroschupf</groupId>
+			<artifactId>zkclient</artifactId>
+			<version>${zkclient.version}</version>
 		</dependency>
 		
 	</dependencies>

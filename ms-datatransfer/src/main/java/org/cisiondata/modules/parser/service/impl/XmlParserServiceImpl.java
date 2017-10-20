@@ -5,50 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
-import org.cisiondata.modules.parser.service.IParserService;
-import org.cisiondata.modules.transfer.service.IConfigService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.file.FileUtils;
-import org.cisiondata.utils.file.PropertiesUtils;
 import org.cisiondata.utils.http.HttpUtils;
 import org.cisiondata.utils.json.GsonUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring4.SpringTemplateEngine;
 
-@Service("parserService")
-public class ParserServiceImpl implements IParserService {
-	
-	private Logger LOG = LoggerFactory.getLogger(ParserServiceImpl.class);
-	
-	private static String PREFIX = "https://api.cisiondata.cn/devplat/ext/api/v1";
-
-	private String directory = null;
-	
-	@Resource(name = "configService")
-	private IConfigService configService = null;
-	
-	@Resource(name = "templateEngine")
-	private SpringTemplateEngine templateEngine = null;
-	
-	@PostConstruct
-	public void postConstruct() {
-		String userDir = System.getProperty("user.dir");
-		String configFile = userDir + File.separator + "config" + File.separator + "sys-conf.properties";
-		this.directory = PropertiesUtils.getProperty(configFile, "transfer.file.o.path");
-		File dir = new File(directory);
-		if (!dir.exists()) dir.mkdirs();
-		LOG.info("parser output path: {}", directory);
-	}
+@Service("xmlParserService")
+public class XmlParserServiceImpl extends AbstractParserServiceImpl {
 	
 	@Override
 	public void parse(File file) throws BusinessException {

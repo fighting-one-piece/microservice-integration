@@ -18,7 +18,7 @@ public class QQGraphController {
 	
 	private Logger LOG = LoggerFactory.getLogger(QQGraphController.class);
 
-	@Resource(name = "qqGraphService")
+	@Resource(name = "qqGraphV2Service")
 	private IQQGraphService qqGraphService = null;
 	
 	@ResponseBody
@@ -102,6 +102,21 @@ public class QQGraphController {
 		WebResult webResult = new WebResult();
 		try {
 			qqGraphService.insertQQQunRelation(nodeJSON);
+			webResult.setResultCode(ResultCode.SUCCESS);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			webResult.setResultCode(ResultCode.FAILURE);
+			webResult.setFailure(e.getMessage());
+		}
+		return webResult;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/qqgraph/search", method = RequestMethod.GET)
+	public WebResult readDataList(String keyword) {
+		WebResult webResult = new WebResult();
+		try {
+			webResult.setData(qqGraphService.readDataList(keyword));
 			webResult.setResultCode(ResultCode.SUCCESS);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

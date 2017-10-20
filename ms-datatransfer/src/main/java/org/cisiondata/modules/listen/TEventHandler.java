@@ -16,8 +16,8 @@ public class TEventHandler implements EventHandler {
 	
 	private Logger LOG = LoggerFactory.getLogger(TEventHandler.class);
 	
-	@Resource(name = "parserService")
-	private IParserService parserService = null;
+	@Resource(name = "xmlParserService")
+	private IParserService xmlParserService = null;
 
 	@Override
 	public void handle(PathEvent event) {
@@ -26,7 +26,7 @@ public class TEventHandler implements EventHandler {
 			if (kind.equals(StandardWatchEventKinds.ENTRY_CREATE)) {
 				File file = event.getPath().toFile();
 				if (file.getName().endsWith(".xml")) {
-					parserService.parse(file);
+					xmlParserService.parse(file);
 				}
 			}
 		} catch (Exception e) {

@@ -4,13 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.structure.Property;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.cisiondata.modules.qqrelation.service.IQQGraphService;
-import org.cisiondata.modules.qqrelation.service.impl.QQGraphServiceImpl;
+import org.cisiondata.modules.qqrelation.service.impl.QQGraphV1ServiceImpl;
+import org.cisiondata.modules.qqrelation.service.impl.QQGraphV2ServiceImpl;
 import org.cisiondata.modules.qqrelation.utils.ESClient;
 import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.http.HttpUtils;
@@ -25,6 +31,10 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.junit.Test;
+
+import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
+import com.thinkaurelius.titan.core.TitanVertex;
 
 public class QQRelationTest {
 	
@@ -65,7 +75,7 @@ public class QQRelationTest {
 		map.put("ipAddress", "浙江省金华市电信");
 		map.put("_id", "f14d3c672cf40a52ff1748bbea98a3e5");
 		String nodeJSON = GsonUtils.fromMapToJson(map);
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
+		IQQGraphService qqRelationService = new QQGraphV1ServiceImpl();
 		qqRelationService.insertQQNode(nodeJSON);
 	}
 	
@@ -83,14 +93,22 @@ public class QQRelationTest {
 		}
 	}
 	
-	public static void t4() throws IOException {
-		List<String> lines = FileUtils.readLines(new File("F:\\document\\doc\\201704\\qqdata10000"));
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
-		qqRelationService.insertQQNodes(lines);
-//		for (String line : lines) {
-//			IQQGraphService qqRelationService = new QQGraphServiceImpl();
-//			qqRelationService.insertQQNode(line);
-//		}
+	@Test
+	public void t4_1() throws IOException {
+		QQGraphV2ServiceImpl qqGraphService = new QQGraphV2ServiceImpl();
+		List<String> lines0 = FileUtils.readLines(new File("F:\\result\\Desktop\\qq.txt"));
+		qqGraphService.insertQQNodes(lines0);
+		List<String> lines1 = FileUtils.readLines(new File("F:\\result\\Desktop\\qun.txt"));
+		qqGraphService.insertQQQunNodes(lines1);
+		TitanUtils.getInstance().closeGraph();
+	}
+	
+	@Test
+	public void t4_2() throws IOException {
+		QQGraphV2ServiceImpl qqGraphService = new QQGraphV2ServiceImpl();
+		List<String> lines2 = FileUtils.readLines(new File("F:\\result\\Desktop\\qqqun.txt"));
+		qqGraphService.insertQQQunRelations(lines2);
+		TitanUtils.getInstance().closeGraph();
 	}
 	
 	public static void t5() throws InterruptedException, ExecutionException {
@@ -118,17 +136,55 @@ public class QQRelationTest {
 	
 	@Test
 	public void t6() {
+		IQQGraphService qqRelationService = new QQGraphV2ServiceImpl();
 		long start = System.currentTimeMillis();
-		IQQGraphService qqRelationService = new QQGraphServiceImpl();
-		List<Map<String, Object>> qqNodes = qqRelationService.readQQNodeDataList("1002754876");
+		List<Map<String, Object>> qqNodes = qqRelationService.readQQNodeDataList("10024041");
 		qqNodes.forEach(qq -> System.out.println(qq));
 		System.out.println("spend time " + (System.currentTimeMillis() - start)/1000 + " s");
 		TitanUtils.getInstance().closeGraph();
 	}
 	
-	public static void main(String[] args) throws Exception {
-//		t4();
+	@Test
+	public void t7() {
+		IQQGraphService qqRelationService = new QQGraphV2ServiceImpl();
+		long start = System.currentTimeMillis();
+		List<Map<String, Object>> qunNodes = qqRelationService.readQunNodeDataList("11112201");
+		System.out.println("spend time " + (System.currentTimeMillis() - start)/1000 + " s");
+		qunNodes.forEach(qun -> System.out.println(qun));
 		TitanUtils.getInstance().closeGraph();
+	}
+	
+	@Test
+	public void t8() {
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		GraphTraversal<Vertex, Vertex> gt = graph.traversal().V().has("o46", "疯狂ING2");
+		while (gt.hasNext()) {
+        	Map<String, Object> result = new HashMap<String, Object>();
+			Vertex vertex = gt.next();
+			Iterator<VertexProperty<Object>> vertexProperties = vertex.properties();
+			while (vertexProperties.hasNext()) {
+				VertexProperty<Object> vp = vertexProperties.next();
+				result.put(vp.key(), vp.value());
+			}
+			System.err.println(result);
+        }
+	}
+	
+	@Test
+	public void t9() {
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		Iterator<Result<TitanVertex>> iterator = graph.indexQuery("qunvertex", "v.o34:(娱乐)").offset(0).limit(50).vertices().iterator();
+		while (iterator.hasNext()) {
+			Result<TitanVertex> result = iterator.next();
+			TitanVertex vertex = result.getElement();
+			Iterator<VertexProperty<Object>> edgeProperties = vertex.properties();
+			Map<String, Object> finalResult = new HashMap<String, Object>();
+			while (edgeProperties.hasNext()) {
+				Property<Object> ep = edgeProperties.next();
+				finalResult.put(ep.key(), ep.value());
+			}
+			System.err.println(finalResult);
+		}
 	}
 
 }

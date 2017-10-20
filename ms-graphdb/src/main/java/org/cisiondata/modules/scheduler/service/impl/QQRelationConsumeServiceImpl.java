@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service("qqRelationConsumeService")
 public class QQRelationConsumeServiceImpl implements IConsumeService {
 	
-	@Resource(name = "qqGraphService")
+	@Resource(name = "qqGraphV2Service")
 	private IQQGraphService qqGraphService = null;
 	
 	@Override

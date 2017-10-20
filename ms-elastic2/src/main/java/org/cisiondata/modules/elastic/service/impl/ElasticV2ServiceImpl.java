@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.elastic.entity.BoolCondition;
 import org.cisiondata.modules.elastic.entity.SearchParams;
 import org.cisiondata.modules.elastic.entity.TermCondition;
 import org.cisiondata.modules.elastic.service.IElasticV2Service;
 import org.cisiondata.modules.elastic.utils.ElasticClient;
+import org.cisiondata.modules.elastic.utils.ElasticScriptUtils;
 import org.cisiondata.modules.elastic.utils.ElasticUtils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.idgen.MD5Utils;
@@ -22,10 +24,13 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptService.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
@@ -115,6 +120,7 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			if (params.isHighLight()) buildHighLight(searchRequestBuilder, attributes);
 			return buildQueryResult(searchRequestBuilder, params);
 		} catch (Exception e) {
+			LOG.error("index: {} type: {} query: {}", index, type, params.getKeywords());
 			LOG.error(e.getMessage(), e);
 		}
 		return new QueryResult<Map<String, Object>>();
@@ -126,14 +132,50 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			if (attributes.size() == 0) return new QueryResult<Map<String, Object>>();
 			SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
 					.prepareSearch(index).setTypes(type);
-			searchRequestBuilder.setQuery(buildBoolQuery(params.keywords(), attributes));
 			searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+			/**
+			ScoreFunctionBuilder scoreFunctionBuilder = 
+			ScoreFunctionBuilders.fieldValueFactorFunction(fieldName)
+				.factor(boostFactor).modifier(modifier).missing(missing).setWeight(weight);
+			线性衰减函数  一旦直线与横轴 0 相交，所有其他值的评分都是 0.0
+			ScoreFunctionBuilders.linearDecayFunction(fieldName, origin, scale)
+				.setDecay(decay).setOffset(offset).setWeight(weight)
+			指数衰减函数  先剧烈衰减然后变缓 
+			ScoreFunctionBuilders.exponentialDecayFunction(fieldName, origin, scale)
+				.setDecay(decay).setOffset(offset).setWeight(weight)
+			高斯衰减函数  高斯函数是钟形的——它的衰减速率是先缓慢，然后变快，最后又放缓。
+			ScoreFunctionBuilders.gaussDecayFunction(fieldName, origin, scale)
+				.setDecay(decay).setOffset(offset).setWeight(weight)
+			origin  中心点或字段可能的最佳值，落在原点 origin上的文档评分 _score 为满分 1.0 。
+			scale  衰减率，即一个文档从原点 origin下落时，评分 _score改变的速度。
+			decay  从原点 origin衰减到 scale所得的评分 _score，默认值为 0.5 。
+			offset  以原点 origin为中心点，为其设置一个非零的偏移量 offset覆盖一个范围，而不只是单个原点。
+				在范围 -offset <= origin <= +offset内的所有评分 _score 都是 1.0 。
+			随机评分
+			ScoreFunctionBuilders.randomFunction(seed)
+			权重因素
+			ScoreFunctionBuilders.weightFactorFunction(weight)
+			**/
+			String timeField = getTypeTimeField(type);
+			if (StringUtils.isBlank(timeField)) {
+				searchRequestBuilder.setQuery(buildBoolQuery(params.keywords(), attributes));
+			} else {
+				String inlineScript = ElasticScriptUtils.scriptWithScoreAndTime(timeField, System.currentTimeMillis());
+				Map<String, Object> sparams = new HashMap<>();  
+				Script script = new Script(inlineScript, ScriptType.INLINE, "groovy", sparams);  
+				ScoreFunctionBuilder scoreFunctionBuilder = ScoreFunctionBuilders.scriptFunction(script);  
+				searchRequestBuilder.setQuery(QueryBuilders.functionScoreQuery(
+						buildBoolQuery(params.keywords(), attributes), scoreFunctionBuilder));
+			}
+			/**
 			searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
+			*/
 			searchRequestBuilder.setSize(200);
 			searchRequestBuilder.setExplain(false);
 			if (params.isHighLight()) buildHighLight(searchRequestBuilder, attributes);
 			return buildQueryResult(searchRequestBuilder, params);
 		} catch (Exception e) {
+			LOG.error("index: {} type: {} query: {}", index, type, params.getKeywords());
 			LOG.error(e.getMessage(), e);
 		}
 		return new QueryResult<Map<String, Object>>();
@@ -298,6 +340,8 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 		for (int i = 0, len = hits.length; i < len; i++) {
 			SearchHit hit = hits[i];
 			source = hit.getSource();
+			source.put("score", hit.getScore());
+			for (Object obj : hit.getSortValues()) System.err.println("sv: " + obj);
 			if (params.isHighLight()) wrapperHighLight(source, hit.getHighlightFields());
 			qr.getResultList().add(source);
 		}
