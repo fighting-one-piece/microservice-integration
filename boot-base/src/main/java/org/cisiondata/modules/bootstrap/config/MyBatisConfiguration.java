@@ -20,15 +20,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@PropertySource("classpath:mybatis/mybatis.properties")
-@EnableTransactionManagement
 @AutoConfigureAfter(DataSourceConfiguration.class)
+@PropertySource("classpath:mybatis/mybatis.properties")
 //@MapperScan(basePackages = "org.cisiondata.modules.**.dao")
 public class MyBatisConfiguration implements EnvironmentAware {
 
@@ -75,11 +71,6 @@ public class MyBatisConfiguration implements EnvironmentAware {
 		routingDataSource.setDefaultTargetDataSource(masterDataSource);
 		routingDataSource.setTargetDataSources(targetDataResources);
 		return routingDataSource;
-	}
-
-	@Bean
-	public PlatformTransactionManager transactionManager() {
-		return new DataSourceTransactionManager(masterDataSource);
 	}
 
 }

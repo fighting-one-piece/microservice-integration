@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 @SpringBootApplication
 @EnableAutoConfiguration
 @ComponentScan(basePackages = { "org.cisiondata" })
-public class BootstrapApplication {
+public class BaseBootstrapApplication {
 
-	public static Logger LOG = LoggerFactory.getLogger(BootstrapApplication.class);
+	protected static Logger LOG = LoggerFactory.getLogger(BaseBootstrapApplication.class);
 
 	@Bean
 	public ObjectMapper objectMapper() {

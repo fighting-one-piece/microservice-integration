@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Configuration
 @PropertySource("classpath:mybatis/mybatis.properties")
 @AutoConfigureAfter(MyBatisConfiguration.class)
-public class MyBatisMapperScannerConfiguration implements EnvironmentAware {
+public class MyBatisMapperConfiguration implements EnvironmentAware {
 
 	private RelaxedPropertyResolver propertyResolver = null;
 

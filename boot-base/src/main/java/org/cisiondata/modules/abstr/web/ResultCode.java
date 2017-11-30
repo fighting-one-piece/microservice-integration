@@ -5,6 +5,8 @@ public enum ResultCode {
 	SUCCESS(1, "操作成功"),
 	FAILURE(2, "操作失败"),
 	NOT_FOUNT_DATA(3, "未查询到数据"),
+	SYSTEM_IS_BUSY(5, "系统繁忙，请稍后再试"),
+	QUERY_FAILURE(7, "查询失败"),
 	
 	PARAM_NULL(-101, "请求参数为空"),
 	PARAM_ERROR(-102, "请求参数错误或非法请求"),
