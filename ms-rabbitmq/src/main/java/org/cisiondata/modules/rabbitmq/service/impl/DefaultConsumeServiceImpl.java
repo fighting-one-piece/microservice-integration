@@ -1,11 +1,11 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
 import org.cisiondata.modules.bootstrap.config.RabbitmqConfiguration;
-import org.cisiondata.modules.rabbitmq.service.impl.ConsumerServiceImpl;
+import org.cisiondata.modules.rabbitmq.service.impl.ConsumeServiceImpl;
 import org.springframework.stereotype.Service;
 
-@Service("defaultConsumerService")
-public class DefaultConsumerServiceImpl extends ConsumerServiceImpl {
+@Service("defaultConsumeService")
+public class DefaultConsumeServiceImpl extends ConsumeServiceImpl {
 
 	@Override
 	protected String getRoutingKey() {

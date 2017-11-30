@@ -1,6 +1,6 @@
 package org.cisiondata.modules.rabbitmq.service;
 
-public interface IConsumerService {
+public interface IConsumeService {
 
 	/**
 	 * 处理消息

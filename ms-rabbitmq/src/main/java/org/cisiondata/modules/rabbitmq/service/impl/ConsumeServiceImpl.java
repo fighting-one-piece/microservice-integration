@@ -1,10 +1,10 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
-import org.cisiondata.modules.rabbitmq.service.IConsumerService;
+import org.cisiondata.modules.rabbitmq.service.IConsumeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ConsumerServiceImpl implements IConsumerService {
+public abstract class ConsumeServiceImpl implements IConsumeService {
 	
 	protected Logger LOG = LoggerFactory.getLogger(getClass());
 	
