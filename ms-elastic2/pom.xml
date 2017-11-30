@@ -82,6 +82,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
+		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
 		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
 		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
 		<elasticsearch.version>2.4.1</elasticsearch.version>
@@ -144,7 +145,7 @@
 		<dependency>  
         	<groupId>org.springframework.boot</groupId>  
           	<artifactId>spring-boot-starter-redis</artifactId>  
-          	<version>1.4.6.RELEASE</version>
+          	<version>${spring.boot.redis.version}</version>
       	</dependency> 
       	
       	<!-- Spring Cloud依赖包 -->
