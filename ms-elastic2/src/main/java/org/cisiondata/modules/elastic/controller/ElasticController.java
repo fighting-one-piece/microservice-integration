@@ -37,12 +37,14 @@ public class ElasticController {
 	public WebResult search(String i, String t, String f, String q, Integer hl, Integer pn, Integer rn) {
 		WebResult result = new WebResult();
 		try {
-			result.setData(elasticV2Service.readDataList(i, t, f, URLDecoder.decode(q, "UTF-8"), hl, pn, rn));
+			result.setData(elasticV2Service.readDataList(i, t, f, URLDecoder.decode(q, "UTF-8"), 
+				null == hl ? 0 : hl, pn, rn));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (BusinessException be) {
 			result.setCode(be.getCode());
 			result.setFailure(be.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
 			result.setResultCode(ResultCode.FAILURE);
 			result.setFailure(e.getMessage());
 		}
@@ -54,7 +56,8 @@ public class ElasticController {
 	public WebResult search(String i, String t, String q, Integer hl, String s) {
 		WebResult result = new WebResult();
 		try {
-			result.setData(elasticV2Service.readDataList(i, t, null, q, hl, s));
+			result.setData(elasticV2Service.readDataList(i, t, null, 
+				q, null == hl ? 0 : hl, s));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (BusinessException be) {
 			result.setCode(be.getCode());
