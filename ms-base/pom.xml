@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.cisiondata</groupId>
-	<artifactId>ms-base</artifactId>
+	<artifactId>boot-base</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-parent</artifactId>
-	    <version>1.5.3.RELEASE</version>
+	    <version>1.5.9.RELEASE</version>
 	    <relativePath/>
 	</parent>
 
@@ -242,7 +242,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>ms-base</finalName>
+		<finalName>boot-base</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -322,12 +322,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/base</warSourceDirectory>
+					<warSourceDirectory>target/boot-base</warSourceDirectory>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

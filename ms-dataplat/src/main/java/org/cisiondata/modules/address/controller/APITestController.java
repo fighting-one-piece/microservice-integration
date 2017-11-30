@@ -1,4 +1,4 @@
-package org.cisiondata.modules.test.controller;
+package org.cisiondata.modules.address.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiResponses;
 @Api("测试相关api")
 @RestController
 @RequestMapping(value = "/test")
-public class TestController {
+public class APITestController {
 
 	@ApiOperation("获取用户信息")
 	@ApiImplicitParams({

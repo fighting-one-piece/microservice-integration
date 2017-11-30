@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.cisiondata</groupId>
-	<artifactId>ms-dataplat</artifactId>
+	<artifactId>devplat-base</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>MS DataPlat Project</name>
+	<name>DevPlat Base Project</name>
 	<url>http://maven.apache.org</url>
 
 	<repositories>
@@ -61,14 +61,14 @@
 		<!-- MS-Base依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>ms-base</artifactId>
+			<artifactId>boot-base</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
-		<!-- MS-Tokenizer依赖包 -->
+		<!-- Tokenizer依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>ms-tokenizer</artifactId>
+			<artifactId>tokenizer</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
         
@@ -82,7 +82,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>ms-dataplat</finalName>
+		<finalName>devplat-base</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -162,12 +162,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/dataplat</warSourceDirectory>
+					<warSourceDirectory>target/devplat-base</warSourceDirectory>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

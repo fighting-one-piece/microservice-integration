@@ -13,6 +13,7 @@ logs
 *.log
 *.bat
 *.dat
+*.txt
 *.class
 */org.eclipse.wst.common.component
 */org.platform.modules.mapreduce.clean
