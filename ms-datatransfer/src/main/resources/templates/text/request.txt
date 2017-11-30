@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<XmlSet ACCESSID="[(${accessId})]" QUERY="[(${query})]" SCROLLID="[(${scrollId})]" ROWNUMPERPAGE="[(${rowNumPerPage})]" TOKEN="[(${token})]" LX="[(${lx})]" >
-
-</XmlSet>
