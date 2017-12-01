@@ -1,7 +1,9 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
+import javax.annotation.Resource;
+
 import org.cisiondata.modules.bootstrap.config.RabbitmqConfiguration;
-import org.cisiondata.modules.rabbitmq.service.IRabbitmqService;
+import org.cisiondata.modules.rabbitmq.service.IRabbitmqV1Service;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -13,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("rabbitmqService")
-public class RabbitmqServiceImpl implements IRabbitmqService {
+public class RabbitmqV1ServiceImpl implements IRabbitmqV1Service {
 	
 	@Autowired
 	private AmqpAdmin amqpAdmin = null;
 
-	@Autowired
+	@Resource(name = "amqpTemplate")
     private AmqpTemplate amqpTemplate = null;
 	
 	@Autowired

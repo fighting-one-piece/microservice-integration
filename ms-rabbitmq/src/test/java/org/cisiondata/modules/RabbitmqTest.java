@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.cisiondata.modules.bootstrap.BootstrapApplication;
 import org.cisiondata.modules.bootstrap.config.RabbitmqConfiguration;
-import org.cisiondata.modules.rabbitmq.service.IRabbitmqService;
+import org.cisiondata.modules.rabbitmq.service.IRabbitmqV1Service;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class RabbitmqTest {
 	private RabbitTemplate rabbitTemplate  = null;
 	
 	@Resource(name = "rabbitmqService")
-	private IRabbitmqService rabbitmqService = null;
+	private IRabbitmqV1Service rabbitmqService = null;
 	
 	@Test
 	public void testProducer() {

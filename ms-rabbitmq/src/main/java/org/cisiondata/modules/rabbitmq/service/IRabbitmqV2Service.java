@@ -4,7 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 
-public interface IRabbitmqV1Service {
+public interface IRabbitmqV2Service {
 	
 	/**
 	 * 定义声明Exchange
@@ -31,11 +31,24 @@ public interface IRabbitmqV1Service {
 	public void sendMessage(Object message);
 	
 	/**
+	 * 发送主题消息,默认队列
+	 * @param message
+	 */
+	public void sendTopicMessage(Object message);
+	
+	/**
 	 * 发送消息,指定routingKey队列
 	 * @param routingKey
 	 * @param message
 	 */
 	public void sendMessage(String routingKey, Object message);
+	
+	/**
+	 * 发送主题消息,指定routingKey队列
+	 * @param routingKey
+	 * @param message
+	 */
+	public void sendTopicMessage(String routingKey, Object message);
 	
 	/**
 	 * 发送消息,指定exchange交换器,指定routingKey队列
@@ -44,6 +57,14 @@ public interface IRabbitmqV1Service {
 	 * @param message
 	 */
 	public void sendMessage(String exchange, String routingKey, Object message);
+	
+	/**
+	 * 发送主题消息,指定exchange交换器,指定routingKey队列
+	 * @param exchange
+	 * @param routingKey
+	 * @param message
+	 */
+	public void sendTopicMessage(String exchange, String routingKey, Object message);
 	
 	/**
 	 * 接受指定队列消息

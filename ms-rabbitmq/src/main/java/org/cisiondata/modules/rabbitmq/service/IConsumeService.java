@@ -1,12 +1,11 @@
 package org.cisiondata.modules.rabbitmq.service;
 
 public interface IConsumeService {
-
+	
 	/**
-	 * 处理消息
-	 * @param routingKey
+	 * 处理指定队列消息
 	 * @param message
 	 */
-	public void handleMessage(String routingKey, Object message);
+	public void handleMessage(String exchange, String routingKey, Object message);
 	
 }
