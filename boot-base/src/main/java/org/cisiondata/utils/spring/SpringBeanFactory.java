@@ -1,5 +1,8 @@
 package org.cisiondata.utils.spring;
 
+import java.util.Map;
+
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -15,9 +18,10 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
     		throws BeansException {
-    	SpringBeanFactory.beanFactory = beanFactory;
+    	if (null == SpringBeanFactory.beanFactory) {
+    		SpringBeanFactory.beanFactory = beanFactory;
+    	}
 	}
-    
     
     /**
      * 获取对象
@@ -25,7 +29,7 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      * @return Object 一个以所给名字注册的bean的实例
      * @throws org.springframework.beans.BeansException
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "hiding" })
     public static <T> T getBean(String name) throws BeansException {
         return (T) beanFactory.getBean(name);
     }
@@ -36,7 +40,8 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      * @return
      * @throws org.springframework.beans.BeansException
      */
-    public static <T> T getBean(Class<T> clz) throws BeansException {
+    @SuppressWarnings("hiding")
+	public static <T> T getBean(Class<T> clz) throws BeansException {
         return (T) beanFactory.getBean(clz);
     }
 
@@ -76,6 +81,26 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      */
     public static String[] getAliases(String name) throws NoSuchBeanDefinitionException {
         return beanFactory.getAliases(name);
+    }
+    
+    /**
+     * 给定bean类型返回所有bean列表
+     * @param type
+     * @return
+     */
+    @SuppressWarnings("hiding")
+	public static <T> Map<String, T> getBeansOfType(Class<T> type) {
+    	return beanFactory.getBeansOfType(type);
+    }
+    
+    /**
+     * bean类型匹配
+     * @param name
+     * @param typeToMatch
+     * @return
+     */
+    public static boolean isTypeMatch(String name, Class<?> typeToMatch) {
+    	return beanFactory.isTypeMatch(name, typeToMatch);
     }
 
 }
