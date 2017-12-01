@@ -5,7 +5,6 @@ import org.cisiondata.utils.redis.JedisClusterFactory;
 import org.cisiondata.utils.redis.RedisObjectSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
-@EnableAutoConfiguration
 public class RedisConfiguration {
 
 	private Logger LOG = LoggerFactory.getLogger(RedisConfiguration.class);
