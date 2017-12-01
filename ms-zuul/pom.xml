@@ -29,10 +29,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
-		<spring.cloud.starter.zuul>1.4.0.RELEASE</spring.cloud.starter.zuul>
-		<spring.cloud.starter.config>1.4.0.RELEASE</spring.cloud.starter.config>
-		<spring.cloud.starter.eureka>1.4.0.RELEASE</spring.cloud.starter.eureka>
-		<spring.cloud.starter.ribbon>1.4.0.RELEASE</spring.cloud.starter.ribbon>
+		<spring.cloud.starter.zuul.version>1.4.0.RELEASE</spring.cloud.starter.zuul.version>
+		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
+		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
+		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
 	</properties>
 
 	<dependencies>
@@ -72,25 +72,25 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-zuul</artifactId>
-			<version>${spring.cloud.starter.zuul}</version>
+			<version>${spring.cloud.starter.zuul.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config}</version>
+			<version>${spring.cloud.starter.config.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<version>${spring.cloud.starter.eureka}</version>
+			<version>${spring.cloud.starter.eureka.version}</version>
 		</dependency>
 		
 		<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-ribbon</artifactId>
-            <version>${spring.cloud.starter.ribbon}</version>
+            <version>${spring.cloud.starter.ribbon.version}</version>
         </dependency>
 
 		<!-- JUnit依赖包 -->
