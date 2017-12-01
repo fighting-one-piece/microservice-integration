@@ -17,6 +17,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import feign.Request;
+import feign.Retryer;
+
 @Configuration
 @EnableHystrix
 @EnableEurekaClient
@@ -29,6 +32,24 @@ public class BootstrapApplication {
 
 	private static Logger LOG = LoggerFactory.getLogger(BootstrapApplication.class);
 	
+	/** 
+	 * timeout设置 
+	 * 默认的connectTimeout为10s readTimeout为60
+	 */
+	@Bean
+	Request.Options feignOptions() {
+		return new Request.Options(/**connectTimeoutMillis**/1 * 1000, /** readTimeoutMillis **/1 * 1000);
+	}
+	
+	/** 
+	 * retry配置
+	 * 默认的retry为5次
+	 */
+    @Bean
+    Retryer feignRetryer() {
+        return Retryer.NEVER_RETRY;
+    }
+	
 	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -40,7 +61,7 @@ public class BootstrapApplication {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(BootstrapApplication.class, args);
-		LOG.info("Server Bootstrap");
+		LOG.info("Feign Client Bootstrap");
 	}
 	
 }

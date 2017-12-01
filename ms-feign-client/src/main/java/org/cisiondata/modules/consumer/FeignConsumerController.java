@@ -1,11 +1,13 @@
 package org.cisiondata.modules.consumer;
 
 import org.cisiondata.modules.consumer.feign.FeignConsumerClient;
+import org.cisiondata.modules.consumer.feign.ICacheService;
 import org.cisiondata.modules.consumer.feign.IElasticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +21,32 @@ public class FeignConsumerController {
 	
 	@Autowired
 	private IElasticService elasticService = null;
+	
+	@Autowired
+	private ICacheService cacheService = null;
+	
+	@ResponseBody
+	@RequestMapping(value = "/set", method = RequestMethod.POST)
+	public int doInvokeRedisSet(String key, @RequestParam Object value) {
+		try {
+			cacheService.set(key, value);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+		return 1;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
+	public Object doInvokeRedisGet(String key) {
+		try {
+			return cacheService.get(key);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	@ResponseBody
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
