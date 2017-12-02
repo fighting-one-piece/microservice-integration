@@ -1,0 +1,317 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.cisiondata</groupId>
+	<artifactId>ms-kafka</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>MS Kafka Project</name>
+	<url>http://maven.apache.org</url>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>1.5.9.RELEASE</version>
+	    <relativePath/>
+	</parent>
+	
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<target-env>development</target-env>
+				<repo-host>127.0.0.1:8081</repo-host>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<target-env>test</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<target-env>production</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>public</id>
+			<name>public repository</name>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		
+		<repository> 
+            <id>maven-restlet</id> 
+            <name>Public Online Restlet Repository</name> 
+            <url>http://maven.restlet.org</url> 
+        </repository> 
+        
+         <repository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+	</repositories>
+	
+	<pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
+		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
+		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
+		<spring.kafka.version>2.1.0.RELEASE</spring.kafka.version>
+		<kafka.clients.version>1.0.0</kafka.clients.version>
+		<kafka.streams.version>1.0.0</kafka.streams.version>
+		<commons.lang.version>2.6</commons.lang.version>
+		<logback.version>1.1.7</logback.version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring Boot依赖包 -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter</artifactId>
+		    <exclusions>  
+		        <exclusion>  
+		            <groupId>org.springframework.boot</groupId>  
+		            <artifactId>spring-boot-starter-logging</artifactId>  
+		        </exclusion>  
+		    </exclusions>  
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		
+		<!-- Spring Cloud依赖包 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+			<version>${spring.cloud.starter.config.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+			<version>${spring.cloud.starter.eureka.version}</version>
+		</dependency>
+		
+		<!-- Spring Kafka依赖包 -->
+		<dependency>
+		    <groupId>org.springframework.kafka</groupId>
+		    <artifactId>spring-kafka</artifactId>
+		    <version>${spring.kafka.version}</version>
+		</dependency>
+		
+		<!--Commons Lang依赖包 -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons.lang.version}</version>
+		</dependency>
+		
+		<!-- Slf4j依赖包 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		
+		<dependency> 
+			<groupId>org.slf4j</groupId> 
+			<artifactId>jcl-over-slf4j</artifactId> 
+		</dependency>
+		
+		<!--Logback依赖包 -->
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-core</artifactId>
+		    <version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-access</artifactId>
+		    <version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.logback-extensions</groupId>
+			<artifactId>logback-ext-spring</artifactId>
+			<version>0.1.4</version>
+		</dependency>
+		
+		<!-- Gson依赖包 -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		
+		<!-- Kafka Clients依赖包 -->
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-clients</artifactId>
+		    <version>${kafka.clients.version}</version>
+		</dependency>
+		
+		<!-- Kafka Streams依赖包 -->
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-streams</artifactId>
+		    <version>${kafka.streams.version}</version>
+		</dependency>	
+		
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <version>1.16.18</version>
+		    <scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.bouncycastle</groupId>
+		    <artifactId>bcpkix-jdk15on</artifactId>
+		    <version>1.58</version>
+		</dependency>
+		
+	</dependencies>
+	
+	<build>
+		<finalName>ms-kafka</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<defaultGoal>install</defaultGoal>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>maven</groupId>
+				<artifactId>maven-test-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/libs
+                            </outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Jar Maven Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.cisiondata.modules.bootstrap.BootstrapApplication</mainClass>
+							<addClasspath>true</addClasspath>
+					        <classpathPrefix>libs/</classpathPrefix>
+						</manifest>
+					</archive>
+					<manifestEntries>
+						<Class-Path>.</Class-Path>
+					</manifestEntries>
+				</configuration>
+			</plugin>
+			<!-- War Maven Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webappDirectory>src/main/webapp</webappDirectory>
+					<warSourceDirectory>target/ms-kafka</warSourceDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+	
+	<distributionManagement>
+		<repository>  
+            <id>user-release</id>  
+            <name>User Project Release</name>  
+            <url>http://192.168.0.124:8081/nexus/content/repositories/releases/</url>  
+        </repository>  
+  
+        <snapshotRepository>  
+            <id>user-snapshots</id>  
+            <name>User Project SNAPSHOTS</name>  
+            <url>http://192.168.0.124:8081/nexus/content/repositories/snapshots/</url>  
+        </snapshotRepository>  
+	</distributionManagement>
+	
+</project>
