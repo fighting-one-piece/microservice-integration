@@ -92,7 +92,7 @@
             <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
   		</dependency>
 	
-		<!-- Boot-Base依赖包 -->
+		<!-- Spring Boot Base依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>boot-base</artifactId>
