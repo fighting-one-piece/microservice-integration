@@ -33,6 +33,8 @@
 		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
 		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
 		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
+		<spring.cloud.starter.security.version>1.2.1.RELEASE</spring.cloud.starter.security.version>
+		<spring.cloud.starter.oauth2.version>1.2.1.RELEASE</spring.cloud.starter.oauth2.version>
 	</properties>
 
 	<dependencies>
@@ -92,6 +94,18 @@
             <artifactId>spring-cloud-starter-ribbon</artifactId>
             <version>${spring.cloud.starter.ribbon.version}</version>
         </dependency>
+        
+        <dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-security</artifactId>
+		    <version>${spring.cloud.starter.security.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-oauth2</artifactId>
+		    <version>${spring.cloud.starter.oauth2.version}</version>
+		</dependency>
 
 		<!-- JUnit依赖包 -->
 		<dependency>
