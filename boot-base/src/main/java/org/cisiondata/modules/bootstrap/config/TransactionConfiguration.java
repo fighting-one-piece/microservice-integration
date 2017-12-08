@@ -6,6 +6,7 @@ import org.cisiondata.modules.bootstrap.interceptor.TransactionInterceptor;
 import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -19,6 +20,7 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 	private javax.sql.DataSource masterDataSource = null;
 	
 	@Bean
+	@Primary
 	public PlatformTransactionManager transactionManager() {
 		return new DataSourceTransactionManager(masterDataSource);
 	}

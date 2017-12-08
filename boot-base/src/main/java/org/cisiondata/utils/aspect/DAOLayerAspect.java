@@ -47,23 +47,18 @@ public class DAOLayerAspect {
 
 	@Around(EXECUTION)
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-		long startTime = System.currentTimeMillis();
-		String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
-		String methodName = proceedingJoinPoint.getSignature().getName();
-		LOG.info("------Class {} Method {} Log Start", className, methodName);
 		Object result = null;
 		try {
 			result = proceedingJoinPoint.proceed();
 		} catch (DuplicateKeyException dke) {
 			throw new BusinessException(ResultCode.DATA_EXISTED);
 		} catch (DataException | DataAccessException de) {
+			LOG.error(de.getMessage(), de);
 			throw new BusinessException(ResultCode.DATABASE_OPERATION_FAIL);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new BusinessException(e.getMessage());
 		}
-		LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, methodName, 
-				(System.currentTimeMillis() - startTime) / 1000);
 		return result;
 	}
 	

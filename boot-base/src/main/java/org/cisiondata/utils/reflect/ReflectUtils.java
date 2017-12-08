@@ -1,5 +1,6 @@
 package org.cisiondata.utils.reflect;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -185,6 +186,8 @@ public class ReflectUtils {
 				Field field = fields[i];
 				if (Modifier.isStatic(field.getModifiers())) continue;
 				String name = field.getName();
+				if ("serialVersionUID".equalsIgnoreCase(name) || 
+					"handler".equalsIgnoreCase(name)) continue;
 				field.setAccessible(true);
 				Object value = field.get(object);
 				field.setAccessible(false);
@@ -204,8 +207,24 @@ public class ReflectUtils {
 				Field field = fields[i];
 				if (Modifier.isStatic(field.getModifiers())) continue;
 				String name = field.getName();
+				if ("serialVersionUID".equalsIgnoreCase(name)) continue;
 				Object value = map.get(name);
-				if (null == value || !field.getType().equals(value.getClass())) continue;
+				if (null == value) continue;
+				Class<?> fieldType = field.getType();
+				if (fieldType.isAssignableFrom(Serializable.class)) {
+					for (Class<?> superClass = object.getClass(); 
+						superClass != Object.class; superClass = superClass.getSuperclass()) {
+						Type type = superClass.getGenericSuperclass();
+						if (type instanceof ParameterizedType) {
+							Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
+							if (actualType instanceof Class) {
+								fieldType = (Class<?>) actualType;
+								break;
+							}
+						}
+					}
+					if (!fieldType.equals(value.getClass())) continue;
+				}
 				field.setAccessible(true);
 				field.set(object, value);
 				field.setAccessible(false);
