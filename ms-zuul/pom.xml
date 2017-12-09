@@ -75,6 +75,12 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-zuul</artifactId>
 			<version>${spring.cloud.starter.zuul.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.netflix.servo</groupId>
+		    		<artifactId>servo-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -105,6 +111,13 @@
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-oauth2</artifactId>
 		    <version>${spring.cloud.starter.oauth2.version}</version>
+		</dependency>
+		
+		<!-- Servo-core依赖包 -->
+		<dependency>
+		    <groupId>com.netflix.servo</groupId>
+		    <artifactId>servo-core</artifactId>
+		    <version>0.12.17</version>
 		</dependency>
 
 		<!-- JUnit依赖包 -->
