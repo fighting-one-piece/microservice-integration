@@ -1,255 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true 
-scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。   
-debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
- -->
+<!-- 属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 
+	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-	<property name="LOG_HOME" value="${webapp.root}/WEB-INF/logs" />
+	<property name="LOG_HOME" value="logs" />
 	<property name="MAX_HISTORY" value="30" />
+	<property name="PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n" />
 
-	<!-- 控制台输出 -->
-	<!--  
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<Encoding>UTF-8</Encoding>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
-		</layout>
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${PATTERN}</pattern>
+		</encoder>
 	</appender>
-	-->
-	
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">  
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
-            <Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</Pattern>  
-            <charset>UTF-8</charset>
-        </encoder>  
-    </appender>  
-	
-	<!-- 每天生成INFO日志文件 -->
-	<appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
+
+	<appender name="SYS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.info.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- 文件最大保存历史数量 -->
 			<MaxHistory>${MAX_HISTORY}</MaxHistory>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
+			<pattern>${PATTERN}</pattern>
 		</layout>
 		<!--日志文件最大的大小 -->
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<MaxFileSize>10MB</MaxFileSize>
 		</triggeringPolicy>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-		    <level>INFO</level>  
-		    <onMatch>ACCEPT</onMatch>  
-		    <onMismatch>DENY</onMismatch>  
-		</filter> 
 	</appender>
 	
-	<!-- 每天生成WARN日志文件 -->
-	<appender name="WARN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.warn.%d{yyyy-MM-dd}.log</FileNamePattern>
-			<MaxHistory>${MAX_HISTORY}</MaxHistory>
-		</rollingPolicy>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
-		</layout>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-		    <level>WARN</level>  
-		    <onMatch>ACCEPT</onMatch>  
-		    <onMismatch>DENY</onMismatch>  
-		</filter> 
-	</appender>
-	
-	<!-- 每天生成DEBUG日志文件 -->
 	<appender name="DEBUG_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
+		<!-- 文件路径 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.debug.log</fileNamePattern>
+			<!-- 文件最大保存历史数量 -->
 			<MaxHistory>${MAX_HISTORY}</MaxHistory>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
+			<pattern>${PATTERN}</pattern>
 		</layout>
 		<!--日志文件最大的大小 -->
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<MaxFileSize>10MB</MaxFileSize>
 		</triggeringPolicy>
+		<!--过滤 -->
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
 		    <level>DEBUG</level>  
 		    <onMatch>ACCEPT</onMatch>  
 		    <onMismatch>DENY</onMismatch>  
-		</filter> 
+		</filter>
 	</appender>
 	
-	<!-- 每天生成异常日志文件 -->
-	<appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
+	<appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.error.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.info.log</fileNamePattern>
+			<!-- 文件最大保存历史数量 -->
 			<MaxHistory>${MAX_HISTORY}</MaxHistory>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
+			<pattern>${PATTERN}</pattern>
 		</layout>
 		<!--日志文件最大的大小 -->
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<MaxFileSize>10MB</MaxFileSize>
 		</triggeringPolicy>
+		<!--过滤 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+		    <level>INFO</level>  
+		    <onMatch>ACCEPT</onMatch>  
+		    <onMismatch>DENY</onMismatch>  
+		</filter>
+	</appender>
+	
+	<appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.error.log</fileNamePattern>
+			<!-- 文件最大保存历史数量 -->
+			<MaxHistory>${MAX_HISTORY}</MaxHistory>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+		<!--日志文件最大的大小 -->
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		<!--过滤 -->
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
 		    <level>ERROR</level>  
 		    <onMatch>ACCEPT</onMatch>  
 		    <onMismatch>DENY</onMismatch>  
-		</filter> 
+		</filter>
 	</appender>
-	
-	<!-- 每天生成模块日志文件 -->
-	<appender name="MODULE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.module.%d{yyyy-MM-dd}.log</FileNamePattern>
-			<MaxHistory>${MAX_HISTORY}</MaxHistory>
-		</rollingPolicy>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
-		</layout>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-		    <level>ERROR</level>  
-		    <onMatch>DENY</onMatch>  
-		    <onMismatch>ACCEPT</onMismatch>  
-		</filter> 
-	</appender>
-	
-	<!-- 每天生成访问日志文件 -->
-	<appender name="ACCESS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<Encoding>UTF-8</Encoding>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/sys.access.%d{yyyy-MM-dd}.log</FileNamePattern>
-			<MaxHistory>${MAX_HISTORY}</MaxHistory>
-		</rollingPolicy>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-				<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-				<charset>UTF-8</charset>
-			</encoder>
-		</layout>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-		    <level>ERROR</level>  
-		    <onMatch>DENY</onMatch>  
-		    <onMismatch>ACCEPT</onMismatch>  
-		</filter> 
-	</appender>
-	
-	<!--日志异步到数据库 -->
-	<appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-		<!--日志异步到数据库 -->
-		<connectionSource
-			class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-			<!--连接池 -->
-			<dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">
-				<driverClass>com.mysql.jdbc.Driver</driverClass>
-				<url>jdbc:mysql://127.0.0.1:3306/databaseName</url>
-				<user>root</user>
-				<password>root</password>
-			</dataSource>
-		</connectionSource>
-	</appender>
-	
-	<!-- 为某个包下的所有类的指定Appender 这里也可以指定类名称例如：com.aa.bb.ClassName -->  
-	<!-- 
-	additivity的作用在于 children-logger是否使用 rootLogger配置的appender进行输出。
-	false：表示只用当前logger的appender-ref。
-	true：表示当前logger的appender-ref和rootLogger的appender-ref都有效。
-	-->
-    <logger name="org.cision.utils.aspect.LogAspect" level="DEBUG" additivity="true">  
-    	<appender-ref ref="STDOUT" />
-        <appender-ref ref="MODULE_LOG" />  
-        <appender-ref ref="ERROR_LOG" />  
-    </logger> 
-    
-    <logger name="org.cision.modules" level="INFO" additivity="false">  
-    	<appender-ref ref="STDOUT" />
-        <appender-ref ref="MODULE_LOG" />  
-        <appender-ref ref="ERROR_LOG" />  
-    </logger> 
-    
-    <logger name="java.sql.Connection" level="DEBUG">
-    	<appender-ref ref="STDOUT" />
-    </logger>
-    
-    <logger name="java.sql.Statement" level="DEBUG">
-    	<appender-ref ref="STDOUT" />
-    </logger>  
-    
-    <logger name="java.sql.PreparedStatement" level="DEBUG">
-    	<appender-ref ref="STDOUT" />
-    </logger>  
-      
-    <logger name="java.sql.ResultSet" level="DEBUG">
-    	<appender-ref ref="STDOUT" />
-    </logger>
-    
-    <!-- show parameters for hibernate sql 专为 Hibernate 定制 -->
-	<!--  
-	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
-	<logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="DEBUG" />
-	<logger name="org.hibernate.SQL" level="DEBUG" />
-	<logger name="org.hibernate.engine.QueryParameters" level="DEBUG" />
-	<logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" />
-	-->
-    
-    <!-- 日志输出级别 -->
-	<root level="INFO">
-		<appender-ref ref="STDOUT" />
-		<appender-ref ref="INFO_LOG" />
-		<appender-ref ref="WARN_LOG" />
-		<appender-ref ref="DEBUG_LOG" />
-        <appender-ref ref="ERROR_LOG" />  
-	</root>
-	
-</configuration>
+
+	<springProfile name="development">
+		<logger name="org.cisiondata" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+		</logger>
+		<logger name="org.springframework" level="ERROR">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="SYS_LOG" />
+		</logger>
+		<logger name="java.sql" level="DEBUG">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+		<logger name="com.ibatis" level="DEBUG">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+	</springProfile>
+
+	<springProfile name="test">
+		<logger name="org.cisiondata" level="INFO" />
+		<logger name="org.springframework" level="ERROR" />
+	</springProfile>
+
+	<springProfile name="production">
+		<logger name="org.cisiondata" level="INFO" />
+		<logger name="org.springframework" level="ERROR" />
+	</springProfile>
+
+	<!-- <include resource="src/main/resources/logging/logback-${spring.profiles.active}.xml"/> -->
+
+</configuration>  
