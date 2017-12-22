@@ -67,7 +67,7 @@ public class ElasticClient {
 				esServerAddress.add(new EsServerAddress(ipAndPort[0], Integer.parseInt(ipAndPort[1])));
 			}
 			Settings settings = Settings.builder().put("cluster.name", clusterName)
-					.put("shield.user","guest:@#guest123").put("client.transport.sniff", true).build();
+					.put("shield.user", "guest:@#guest123").put("client.transport.sniff", true).build();
 			client = TransportClient.builder().addPlugin(ShieldPlugin.class).settings(settings).build();
 			for (EsServerAddress address : esServerAddress) {
 				client.addTransportAddress(new InetSocketTransportAddress(

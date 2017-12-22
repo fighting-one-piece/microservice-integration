@@ -85,7 +85,7 @@
 		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
 		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
 		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
-		<elasticsearch.version>2.4.1</elasticsearch.version>
+		<elasticsearch.version>2.4.6</elasticsearch.version>
 		<elasticsearch.shield.version>2.4.1</elasticsearch.shield.version>
 		<jedis.version>2.9.0</jedis.version>
 		<hbase.version>1.2.3</hbase.version>
@@ -398,6 +398,9 @@
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>

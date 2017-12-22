@@ -31,7 +31,7 @@ public class IKSynonymsAnalyzer extends Analyzer {
 	protected TokenStreamComponents createComponents(String fieldName) {
 		Map<String, String> filterArgs = new HashMap<String, String>();
 		filterArgs.put("synonyms", "elastic/synonyms_1.txt,elastic/synonyms_2.txt");
-		filterArgs.put("luceneMatchVersion", Version.LUCENE_5_5_2.toString());
+		filterArgs.put("luceneMatchVersion", Version.LUCENE_5_5_4.toString());
 		filterArgs.put("expand", "true");
 		SynonymFilterFactory factory = new SynonymFilterFactory(filterArgs);
 		try {
