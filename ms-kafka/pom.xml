@@ -220,6 +220,9 @@
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -304,13 +307,13 @@
 		<repository>  
             <id>user-release</id>  
             <name>User Project Release</name>  
-            <url>http://192.168.0.124:8081/nexus/content/repositories/releases/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/releases/</url>  
         </repository>  
   
         <snapshotRepository>  
             <id>user-snapshots</id>  
             <name>User Project SNAPSHOTS</name>  
-            <url>http://192.168.0.124:8081/nexus/content/repositories/snapshots/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/snapshots/</url>  
         </snapshotRepository>  
 	</distributionManagement>
 	
