@@ -5,9 +5,11 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.cisiondata.modules.bootstrap.config.ds.DataSource;
 import org.cisiondata.modules.bootstrap.config.ds.DynamicRoutingDataSource;
+import org.cisiondata.modules.bootstrap.config.fs.SpringBootVFS;
 import org.mybatis.spring.CustomSqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -44,15 +46,16 @@ public class MyBatisConfiguration implements EnvironmentAware {
 	/** SqlSeesion配置 */
 	@Bean(name = "sqlSessionFactory")
 	public SqlSessionFactory sqlSessionFactoryBean() throws Exception {
+		VFS.addImplClass(SpringBootVFS.class);
 		SqlSessionFactoryBean sqlSessionFactoryBean = new CustomSqlSessionFactoryBean();
 		sqlSessionFactoryBean.setDataSource(routingDataSouce());
+		sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		DefaultResourceLoader loader = new DefaultResourceLoader();
 		sqlSessionFactoryBean.setConfigLocation(loader.getResource(propertyResolver.getProperty("configLocation")));
 		sqlSessionFactoryBean.setMapperLocations(resolver.getResources(propertyResolver.getProperty("mapperLocations")));
 		/**
-		 * sqlSessionFactoryBean.setTypeAliasesPackage(propertyResolver.
-		 * getProperty("typeAliasesPackage"));
+		 * sqlSessionFactoryBean.setTypeAliasesPackage(propertyResolver.getProperty("typeAliasesPackage"));
 		 **/
 		return sqlSessionFactoryBean.getObject();
 	}
