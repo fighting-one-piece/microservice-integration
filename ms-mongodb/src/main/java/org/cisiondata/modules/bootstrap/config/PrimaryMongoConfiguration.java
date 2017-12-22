@@ -12,7 +12,8 @@ public class PrimaryMongoConfiguration extends AbstractMongoConfiguration {
 
 	@Primary
 	@Override
-	public @Bean(name = "primaryMongoTemplate") MongoTemplate getMongoTemplate() throws Exception {
+	@Bean(name = "primaryMongoTemplate")
+	public MongoTemplate getMongoTemplate() throws Exception {
 		return new MongoTemplate(mongoDbFactory());
 	}
 

@@ -10,7 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class SecondaryMongoConfiguration extends AbstractMongoConfiguration {
 
 	@Override
-	public @Bean(name = "secondaryMongoTemplate") MongoTemplate getMongoTemplate() throws Exception {
+	@Bean(name = "secondaryMongoTemplate")
+	public MongoTemplate getMongoTemplate() throws Exception {
 		return new MongoTemplate(mongoDbFactory());
 	}
 }
