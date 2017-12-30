@@ -1,13 +1,20 @@
 package org.cisiondata.modules.elastic.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.elastic.service.IElasticV3Service;
 import org.cisiondata.modules.elastic.utils.ElasticClient;
 import org.cisiondata.utils.exception.BusinessException;
@@ -33,6 +40,8 @@ public class ElasticV3ServiceImpl extends ElasticV3AbstractServiceImpl implement
 	private static final String QQ_REG = "[1-9][0-9]{4,9}";
 	
 	private static final String DIGITAL_REG = "^\\d{1,}$";
+	
+	private static ExecutorService executorService = Executors.newFixedThreadPool(100);
 
 	@Override
 	public QueryResult<Map<String, Object>> readDataList(String keywords) throws BusinessException {
@@ -45,6 +54,39 @@ public class ElasticV3ServiceImpl extends ElasticV3AbstractServiceImpl implement
 			qr.setTotalRowNum(qr.getTotalRowNum() + subqr.getTotalRowNum());
 		}
 		return qr;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataHitList(String keywords) throws BusinessException {
+		List<DataHitTask> tasks = new ArrayList<DataHitTask>();
+		for (String type : types) {
+			tasks.add(new DataHitTask(type, keywords));
+		}
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		List<Future<Map<String, Object>>> fs = null;
+		try {
+			fs = executorService.invokeAll(tasks, 20, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		for (int i = 0, len = fs.size(); i < len; i++) {
+			Map<String, Object> result = null;
+			try {
+				result = fs.get(i).get();
+			} catch (Exception e) {
+				DataHitTask task = tasks.get(i);
+				result = new HashMap<String, Object>();
+				result.put("index", task.getIndex());
+				result.put("type", task.getType());
+				result.put("hits", -1);
+				LOG.error(e.getMessage(), e);
+			}
+			if (!result.isEmpty())
+				resultList.add(result);
+		}
+		if (resultList.size() == 0)
+			throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+		return resultList;
 	}
 	
 	private QueryResult<Map<String, Object>> readDataList(String type, String keywords) {
@@ -95,6 +137,47 @@ public class ElasticV3ServiceImpl extends ElasticV3AbstractServiceImpl implement
 	
 	private boolean isMatchRegex(String keyword, String regex) {
 		return Pattern.compile(regex).matcher(keyword).find();
+	}
+	
+	class DataHitTask implements Callable<Map<String, Object>> {
+
+		private String index = null;
+
+		private String type = null;
+
+		private String keywords = null;
+
+		public DataHitTask(String type, String keywords) {
+			this.index = type_index_mapping.get(type);
+			this.type = type;
+			this.keywords = keywords;
+		}
+		
+		public DataHitTask(String index, String type, String keywords) {
+			this.index = index;
+			this.type = type;
+			this.keywords = keywords;
+		}
+
+		@Override
+		public Map<String, Object> call() throws Exception {
+			Map<String, Object> result = new HashMap<String, Object>();
+			QueryResult<Map<String, Object>> qr = readDataList(type, keywords);
+			if (qr.getTotalRowNum() == 0) return result;
+			result.put("index", index);
+			result.put("type", type);
+			result.put("hits", qr.getTotalRowNum());
+			return result;
+		}
+
+		public String getIndex() {
+			return index;
+		}
+
+		public String getType() {
+			return type;
+		}
+		
 	}
 	
 }

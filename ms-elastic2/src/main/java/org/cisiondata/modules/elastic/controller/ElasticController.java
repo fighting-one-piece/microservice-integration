@@ -87,6 +87,23 @@ public class ElasticController {
 	}
 	
 	@ResponseBody
+	@RequestMapping(value = "/fh/search", method = RequestMethod.GET)
+	public WebResult searchHits(String q) {
+		WebResult result = new WebResult();
+		try {
+			result.setData(elasticV3Service.readDataHitList(q));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (BusinessException be) {
+			result.setCode(be.getCode());
+			result.setFailure(be.getMessage());
+		} catch (Exception e) {
+			result.setResultCode(ResultCode.FAILURE);
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	@ResponseBody
 	@RequestMapping(value = "/sf/search", method = RequestMethod.GET)
 	public WebResult search(String i, String t, String q, Integer d) {
 		WebResult result = new WebResult();
