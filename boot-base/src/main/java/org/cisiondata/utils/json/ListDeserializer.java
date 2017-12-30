@@ -33,9 +33,9 @@ public class ListDeserializer implements JsonDeserializer<List<Object>> {
 			Class<?> elementClass = element.getClass();
 			if (JsonObject.class.isAssignableFrom(elementClass)) {
 				JsonObject jsonObject = element.getAsJsonObject();
-				Map<String, String> map = new HashMap<String, String>();
+				Map<String, Object> map = new HashMap<String, Object>();
 				for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					map.put(entry.getKey(), entry.getValue().getAsString());
+					map.put(entry.getKey(), handle(entry.getValue()));
 				}
 				list.add(map);
 			} else {
@@ -54,6 +54,20 @@ public class ListDeserializer implements JsonDeserializer<List<Object>> {
 		Pattern pattern = Pattern.compile("[0-9]+");
 		Matcher matcher = pattern.matcher(input);
 		return !matcher.matches() ? false : true;
+	}
+	
+	private Object handle(JsonElement element) {
+		Class<?> elementClass = element.getClass();
+		if (JsonObject.class.isAssignableFrom(elementClass)) {
+			JsonObject jsonObject = element.getAsJsonObject();
+			Map<String, Object> map = new HashMap<String, Object>();
+			for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+				map.put(entry.getKey(), handle(entry.getValue()));
+			}
+			return map;
+		} else {
+			return isNumberic(element.getAsString()) ? element.getAsLong() : element;
+		}
 	}
 
 }

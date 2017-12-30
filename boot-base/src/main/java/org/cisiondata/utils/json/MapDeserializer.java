@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.JsonArray;
@@ -14,7 +13,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;  
+import com.google.gson.JsonParseException;
 
 public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 
@@ -47,9 +46,8 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 	 * @return 是数字类型返回true
 	 */
 	public boolean isNumberic(String input) {
-		Pattern pattern = Pattern.compile("[0-9]+");
-		Matcher matcher = pattern.matcher(input);
-		return !matcher.matches() ? false : true;
+		Pattern pattern = Pattern.compile("\\d{1,18}|[0-8][0-9]{18}|9[0-1]\\d{17}");
+		return !pattern.matcher(input).matches() ? false : true;
 	}
 
 }
