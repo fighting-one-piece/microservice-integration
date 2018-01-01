@@ -1,7 +1,10 @@
 package org.cisiondata.utils.json;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,6 +31,8 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 		for (Entry<String, JsonElement> entry : entries) {
 			JsonElement element = entry.getValue();
 			if (null == element || element instanceof JsonNull) continue;
+			map.put(entry.getKey(), handle(element));
+			/**
 			Class<?> elementClass = element.getClass();
 			if (JsonArray.class.isAssignableFrom(elementClass)) {
 				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
@@ -36,6 +41,7 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 			} else {
 				map.put(entry.getKey(), isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString());
 			}
+			*/
 		}
 		return map;
 	}
@@ -48,6 +54,33 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 	public boolean isNumberic(String input) {
 		Pattern pattern = Pattern.compile("\\d{1,18}|[0-8][0-9]{18}|9[0-1]\\d{17}");
 		return !pattern.matcher(input).matches() ? false : true;
+	}
+	
+	/**
+	 * 递归处理Element
+	 * @param element
+	 * @return
+	 */
+	private Object handle(JsonElement element) {
+		Class<?> elementClass = element.getClass();
+		if (JsonObject.class.isAssignableFrom(elementClass)) {
+			JsonObject jsonObject = element.getAsJsonObject();
+			Map<String, Object> map = new HashMap<String, Object>();
+			for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+				map.put(entry.getKey(), handle(entry.getValue()));
+			}
+			return map;
+		} else if (JsonArray.class.isAssignableFrom(elementClass)) {
+			List<Object> list = new ArrayList<Object>();
+			Iterator<JsonElement> iterator = element.getAsJsonArray().iterator();
+			while (iterator.hasNext()) {
+				JsonElement subElement = iterator.next();
+				list.add(handle(subElement));
+			}
+			return list;
+		} else {
+			return isNumberic(element.getAsString()) ? element.getAsLong() : element;
+		}
 	}
 
 }

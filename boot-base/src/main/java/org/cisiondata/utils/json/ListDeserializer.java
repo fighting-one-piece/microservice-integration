@@ -15,6 +15,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParseException;  
 
 public class ListDeserializer implements JsonDeserializer<List<Object>> {
@@ -30,19 +31,36 @@ public class ListDeserializer implements JsonDeserializer<List<Object>> {
 		while (iterator.hasNext()) {
 			JsonElement element = iterator.next();
 			if (null == element || element instanceof JsonNull) continue;
-			Class<?> elementClass = element.getClass();
-			if (JsonObject.class.isAssignableFrom(elementClass)) {
-				JsonObject jsonObject = element.getAsJsonObject();
-				Map<String, Object> map = new HashMap<String, Object>();
-				for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					map.put(entry.getKey(), handle(entry.getValue()));
-				}
-				list.add(map);
-			} else {
-				list.add(isNumberic(element.getAsString()) ? element.getAsLong() : element);
-			}
+			list.add(handle(element));
 		}
 		return list;
+	}
+	
+	/**
+	 * 递归处理Element
+	 * @param element
+	 * @return
+	 */
+	private Object handle(JsonElement element) {
+		Class<?> elementClass = element.getClass();
+		if (JsonObject.class.isAssignableFrom(elementClass)) {
+			JsonObject jsonObject = element.getAsJsonObject();
+			Map<String, Object> map = new HashMap<String, Object>();
+			for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+				map.put(entry.getKey(), handle(entry.getValue()));
+			}
+			return map;
+		} else if (JsonArray.class.isAssignableFrom(elementClass)) {
+			List<Object> list = new ArrayList<Object>();
+			Iterator<JsonElement> iterator = element.getAsJsonArray().iterator();
+			while (iterator.hasNext()) {
+				JsonElement subElement = iterator.next();
+				list.add(handle(subElement));
+			}
+			return list;
+		} else {
+			return isNumberic(element.getAsString()) ? element.getAsLong() : element;
+		}
 	}
 
 	/**
@@ -54,20 +72,6 @@ public class ListDeserializer implements JsonDeserializer<List<Object>> {
 		Pattern pattern = Pattern.compile("[0-9]+");
 		Matcher matcher = pattern.matcher(input);
 		return !matcher.matches() ? false : true;
-	}
-	
-	private Object handle(JsonElement element) {
-		Class<?> elementClass = element.getClass();
-		if (JsonObject.class.isAssignableFrom(elementClass)) {
-			JsonObject jsonObject = element.getAsJsonObject();
-			Map<String, Object> map = new HashMap<String, Object>();
-			for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-				map.put(entry.getKey(), handle(entry.getValue()));
-			}
-			return map;
-		} else {
-			return isNumberic(element.getAsString()) ? element.getAsLong() : element;
-		}
 	}
 
 }
