@@ -266,8 +266,9 @@ public class ReflectUtils {
 				Field field = fields[i];
 				if (Modifier.isStatic(field.getModifiers())) continue;
 				String name = field.getName();
-				String valueString = map.get(name);
-				if (null == valueString) continue;
+				String valueString = String.valueOf(map.get(name));
+				if (null == valueString || "".equals(valueString) 
+					|| "null".equalsIgnoreCase(valueString)) continue;
 				Object value = convertValueByFileType(field.getType(), valueString);
 				field.setAccessible(true);
 				field.set(object, value);
