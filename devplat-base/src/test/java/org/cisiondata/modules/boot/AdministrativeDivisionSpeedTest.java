@@ -54,7 +54,7 @@ public class AdministrativeDivisionSpeedTest {
 	public static List<String> extract3ADFromAddress(String address) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("address", address);
-		String json = HttpClientUtils.get("http://192.168.0.114:18080/ads", params, "UTF-8");
+		String json = HttpClientUtils.sendGet("http://192.168.0.114:18080/ads", params, "UTF-8");
 //		String json = HttpClientUtils.get("http://localhost:18080/ads", params, "UTF-8");
 		Map<String, Object> map = GsonUtils.fromJsonToMap(json);
 		if (null == map) return new ArrayList<String>();

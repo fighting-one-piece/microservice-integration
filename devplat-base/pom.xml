@@ -143,6 +143,13 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
+		<!-- Logback Redis Appender依赖包 -->
+		<dependency>
+            <groupId>com.cwbase</groupId>
+            <artifactId>logback-redis-appender</artifactId>
+            <version>1.1.5</version>
+        </dependency>
+		
 	</dependencies>
 	
 	<build>
@@ -242,6 +249,31 @@
 					<overwrite>true</overwrite>
 				</configuration>
 			</plugin>
+			<!-- Assembly Maven Plugin -->
+			<plugin>  
+	            <groupId>org.apache.maven.plugins</groupId>  
+	            <artifactId>maven-assembly-plugin</artifactId>  
+	            <version>2.5.5</version>  
+	            <configuration>  
+	                <archive>  
+	                    <manifest>  
+	                        <mainClass>org.cisiondata.modules.bootstrap.BootstrapApplication</mainClass>  
+	                    </manifest>  
+	                </archive>  
+	                <descriptorRefs>  
+	                    <descriptorRef>jar-with-dependencies</descriptorRef>  
+	                </descriptorRefs>  
+	            </configuration>  
+	            <executions>  
+	                <execution>  
+	                    <id>make-assembly</id>  
+	                    <phase>package</phase>  
+	                    <goals>  
+	                        <goal>single</goal>  
+	                    </goals>  
+	                </execution>  
+	            </executions>  
+	        </plugin>
 		</plugins>
 
 	</build>
