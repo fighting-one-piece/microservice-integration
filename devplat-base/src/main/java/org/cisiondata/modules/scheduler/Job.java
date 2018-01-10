@@ -28,6 +28,8 @@ public abstract class Job {
 	public static final int DEFAULT_C_THREAD_POOL_NUM = 10;
 	public static final int DEFAULT_QUEUE_CAPACITY = 10000;
 	public static final int DEFAULT_CONSUME_DELAY_SECONDS = 10;
+	
+	private Map<String, Object> jobConf = null;
 
 	private ExecutorService pExecutorService = null;
 	private ExecutorService cExecutorService = null;
@@ -47,11 +49,29 @@ public abstract class Job {
 	private List<Future<?>> cFutures = null;
 	
 	/**
-	 * 参数配置
+	 * 获取参数配置
 	 * @return
 	 */
-	protected Map<String, Object> configuration() {
-		return new HashMap<String, Object>();
+	public Map<String, Object> getJobConf() {
+		if (null == jobConf) jobConf = new HashMap<String, Object>();
+		return jobConf;
+	}
+	
+	/**
+	 * 参数配置
+	 * @param jobConf
+	 */
+	public void setJobConf(Map<String, Object> jobConf) {
+		getJobConf().putAll(jobConf);
+	}
+	
+	/**
+	 * 参数配置
+	 * @param key
+	 * @param value
+	 */
+	public void setJobConf(String key, Object value) {
+		getJobConf().put(key, value);
 	}
 
 	/**
@@ -75,7 +95,7 @@ public abstract class Job {
 	public abstract Task consumer(Map<String, Object> params);
 	
 	public void startup() {
-		initialize(configuration());
+		initializeJobConf();
 		startupProducers();
 		if (!useConsumerModel) return;
 		startupConsumers();
@@ -97,21 +117,21 @@ public abstract class Job {
 	
 	/**
 	 * 初始化参数配置
-	 * @param configuration
+	 * @param jobConf
 	 */
-	private void initialize(Map<String, Object> configuration) {
-		pThreadPoolNum = (int) configuration.getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
+	private void initializeJobConf() {
+		pThreadPoolNum = (int) getJobConf().getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
 		pExecutorService = Executors.newFixedThreadPool(pThreadPoolNum);
-		cThreadPoolNum = (int) configuration.getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
+		cThreadPoolNum = (int) getJobConf().getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
 		cExecutorService = Executors.newFixedThreadPool(cThreadPoolNum);
-		useBlockingQueue = (boolean) configuration.getOrDefault(USE_BLOCKING_QUEUE, false);
+		useBlockingQueue = (boolean) getJobConf().getOrDefault(USE_BLOCKING_QUEUE, false);
 		if (useBlockingQueue) {
-			int queueCapaciy = (int) configuration.getOrDefault(QUEUE_CAPACITY, DEFAULT_QUEUE_CAPACITY);
+			int queueCapaciy = (int) getJobConf().getOrDefault(QUEUE_CAPACITY, DEFAULT_QUEUE_CAPACITY);
 			queue = new ArrayBlockingQueue<String>(queueCapaciy);
 		}
-		useConsumerModel = (boolean) configuration.getOrDefault(USE_CONSUMER_MODEL, false);
+		useConsumerModel = (boolean) getJobConf().getOrDefault(USE_CONSUMER_MODEL, false);
 		if (useConsumerModel) {
-			consumeDelaySeconds = (int) configuration.getOrDefault(
+			consumeDelaySeconds = (int) getJobConf().getOrDefault(
 				CONSUME_DELAY_SECONDS, DEFAULT_CONSUME_DELAY_SECONDS);
 		}
 	}
@@ -129,6 +149,7 @@ public abstract class Job {
 				int index = 1;
 				for (int i = 0; i < pThreadPoolNum; i++) {
 					Map<String, Object> params = new HashMap<String, Object>();
+					params.putAll(getJobConf());
 					if (useBlockingQueue) params.put("queue", queue);
 					params.put("startIndex", index);
 					index = (i == (pThreadPoolNum - 1)) ? recordTotalNumber + 1 : index + splitNumber;
@@ -147,6 +168,7 @@ public abstract class Job {
 			cFutures = new ArrayList<Future<?>>();
 			for (int i = 0; i < cThreadPoolNum; i++) {
 				Map<String, Object> params = new HashMap<String, Object>();
+				params.putAll(getJobConf());
 				if (useBlockingQueue) params.put("queue", queue);
 				cFutures.add(cExecutorService.submit(consumer(params)));
 			}
