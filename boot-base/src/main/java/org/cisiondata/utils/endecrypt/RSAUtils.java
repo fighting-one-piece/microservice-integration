@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.crypto.Cipher;
 
+import org.cisiondata.utils.file.DefaultLineHandler;
 import org.cisiondata.utils.file.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +47,43 @@ public class RSAUtils {
 	private static PrivateKey privateKey = null;
 	
 	static {
-		initializeKeyPair();
+		initializeKeyPairV1();
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());  
 	}
 	
-	private static void initializeKeyPair() {
+	private static void initializeKeyPairV1() {
+		try {
+			List<String> pubLines = FileUtils.readFromClasspath(PUBLIC_KEY_PATH, new DefaultLineHandler());
+			StringBuilder publicKeySB = new StringBuilder(1024);
+			for (int i = 0, len = pubLines.size(); i < len; i++) {
+				publicKeySB.append(pubLines.get(i)).append("\n");
+			}
+			//读取公钥对应的字节数组
+			byte[] publicKeyCode = Base64Utils.decode(publicKeySB.toString());
+			KeyFactory pubKeyFactory = KeyFactory.getInstance(ALGORITHM);
+			//构造公钥，存储起来的公钥需要使用X509EncodedKeySpec进行读取
+			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(publicKeyCode);
+			//根据已有的KeySpec生成对应的公钥
+			publicKey = pubKeyFactory.generatePublic(pubKeySpec);
+			
+			List<String> priLines = FileUtils.readFromClasspath(PRIVATE_KEY_PATH, new DefaultLineHandler());
+			StringBuilder privateKeySB = new StringBuilder(1024);
+			for (int i = 0, len = priLines.size(); i < len; i++) {
+				privateKeySB.append(priLines.get(i)).append("\n");
+			}
+			byte[] privateKeyCode = Base64Utils.decode(privateKeySB.toString());
+			KeyFactory priKeyFactory = KeyFactory.getInstance(ALGORITHM);
+			//私钥需要通过PKCS8EncodedKeySpec来读取
+			PKCS8EncodedKeySpec priKeySpec = new PKCS8EncodedKeySpec(privateKeyCode);
+			//生成私钥
+			privateKey = priKeyFactory.generatePrivate(priKeySpec);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			initializeKeyPairV2();
+		}
+	}
+	
+	private static void initializeKeyPairV2() {
 		try {
 			URL pubUrl = RSAUtils.class.getClassLoader().getResource(PUBLIC_KEY_PATH);
 			if (null != pubUrl) {

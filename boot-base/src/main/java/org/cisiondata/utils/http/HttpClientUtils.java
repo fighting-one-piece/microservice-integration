@@ -25,6 +25,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class HttpClientUtils {
 
-	private final static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
+	private final static Logger LOG = LoggerFactory.getLogger(HttpClientUtils.class);
 	
 	/**  定义编码格式 UTF-8*/  
     public static final String ENCODE_UTF8 = "UTF-8";  
@@ -73,8 +74,9 @@ public class HttpClientUtils {
 	
 	public final static int soTimeout = 5000;
 	
-	public static RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
-			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+	public static RequestConfig defaultRequestConfig = RequestConfig.custom()
+			.setSocketTimeout(connectTimeout).setConnectTimeout(connectTimeout)
+			.setConnectionRequestTimeout(connectTimeout).build();
 	
 	static {
 		try {
@@ -104,26 +106,26 @@ public class HttpClientUtils {
 			
 			httpclient = HttpClients.custom().setConnectionManager(connManager).build();
 			
-			// Create socket configuration
 			SocketConfig socketConfig = SocketConfig.custom()
 					.setTcpNoDelay(true).build();
 			connManager.setDefaultSocketConfig(socketConfig);
-			// Create message constraints
+			
 			MessageConstraints messageConstraints = MessageConstraints.custom()
 					.setMaxHeaderCount(200).setMaxLineLength(2000).build();
-			// Create connection configuration
+			
 			ConnectionConfig connectionConfig = ConnectionConfig.custom()
 					.setMalformedInputAction(CodingErrorAction.IGNORE)
 					.setUnmappableInputAction(CodingErrorAction.IGNORE)
 					.setCharset(Consts.UTF_8)
 					.setMessageConstraints(messageConstraints).build();
 			connManager.setDefaultConnectionConfig(connectionConfig);
+			
 			connManager.setMaxTotal(200);
 			connManager.setDefaultMaxPerRoute(20);
 		} catch (KeyManagementException e) {
-			logger.error("KeyManagementException", e);
+			LOG.error("KeyManagementException", e);
 		} catch (NoSuchAlgorithmException e) {
-			logger.error("NoSuchAlgorithmException", e);
+			LOG.error("NoSuchAlgorithmException", e);
 		}
 	}
 	
@@ -199,15 +201,34 @@ public class HttpClientUtils {
 	 * @param encode
 	 * @param connectTimeout
 	 * @param soTimeout
+	 * @param headers
 	 * @return
 	 */
 	public static String sendGet(String url, Map<String, String> params, String encode, 
 			int connectTimeout, int soTimeout, String... headers) {
-		String responseString = null;
-		RequestConfig requestConfig = RequestConfig.custom()
+		return sendGet(url, params, encode, connectTimeout, soTimeout, null, headers);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param connectTimeout
+	 * @param soTimeout
+	 * @param proxy
+	 * @param headers
+	 * @return
+	 */
+	public static String sendGet(String url, Map<String, String> params, String encode, 
+			int connectTimeout, int soTimeout, HttpHost proxy, String... headers) {
+		String responseTxt = null;
+		RequestConfig.Builder builder = RequestConfig.custom()
 				.setSocketTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(connectTimeout).build();
+				.setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		StringBuilder sb = new StringBuilder(url);
 		int i = 0;
 		if (null != params && params.size() > 0) {
@@ -218,13 +239,12 @@ public class HttpClientUtils {
 				try {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
 				} catch (UnsupportedEncodingException e) {
-					logger.warn("encode http get params error, value is " + value, e);
+					LOG.warn("encode http get params error, value is " + value, e);
 					sb.append(URLEncoder.encode(value));
 				}
 				i++;
 			}
 		}
-		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
 		HttpGet httpGet = new HttpGet(sb.toString());
 		httpGet.setConfig(requestConfig);
 		if (null != headers) {
@@ -239,7 +259,8 @@ public class HttpClientUtils {
 				HttpEntity entity = response.getEntity();
 				try {
 					if (entity != null) {
-						responseString = EntityUtils.toString(entity, encode);
+						if (null == encode || "".equals(encode)) encode = ENCODE_UTF8;
+						responseTxt = EntityUtils.toString(entity, encode);
 					}
 				} finally {
 					if (entity != null) {
@@ -247,23 +268,22 @@ public class HttpClientUtils {
 					}
 				}
 			} catch (Exception e) {
-				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
-				return responseString;
+				LOG.error(String.format("response error, url:%s", sb.toString()), e);
+				return responseTxt;
 			} finally {
 				if (response != null) {
 					response.close();
 				}
 			}
-			logger.info(String.format("[HttpClientUtils Get]Debug url:%s , response string %s:", sb.toString(), responseString));
 		} catch (SocketTimeoutException e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get timout error, url:%s", sb.toString()), e);
-			return responseString;
+			LOG.error(String.format("invoke timout error, url:%s", sb.toString()), e);
+			return responseTxt;
 		} catch (Exception e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get error, url:%s", sb.toString()), e);
+			LOG.error(String.format("invoke error, url:%s", sb.toString()), e);
 		} finally {
 			httpGet.releaseConnection();
 		}
-		return responseString;
+		return responseTxt;
 	}
 	
 	/**
@@ -271,8 +291,8 @@ public class HttpClientUtils {
 	 * @param url
 	 * @return
 	 */
-	public static Map<String, Object> sendGetWithHeaders(String url) {
-		return sendGetWithHeaders(url, null, ENCODE_UTF8);
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url) {
+		return sendGetThenRespAndHeaders(url, null, ENCODE_UTF8);
 	}
 	
 	/**
@@ -281,8 +301,8 @@ public class HttpClientUtils {
 	 * @param headers
 	 * @return
 	 */
-	public static Map<String, Object> sendGetWithHeaders(String url, String[] headers) {
-		return sendGetWithHeaders(url, null, ENCODE_UTF8, headers);
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url, String[] headers) {
+		return sendGetThenRespAndHeaders(url, null, connectTimeout, soTimeout, headers);
 	}
 	
 	/**
@@ -291,19 +311,8 @@ public class HttpClientUtils {
 	 * @param params
 	 * @return
 	 */
-	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params) {
-		return sendGetWithHeaders(url, params, ENCODE_UTF8);
-	}
-	
-	/**
-	 * HTTP GET请求
-	 * @param url
-	 * @param params
-	 * @param encode
-	 * @return
-	 */
-	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, String encode) {
-		return sendGetWithHeaders(url, params, encode, connectTimeout, soTimeout);
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params) {
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout);
 	}
 	
 	/**
@@ -314,9 +323,9 @@ public class HttpClientUtils {
 	 * @param headers
 	 * @return
 	 */
-	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, 
-			String encode, String... headers) {
-		return sendGetWithHeaders(url, params, encode, connectTimeout, soTimeout, headers);
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
+			String... headers) {
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout, headers);
 	}
 	
 	/**
@@ -326,15 +335,33 @@ public class HttpClientUtils {
 	 * @param encode
 	 * @param connectTimeout
 	 * @param soTimeout
-	 * @return Response Header Infomations
+	 * @param headers
+	 * @return
 	 */
-	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, 
-			String encode, int connectTimeout, int soTimeout, String... headers) {
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
+			int connectTimeout, int soTimeout, String... headers) {
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout, null, headers);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param connectTimeout
+	 * @param soTimeout
+	 * @return proxy
+	 * @return headers
+	 */
+	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
+			int connectTimeout, int soTimeout, HttpHost proxy, String... headers) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		RequestConfig requestConfig = RequestConfig.custom()
+		RequestConfig.Builder builder = RequestConfig.custom()
 				.setSocketTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(connectTimeout).build();
+				.setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		StringBuilder sb = new StringBuilder(url);
 		int i = 0;
 		if (null != params && params.size() > 0) {
@@ -345,13 +372,11 @@ public class HttpClientUtils {
 				try {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
 				} catch (UnsupportedEncodingException e) {
-					logger.warn("encode http get params error, value is " + value, e);
 					sb.append(URLEncoder.encode(value));
 				}
 				i++;
 			}
 		}
-		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
 		HttpGet httpGet = new HttpGet(sb.toString());
 		httpGet.setConfig(requestConfig);
 		if (null != headers) {
@@ -362,7 +387,7 @@ public class HttpClientUtils {
 		}
 		Header[] reqHeaders = httpGet.getAllHeaders();
 		for (Header reqHeader : reqHeaders) {
-			System.err.println(reqHeader.getName() + " == " + reqHeader.getValue());
+			LOG.info(reqHeader.getName() + " == " + reqHeader.getValue());
 		}
 		try {
 			CloseableHttpResponse response = httpclient.execute(httpGet);
@@ -398,17 +423,16 @@ public class HttpClientUtils {
 					}
 				}
 			} catch (Exception e) {
-				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
+				LOG.error(String.format("response error, url:%s", sb.toString()), e);
 			} finally {
 				if (response != null) {
 					response.close();
 				}
 			}
-			logger.info(String.format("[HttpClientUtils Get]Debug url:%s , response string %s:", sb.toString(), response.toString()));
 		} catch (SocketTimeoutException e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get timout error, url:%s", sb.toString()), e);
+			LOG.error(String.format("invoke timout error, url:%s", sb.toString()), e);
 		} catch (Exception e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get error, url:%s", sb.toString()), e);
+			LOG.error(String.format("invoke error, url:%s", sb.toString()), e);
 		} finally {
 			httpGet.releaseConnection();
 		}
@@ -449,22 +473,40 @@ public class HttpClientUtils {
 	}
 	
 	/**
+	 * HTTP POST请求
+	 * @param url
+	 * @param params
+	 * @param connectTimeout
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static String sendPost(String url, Map<String, String> params, int connectTimeout, 
+			String encode, String... headers) {
+		return sendPost(url, params, connectTimeout, encode, null, headers);
+	}
+	
+	/**
 	  * HTTP POST请求
 	  * @param url
 	  * @param params
 	  * @param connectTimeout
 	  * @param encode
+	  * @param proxy
 	  * @param headers
 	  * @return
 	 */
-	public static String sendPost(String url, Map<String, String> params, int connectTimeout, String encode, String... headers) {
-		String responseContent = null;
+	public static String sendPost(String url, Map<String, String> params, int connectTimeout, 
+			String encode, HttpHost proxy, String... headers) {
+		String responseTxt = null;
 		HttpPost httpPost = new HttpPost(url);
 		try {
-			RequestConfig requestConfig = RequestConfig.custom()
+			RequestConfig.Builder builder = RequestConfig.custom()
 					.setSocketTimeout(connectTimeout)
 					.setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(connectTimeout).build();
+					.setConnectionRequestTimeout(connectTimeout);
+			if (null != proxy) builder.setProxy(proxy);
+			RequestConfig requestConfig = builder.build();
 			httpPost.setConfig(requestConfig);
 			if (null == encode) encode = ENCODE_UTF8;
 			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
@@ -473,7 +515,6 @@ public class HttpClientUtils {
 					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 				}
 			}
-			// 绑定到请求 Entry
 			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
 			if (null != headers) {
 				for (int i = 0, len = headers.length; i < len;) {
@@ -483,11 +524,10 @@ public class HttpClientUtils {
 			}
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			try {
-				// 执行POST请求
-				HttpEntity entity = response.getEntity(); // 获取响应实体
+				HttpEntity entity = response.getEntity();
 				try {
 					if (null != entity) {
-						responseContent = EntityUtils.toString(entity, Charset.forName(encode));
+						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
 					}
 				} finally {
 					if (entity != null) {
@@ -499,17 +539,29 @@ public class HttpClientUtils {
 					response.close();
 				}
 			}
-			logger.info("requestURI : " + httpPost.getURI() + ", responseContent: " + responseContent);
 		} catch (ClientProtocolException e) {
-			logger.error("ClientProtocolException", e);
+			LOG.error(e.getMessage(), e);
 		} catch (IOException e) {
-			logger.error("IOException", e);
+			LOG.error(e.getMessage(), e);
 		} finally {
 			httpPost.releaseConnection();
 		}
-		return responseContent;
+		return responseTxt;
 	}
 	
+	/**
+	 * HTTP POST请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static Map<String, Object> sendPostThenRespAndHeaders(String url, Map<String, String> params, 
+			String encode, String... headers) {
+		return sendPostThenRespAndHeaders(url, params, encode, null, headers);
+	}
+
 	/**
 	  * HTTP POST请求
 	  * @param url
@@ -519,12 +571,18 @@ public class HttpClientUtils {
 	  * @param headers
 	  * @return
 	 */
-	public static Map<String, Object> sendPostWithHeaders(String url, Map<String, String> params, 
-			String encode, String... headers) {
+	public static Map<String, Object> sendPostThenRespAndHeaders(String url, Map<String, String> params, 
+			String encode, HttpHost proxy, String... headers) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		HttpPost httpPost = new HttpPost(url);
 		try {
-			httpPost.setConfig(defaultRequestConfig);
+			RequestConfig.Builder builder = RequestConfig.custom()
+					.setSocketTimeout(connectTimeout)
+					.setConnectTimeout(connectTimeout)
+					.setConnectionRequestTimeout(connectTimeout);
+			if (null != proxy) builder.setProxy(proxy);
+			RequestConfig requestConfig = builder.build();
+			httpPost.setConfig(requestConfig);
 			if (null == encode) encode = ENCODE_UTF8;
 			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 			if (null != params && params.size() > 0) {
@@ -532,7 +590,6 @@ public class HttpClientUtils {
 					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 				}
 			}
-			// 绑定到请求 Entry
 			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
 			if (null != headers) {
 				for (int i = 0, len = headers.length; i < len;) {
@@ -553,7 +610,7 @@ public class HttpClientUtils {
 					respheaders.put(headerName, headerValue);
 				}
 				result.put("headers", respheaders);
-				HttpEntity entity = response.getEntity(); // 获取响应实体
+				HttpEntity entity = response.getEntity();
 				try {
 					if (null != entity) {
 						result.put("content", EntityUtils.toString(entity, Charset.forName(encode)));
@@ -568,19 +625,26 @@ public class HttpClientUtils {
 					response.close();
 				}
 			}
-			logger.info("requestURI : " + httpPost.getURI() + ", responseContent: " + result.get("content"));
 		} catch (ClientProtocolException e) {
-			logger.error("ClientProtocolException", e);
+			LOG.error(e.getMessage(), e);
 		} catch (IOException e) {
-			logger.error("IOException", e);
+			LOG.error(e.getMessage(), e);
 		} finally {
 			httpPost.releaseConnection();
 		}
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @param url
+	 * @param path
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
 	public static String sendPostWithFile(String url, String path, String encode, String... headers) {
-		String responseContent = null;
+		String responseTxt = null;
 		HttpPost httpPost = new HttpPost(url);
 		try {
 			RequestConfig requestConfig = RequestConfig.custom()
@@ -589,7 +653,6 @@ public class HttpClientUtils {
 					.setConnectionRequestTimeout(connectTimeout).build();
 			httpPost.setConfig(requestConfig);
 			if (null == encode) encode = ENCODE_UTF8;
-			// 绑定到请求 Entry
 			if (null != headers) {
 				for (int i = 0, len = headers.length; i < len;) {
             		httpPost.setHeader(headers[i], headers[i + 1]);
@@ -601,11 +664,10 @@ public class HttpClientUtils {
 			httpPost.setEntity(httpEntity);
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			try {
-				// 执行POST请求
-				HttpEntity entity = response.getEntity(); // 获取响应实体
+				HttpEntity entity = response.getEntity();
 				try {
 					if (null != entity) {
-						responseContent = EntityUtils.toString(entity, Charset.forName(encode));
+						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
 					}
 				} finally {
 					if (entity != null) {
@@ -617,15 +679,14 @@ public class HttpClientUtils {
 					response.close();
 				}
 			}
-			logger.info("requestURI : " + httpPost.getURI() + ", responseContent: " + responseContent);
 		} catch (ClientProtocolException e) {
-			logger.error("ClientProtocolException", e);
+			LOG.error(e.getMessage(), e);
 		} catch (IOException e) {
-			logger.error("IOException", e);
+			LOG.error(e.getMessage(), e);
 		} finally {
 			httpPost.releaseConnection();
 		}
-		return responseContent;
+		return responseTxt;
 	}
 
 }
