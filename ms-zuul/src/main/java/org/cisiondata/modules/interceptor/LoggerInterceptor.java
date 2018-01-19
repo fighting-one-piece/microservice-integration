@@ -26,7 +26,6 @@ public class LoggerInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		System.err.println("preHandle");
 		LogEntity logEntity = new LogEntity();
 		logEntity.setSpendTime(System.currentTimeMillis());
 		logEntity.setJsessionId(request.getRequestedSessionId());
@@ -43,13 +42,11 @@ public class LoggerInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		System.err.println("postHandle");
 	}
 
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		System.err.println("afterCompletion");
         LogEntity logEntity = (LogEntity) request.getAttribute("_log_entity");
         logEntity.setSpendTime((System.currentTimeMillis() - logEntity.getSpendTime()) / 1000);
         logEntity.setResult(response.toString());
