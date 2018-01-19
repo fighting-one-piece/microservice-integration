@@ -1,13 +1,13 @@
-package org.cisiondata.modules.auth.service.impl;
+package org.cisiondata.modules.oauth.service.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.auth.entity.User;
-import org.cisiondata.modules.auth.service.IRoleService;
-import org.cisiondata.modules.auth.service.IUserService;
+import org.cisiondata.modules.oauth.entity.User;
+import org.cisiondata.modules.oauth.service.IRoleService;
+import org.cisiondata.modules.oauth.service.IUserService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

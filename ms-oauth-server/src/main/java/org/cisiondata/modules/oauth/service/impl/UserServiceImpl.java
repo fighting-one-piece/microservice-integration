@@ -1,4 +1,4 @@
-package org.cisiondata.modules.auth.service.impl;
+package org.cisiondata.modules.oauth.service.impl;
 
 import javax.annotation.Resource;
 
@@ -6,9 +6,9 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.dao.GenericDAO;
 import org.cisiondata.modules.abstr.entity.Query;
 import org.cisiondata.modules.abstr.service.impl.GenericServiceImpl;
-import org.cisiondata.modules.auth.dao.UserDAO;
-import org.cisiondata.modules.auth.entity.User;
-import org.cisiondata.modules.auth.service.IUserService;
+import org.cisiondata.modules.oauth.dao.UserDAO;
+import org.cisiondata.modules.oauth.entity.User;
+import org.cisiondata.modules.oauth.service.IUserService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Service;
 

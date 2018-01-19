@@ -4,9 +4,9 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.auth.dao.UserDAO;
-import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.bootstrap.BaseBootstrapApplication;
+import org.cisiondata.modules.oauth.dao.UserDAO;
+import org.cisiondata.modules.oauth.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package org.cisiondata.modules.auth.entity;
+package org.cisiondata.modules.oauth.entity;
 
 import java.util.ArrayList;
 import java.util.Date;

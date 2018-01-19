@@ -1,4 +1,4 @@
-package org.cisiondata.modules.auth.controller;
+package org.cisiondata.modules.oauth.controller;
 
 import java.security.Principal;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.entity.Query;
-import org.cisiondata.modules.auth.entity.User;
-import org.cisiondata.modules.auth.service.IUserService;
+import org.cisiondata.modules.oauth.entity.User;
+import org.cisiondata.modules.oauth.service.IUserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ public class UserController {
 
 	@Resource(name = "userService")
 	private IUserService userService;
-
+	
 	@RequestMapping(value = "/user", method = RequestMethod.GET)
 	public Principal user(Principal user) {
 		return user;
@@ -38,7 +38,7 @@ public class UserController {
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
 	public List<User> listAllUsers() {
-		List<User> users = (List<User>) userService.readDataByCondition(new Query(), false);
+		List<User> users = (List<User>) userService.readDataListByCondition(new Query(), false);
 		return users.isEmpty() ? null : users;
 	}
 	

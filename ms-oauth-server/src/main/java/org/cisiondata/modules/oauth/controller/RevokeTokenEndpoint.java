@@ -1,4 +1,4 @@
-package org.cisiondata.modules.auth.controller;
+package org.cisiondata.modules.oauth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
