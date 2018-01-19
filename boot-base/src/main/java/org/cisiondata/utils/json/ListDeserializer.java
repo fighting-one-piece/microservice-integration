@@ -42,6 +42,7 @@ public class ListDeserializer implements JsonDeserializer<List<Object>> {
 	 * @return
 	 */
 	private Object handle(JsonElement element) {
+		if (null == element || element instanceof JsonNull) return null;
 		Class<?> elementClass = element.getClass();
 		if (JsonObject.class.isAssignableFrom(elementClass)) {
 			JsonObject jsonObject = element.getAsJsonObject();

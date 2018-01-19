@@ -20,8 +20,6 @@ import org.springframework.web.util.IntrospectorCleanupListener;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
@@ -74,6 +72,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 		XSSFilter xssFilter = new XSSFilter();
 		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
 		filterRegistrationBean.setFilter(xssFilter);
+		filterRegistrationBean.setName("xssFilter");
 		List<String> urlPatterns = new ArrayList<String>();
 		urlPatterns.add("/*");//拦截路径，可以添加多个
 		filterRegistrationBean.setUrlPatterns(urlPatterns);
@@ -105,6 +104,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         
+		/**
         SimpleModule simpleModule1 = new SimpleModule();
         simpleModule1.addSerializer(Integer.class, ToStringSerializer.instance);
         simpleModule1.addSerializer(Integer.TYPE, ToStringSerializer.instance);
@@ -124,6 +124,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         simpleModule4.addSerializer(Double.class, ToStringSerializer.instance);
         simpleModule4.addSerializer(Double.TYPE, ToStringSerializer.instance);
         objectMapper.registerModule(simpleModule4);
+		*/
 
         jackson2HttpMessageConverter.setObjectMapper(objectMapper);
         

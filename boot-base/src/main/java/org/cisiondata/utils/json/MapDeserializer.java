@@ -29,19 +29,7 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Set<Entry<String, JsonElement>> entries = json.getAsJsonObject().entrySet();
 		for (Entry<String, JsonElement> entry : entries) {
-			JsonElement element = entry.getValue();
-			if (null == element || element instanceof JsonNull) continue;
-			map.put(entry.getKey(), handle(element));
-			/**
-			Class<?> elementClass = element.getClass();
-			if (JsonArray.class.isAssignableFrom(elementClass)) {
-				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
-			} else if (JsonObject.class.isAssignableFrom(elementClass)) {
-				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
-			} else {
-				map.put(entry.getKey(), isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString());
-			}
-			*/
+			map.put(entry.getKey(), handle(entry.getValue()));
 		}
 		return map;
 	}
@@ -62,6 +50,7 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 	 * @return
 	 */
 	private Object handle(JsonElement element) {
+		if (null == element || element instanceof JsonNull) return null;
 		Class<?> elementClass = element.getClass();
 		if (JsonObject.class.isAssignableFrom(elementClass)) {
 			JsonObject jsonObject = element.getAsJsonObject();

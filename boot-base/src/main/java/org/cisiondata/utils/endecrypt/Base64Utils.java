@@ -37,11 +37,4 @@ public class Base64Utils {
 		return null;
 	}
 	
-	public static void main(String[] args) {
-        String data = "cisiondata";
-        String encodeData = Base64Utils.encode(data.getBytes());
-        System.out.println(encodeData);
-        System.out.println(new String(Base64Utils.decode(encodeData)));
-    }
-
 }
