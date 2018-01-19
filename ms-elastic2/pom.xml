@@ -269,7 +269,6 @@
 		    <groupId>org.elasticsearch.plugin</groupId>
 		    <artifactId>shield</artifactId>
 		    <version>${elasticsearch.shield.version}</version>
-		    <scope>provided</scope>
 		</dependency>
 		
 	    <!-- HBase依赖报 --> 
@@ -465,6 +464,7 @@
 							<mainClass>org.cisiondata.modules.bootstrap.BootstrapApplication</mainClass>
 							<addClasspath>true</addClasspath>
 					        <classpathPrefix>libs/</classpathPrefix>
+					        <useUniqueVersions>false</useUniqueVersions>  
 						</manifest>
 					</archive>
 					<manifestEntries>
@@ -472,10 +472,12 @@
 					</manifestEntries>
 				</configuration>
 			</plugin>
+			<!--  
 			<plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            -->
 		</plugins>
 
 	</build>
