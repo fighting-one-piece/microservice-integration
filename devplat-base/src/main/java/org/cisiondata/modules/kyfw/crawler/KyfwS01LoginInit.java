@@ -12,7 +12,7 @@ public class KyfwS01LoginInit extends KyfwHandler {
 	@Override
 	public Map<String, String> handle(Map<String, String> params) {
 		String url = "https://kyfw.12306.cn/otn/login/init";
-		Map<String, Object> result = HttpClientUtils.sendGetWithHeaders(url);
+		Map<String, Object> result = HttpClientUtils.sendGetThenRespAndHeaders(url);
 		Map<String, String> headers = (Map<String, String>) result.get("headers");
 		System.err.println(headers);
 		Map<String, String> cookies = HeaderUtils.extractCookies(headers, "JSESSIONID", "BIGipServerotn", "route");

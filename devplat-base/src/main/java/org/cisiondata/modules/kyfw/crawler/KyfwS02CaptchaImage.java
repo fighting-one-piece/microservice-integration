@@ -14,7 +14,7 @@ public class KyfwS02CaptchaImage extends KyfwHandler {
 	@Override
 	public Map<String, String> handle(Map<String, String> params) {
 		String url = "https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.6755646629172731";
-		Map<String, Object> result = HttpClientUtils.sendGetWithHeaders(url);
+		Map<String, Object> result = HttpClientUtils.sendGetThenRespAndHeaders(url);
 		Map<String, String> headers = (Map<String, String>) result.get("headers");
 		Map<String, String> cookies = HeaderUtils.extractCookies(headers, "_passport_session", "_passport_ct", "BIGipServerpassport");
 		cookies.putAll(params);

@@ -38,7 +38,7 @@ public class KyfwS16CheckOrderInfo extends KyfwHandler {
 		rparams.put("whatsSelect", "1");
 		rparams.put("_json_att", "");
 		rparams.put("REPEAT_SUBMIT_TOKEN", repeatSubmitToken);
-		Map<String, Object> result = HttpClientUtils.sendPostWithHeaders(url, rparams, "UTF-8", HeaderUtils.buildHeaders(headers));
+		Map<String, Object> result = HttpClientUtils.sendPostThenRespAndHeaders(url, rparams, "UTF-8", HeaderUtils.buildHeaders(headers));
 		System.err.println(result.get("content"));
 		Map<String, String> cookies = HeaderUtils.extractCookies((Map<String, String>) result.get("headers"), "tk");
 		if (null != cookies && cookies.containsKey("tk")) {

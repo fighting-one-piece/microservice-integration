@@ -34,7 +34,7 @@ public class KyfwS12SubmitOrderRequest extends KyfwHandler {
 		rparams.put("purpose_codes", "ADULT");
 		rparams.put("query_from_station_name", fromStationName);
 		rparams.put("query_to_station_name", toStationName);
-		Map<String, Object> result = HttpClientUtils.sendPostWithHeaders(url, rparams, "UTF-8", HeaderUtils.buildHeaders(headers));
+		Map<String, Object> result = HttpClientUtils.sendPostThenRespAndHeaders(url, rparams, "UTF-8", HeaderUtils.buildHeaders(headers));
 		String content = String.valueOf(result.get("content"));
 		System.err.println(content);
 		if (content.startsWith("{") && content.endsWith("}")) {
