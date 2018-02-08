@@ -1,13 +1,8 @@
 package org.cisiondata.utils.aspect;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.exception.DataException;
@@ -25,6 +20,7 @@ public class DAOLayerAspect {
 
 	private static final String EXECUTION = "execution(* org.cisiondata.modules.*.dao.*.*(..))";
 	
+	/**
 	@Before(EXECUTION)
 	public void logBefore(JoinPoint joinPoint){
 	}
@@ -44,6 +40,7 @@ public class DAOLayerAspect {
 		}
 		LOG.error(exception.getMessage(), exception);
 	}
+	*/
 
 	@Around(EXECUTION)
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {

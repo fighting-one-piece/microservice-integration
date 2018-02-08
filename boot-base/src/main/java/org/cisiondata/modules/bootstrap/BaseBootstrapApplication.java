@@ -29,6 +29,16 @@ public class BaseBootstrapApplication {
 	protected static Logger LOG = LoggerFactory.getLogger(BaseBootstrapApplication.class);
 
 	@Bean
+	@Primary
+	public ObjectMapper xssObjectMapper(Jackson2ObjectMapperBuilder builder) {
+		ObjectMapper objectMapper = builder.createXmlMapper(false).build(); 
+		SimpleModule xssModule = new SimpleModule("XssStringJsonSerializer");
+		xssModule.addSerializer(new XssStringJsonSerializer());
+		objectMapper.registerModule(xssModule);
+		return objectMapper;
+	}
+	
+	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -48,17 +58,6 @@ public class BaseBootstrapApplication {
 	            container.addErrorPages(new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error/500.html"));            
 	        }    
 	    };
-	}
-	
-	@Bean
-	@Primary
-	public ObjectMapper xssObjectMapper(Jackson2ObjectMapperBuilder builder) {
-		ObjectMapper objectMapper = builder.createXmlMapper(false).build(); 
-		// 注册xss解析器
-		SimpleModule xssModule = new SimpleModule("XssStringJsonSerializer");
-		xssModule.addSerializer(new XssStringJsonSerializer());
-		objectMapper.registerModule(xssModule);
-		return objectMapper;
 	}
 	
 }

@@ -4,14 +4,9 @@ import java.net.ConnectException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.bootstrap.config.ds.DataSource;
 import org.cisiondata.modules.bootstrap.config.ds.DataSourceContextHolder;
@@ -26,7 +21,7 @@ public class ServiceLayerAspect {
 
 	private Logger LOG = LoggerFactory.getLogger(ServiceLayerAspect.class);
 
-	private static final String EXECUTION = "execution(* org.cisiondata.modules.*.*.impl.*.*(..))";
+	private static final String EXECUTION = "execution(* org.cisiondata.modules.*.service.impl.*.*(..))";
 	
 	private static Set<Integer> notPrintStackTraceResultCode = new HashSet<Integer>();
 	
@@ -41,6 +36,7 @@ public class ServiceLayerAspect {
 		}
 	}
 	
+	/**
 	@Before(EXECUTION)
 	public void logBefore(JoinPoint joinPoint){
 //		LOG.info("------Log Before Method------" + joinPoint.getSignature().getName());
@@ -62,6 +58,7 @@ public class ServiceLayerAspect {
 //		LOG.info("------Log After Throwing Method------" + joinPoint.getSignature().getName());
 //		LOG.error(exception.getMessage(), exception);
 	}
+	*/
 
 	@Around(EXECUTION)
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {

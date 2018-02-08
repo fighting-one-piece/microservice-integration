@@ -41,6 +41,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -277,7 +278,6 @@ public class HttpClientUtils {
 			}
 		} catch (SocketTimeoutException e) {
 			LOG.error(String.format("invoke timout error, url:%s", sb.toString()), e);
-			return responseTxt;
 		} catch (Exception e) {
 			LOG.error(String.format("invoke error, url:%s", sb.toString()), e);
 		} finally {
@@ -516,6 +516,65 @@ public class HttpClientUtils {
 				}
 			}
 			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
+			if (null != headers) {
+				for (int i = 0, len = headers.length; i < len;) {
+            		httpPost.setHeader(headers[i], headers[i + 1]);
+            		i = i + 2;
+            	}
+			}
+			CloseableHttpResponse response = httpclient.execute(httpPost);
+			try {
+				HttpEntity entity = response.getEntity();
+				try {
+					if (null != entity) {
+						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
+					}
+				} finally {
+					if (entity != null) {
+						entity.getContent().close();
+					}
+				}
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+		} catch (ClientProtocolException e) {
+			LOG.error(e.getMessage(), e);
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		} finally {
+			httpPost.releaseConnection();
+		}
+		return responseTxt;
+	}
+	
+	/**
+	 * HTTP POST请求
+	 * @param url
+	 * @param params
+	 * @param connectTimeout
+	 * @param encode
+	 * @param proxy
+	 * @param headers
+	 * @return
+	 */
+	public static String sendPost(String url, String params, int connectTimeout, 
+			String encode, HttpHost proxy, String... headers) {
+		String responseTxt = null;
+		HttpPost httpPost = new HttpPost(url);
+		try {
+			RequestConfig.Builder builder = RequestConfig.custom()
+					.setSocketTimeout(connectTimeout)
+					.setConnectTimeout(connectTimeout)
+					.setConnectionRequestTimeout(connectTimeout);
+			if (null != proxy) builder.setProxy(proxy);
+			RequestConfig requestConfig = builder.build();
+			httpPost.setConfig(requestConfig);
+			if (null == encode) encode = ENCODE_UTF8;
+			StringEntity stringEntity = new StringEntity(params, ENCODE_UTF8);
+        	stringEntity.setContentType("application/x-www-form-urlencoded");
+            httpPost.setEntity(stringEntity);
 			if (null != headers) {
 				for (int i = 0, len = headers.length; i < len;) {
             		httpPost.setHeader(headers[i], headers[i + 1]);

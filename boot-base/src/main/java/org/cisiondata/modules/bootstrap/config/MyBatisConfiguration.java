@@ -1,14 +1,9 @@
 package org.cisiondata.modules.bootstrap.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Resource;
 
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.cisiondata.modules.bootstrap.config.ds.DataSource;
-import org.cisiondata.modules.bootstrap.config.ds.DynamicRoutingDataSource;
 import org.cisiondata.modules.bootstrap.config.fs.SpringBootVFS;
 import org.mybatis.spring.CustomSqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -27,14 +22,13 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 @Configuration
 @AutoConfigureAfter(DataSourceConfiguration.class)
 @PropertySource("classpath:mybatis/mybatis.properties")
-//@MapperScan(basePackages = "org.cisiondata.modules.**.dao")
+/**
+@MapperScan(basePackages = "org.cisiondata.modules.**.dao")
+*/
 public class MyBatisConfiguration implements EnvironmentAware {
 
-	@Resource(name = "masterDataSource")
-	private javax.sql.DataSource masterDataSource = null;
-
-	@Resource(name = "slaveDataSource")
-	private javax.sql.DataSource slaveDataSource = null;
+	@Resource(name = "routingDataSouce")
+	private AbstractRoutingDataSource routingDataSouce = null;
 
 	private RelaxedPropertyResolver propertyResolver = null;
 
@@ -48,32 +42,21 @@ public class MyBatisConfiguration implements EnvironmentAware {
 	public SqlSessionFactory sqlSessionFactoryBean() throws Exception {
 		VFS.addImplClass(SpringBootVFS.class);
 		SqlSessionFactoryBean sqlSessionFactoryBean = new CustomSqlSessionFactoryBean();
-		sqlSessionFactoryBean.setDataSource(routingDataSouce());
+		sqlSessionFactoryBean.setDataSource(routingDataSouce);
 		sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		DefaultResourceLoader loader = new DefaultResourceLoader();
 		sqlSessionFactoryBean.setConfigLocation(loader.getResource(propertyResolver.getProperty("configLocation")));
 		sqlSessionFactoryBean.setMapperLocations(resolver.getResources(propertyResolver.getProperty("mapperLocations")));
 		/**
-		 * sqlSessionFactoryBean.setTypeAliasesPackage(propertyResolver.getProperty("typeAliasesPackage"));
-		 **/
+		sqlSessionFactoryBean.setTypeAliasesPackage(propertyResolver.getProperty("typeAliasesPackage"));
+		*/
 		return sqlSessionFactoryBean.getObject();
 	}
 
 	@Bean
 	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
 		return new SqlSessionTemplate(sqlSessionFactory);
-	}
-
-	@Bean
-	public AbstractRoutingDataSource routingDataSouce() {
-		DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource();
-		Map<Object, Object> targetDataResources = new HashMap<Object, Object>();
-		targetDataResources.put(DataSource.MASTER, masterDataSource);
-		targetDataResources.put(DataSource.SLAVE, slaveDataSource);
-		routingDataSource.setDefaultTargetDataSource(masterDataSource);
-		routingDataSource.setTargetDataSources(targetDataResources);
-		return routingDataSource;
 	}
 
 }

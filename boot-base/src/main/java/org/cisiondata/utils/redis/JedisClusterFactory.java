@@ -42,28 +42,29 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Set<HostAndPort> hostAndPorts = this.parseHostAndPort();
+		if (hostAndPorts.size() == 0) return;
 		jedisCluster = new JedisCluster(hostAndPorts, timeout, maxRedirections, genericObjectPoolConfig);
 	}
 	
 	private Set<HostAndPort> parseHostAndPort() {
+		Set<HostAndPort> hostAndPorts = new HashSet<HostAndPort>();
 		try {
+			if (null == this.address || "".equals(this.address)) return hostAndPorts;
 			String[] addresses = this.address.indexOf(",") == -1 ? new String[]{this.address} : this.address.split(",");
-			Set<HostAndPort> hostAndPorts = new HashSet<HostAndPort>();
 			for (int i = 0, len = addresses.length; i < len; i++) {
 				String clusterAddress = addresses[i];
 				boolean isIpPort = pattern.matcher(clusterAddress).matches();
 				if (!isIpPort) {
-					throw new IllegalArgumentException("ip 或  port 不合法");
+					throw new IllegalArgumentException("ip or port error");
 				}
 				String[] ipAndPort = clusterAddress.split(":");
 				HostAndPort hostAndPort = new HostAndPort(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
 				hostAndPorts.add(hostAndPort);
 			}
-			return hostAndPorts;
 		} catch (Exception e) {
-			LOG.error("解析redis配置文件失败", e);
+			LOG.error("parse redis cluster config failure!", e);
 		}
-		return null;
+		return hostAndPorts;
 	}
 	
 	public void setAddress(String address) {
