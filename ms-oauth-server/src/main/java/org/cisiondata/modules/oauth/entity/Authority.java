@@ -12,6 +12,9 @@ public class Authority extends PKAutoEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String USER = "user";
+	public static final String ADMIN = "admin";
+	
 	/** 授权名称 */
 	@Column(name = "NAME")
 	private String name = null;

@@ -127,8 +127,18 @@
 		</logger>
 		<logger name="org.springframework" level="INFO">
 			<appender-ref ref="CONSOLE" />
-			<appender-ref ref="SYS_LOG" />
 		</logger>
+		<!--  
+		<logger name="org.springframework.security" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="org.springframework.transaction.interceptor" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="org.springframework.jdbc.datasource" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		-->
 		<logger name="java.sql" level="INFO">
 	    	<appender-ref ref="CONSOLE" />
 	    </logger>

@@ -24,6 +24,17 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 	}
 	
 	@Override
+	protected void preHandle(Object object) throws BusinessException {
+		
+	}
+	
+	@Override
+	public void insert(Object object) throws BusinessException {
+		super.insert(object);
+//		throw new RuntimeException("error!");
+	}
+	
+	@Override
 	public User readUserByUsername(String username) throws BusinessException {
 		if (StringUtils.isBlank(username)) throw new BusinessException("username is null");
 		Query query = new Query();

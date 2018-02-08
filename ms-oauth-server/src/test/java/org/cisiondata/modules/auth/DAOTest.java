@@ -33,9 +33,9 @@ public class DAOTest {
 	@Test
 	public void testInsertUser() {
 		User user = new User();
-		user.setUsername("admin");
-		user.setPassword(new BCryptPasswordEncoder().encode("admin"));
-		user.setSalt("admin");
+		user.setUsername("admin1");
+		user.setPassword(new BCryptPasswordEncoder().encode("admin1"));
+		user.setSalt("admin1");
 		user.setCreateTime(new Date());
 		user.setDeleteFlag(false);
 		userDAO.insert(user);

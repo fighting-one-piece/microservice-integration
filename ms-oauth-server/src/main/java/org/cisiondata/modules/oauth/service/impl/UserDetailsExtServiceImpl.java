@@ -30,6 +30,7 @@ public class UserDetailsExtServiceImpl implements UserDetailsService {
         	throw new UsernameNotFoundException("用户名："+ username + "不存在！");
         }
         Collection<SimpleGrantedAuthority> collection = new HashSet<SimpleGrantedAuthority>();
+        collection.add(new SimpleGrantedAuthority("ADMIN"));
         /**
         Iterator<String> iterator =  userRoleService.findRoles(user.getId()).iterator();
         while (iterator.hasNext()){

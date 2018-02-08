@@ -39,6 +39,7 @@ public class User extends PKAutoEntity<Long> {
 	/** 是否删除标志 */
 	@Column(name = "DELETE_FLAG")
 	private Boolean deleteFlag = false;
+	
     private List<Role> roles = new ArrayList<Role>();
 
     public String getUsername() {
