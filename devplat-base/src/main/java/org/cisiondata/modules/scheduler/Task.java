@@ -11,8 +11,8 @@ public abstract class Task implements Runnable {
 	
 	protected Map<String, Object> params = null;
 	
-	public Task(Map<String, Object> params) {
+	public void setParams(Map<String, Object> params) {
 		this.params = params;
 	}
-
+	
 }

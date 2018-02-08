@@ -73,6 +73,11 @@ public abstract class Job {
 	public void setJobConf(String key, Object value) {
 		getJobConf().put(key, value);
 	}
+	
+	/**
+	 * 初始化配置
+	 */
+	public void initializeJobConf() {}
 
 	/**
 	 * 分割总记录数,-1表示不需要分割数据
@@ -96,6 +101,7 @@ public abstract class Job {
 	
 	public void startup() {
 		initializeJobConf();
+		initializeJobParams();
 		startupProducers();
 		if (!useConsumerModel) return;
 		startupConsumers();
@@ -119,7 +125,7 @@ public abstract class Job {
 	 * 初始化参数配置
 	 * @param jobConf
 	 */
-	private void initializeJobConf() {
+	private void initializeJobParams() {
 		pThreadPoolNum = (int) getJobConf().getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
 		pExecutorService = Executors.newFixedThreadPool(pThreadPoolNum);
 		cThreadPoolNum = (int) getJobConf().getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
@@ -142,7 +148,7 @@ public abstract class Job {
 			int recordTotalNumber = readRecordTotalNumber();
 			if (recordTotalNumber == -1) {
 				for (int i = 0; i < pThreadPoolNum; i++) {
-					pFutures.add(pExecutorService.submit(producer(null)));
+					pFutures.add(pExecutorService.submit(producer(getJobConf())));
 				}
 			} else {
 				int splitNumber = recordTotalNumber / pThreadPoolNum;

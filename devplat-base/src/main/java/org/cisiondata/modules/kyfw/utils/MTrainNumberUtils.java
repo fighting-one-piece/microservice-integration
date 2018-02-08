@@ -26,9 +26,9 @@ import org.cisiondata.utils.json.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TrainNumberUtils {
+public class MTrainNumberUtils {
 	
-	private static Logger LOG = LoggerFactory.getLogger(TrainNumberUtils.class);
+	private static Logger LOG = LoggerFactory.getLogger(MTrainNumberUtils.class);
 	
 	private static long expiredTime = 0L;
 	
@@ -70,7 +70,7 @@ public class TrainNumberUtils {
 	}
 	
 	public static List<Map<String, Object>> obtainTrainNumberInfos(String startPlace, String endPlace) {
-		return TrainNumberService.obtainTrainNumberInfos(startPlace, endPlace);
+		return MTrainNumberService.obtainTrainNumberInfos(startPlace, endPlace);
 	}
 	
 	/**
@@ -149,7 +149,7 @@ public class TrainNumberUtils {
 				@Override
 				public List<Map<String, Object>> call() throws Exception {
 					String[] seStation = stationsTxt.split("-");
-					return TrainNumberService.obtainTrainNumberInfos(seStation[0], seStation[1]);
+					return MTrainNumberService.obtainTrainNumberInfos(seStation[0], seStation[1]);
 				}
 			});
 		}
@@ -164,10 +164,10 @@ public class TrainNumberUtils {
 		}
 		for (int i = 0, len = trainNumberInfos.size(); i < len; i++) {
 			Map<String, Object> trainNumberInfo = trainNumberInfos.get(i);
-			String trainNumber = ((String) trainNumberInfo.get("trainNo")).replace("\"", "");
-			String key = trainNumber + ":" + (String) trainNumberInfo.get("seatType");
+			String trainNumber = ((String) trainNumberInfo.get("trainNumber")).replace("\"", "");
+			String key = trainNumber + ":" + (String) trainNumberInfo.get("type");
 			ti.put(key, trainNumberInfo);
-			tm.put(key, (int) trainNumberInfo.get("seatCount"));
+			tm.put(key, (int) trainNumberInfo.get("count"));
 			trainNumberList.add(trainNumber);
 		}
 		tc = new ArrayList<Map.Entry<String, Integer>>(tm.entrySet());
@@ -196,11 +196,11 @@ public class TrainNumberUtils {
 	
 }
 
-class TrainNumberService {
+class MTrainNumberService {
 	
 	public static Logger LOG = LoggerFactory.getLogger(TrainNumberService.class);
 	
-	private static String TRAIN_NUMBER_URL = "https://train.qunar.com/dict/open/s2s.do?callback=&dptStation=%s&arrStation=%s&date=%s&type=normal&user=neibu&source=site&start=1&num=500&sort=3&_=%s";
+	private static String TRAIN_NUMBER_URL = "http://touch.train.qunar.com/api/train/trains2s?startStation=%s&endStation=%s&date=%s&searchType=stasta&bd_source=baidupz&wakeup=1";
 	
 	private static SimpleDateFormat DSDF = DateFormatter.DATE.get();
 	private static SimpleDateFormat TSDF = DateFormatter.TIME.get();
@@ -211,39 +211,42 @@ class TrainNumberService {
 		try {
 			String url = String.format(TRAIN_NUMBER_URL, startPlace, endPlace, DSDF.format(new Date()), System.currentTimeMillis());
 			String response = HttpUtils.sendGet(url);
-			response = response.substring(response.indexOf("(") + 1, response.length() - 2);
-			Map<String, Object> map = GsonUtils.fromJsonToMap(response);
-			Map<String, Object> dataMap = (Map<String, Object>) map.get("data");
-			List<Map<String, Object>> s2sBeanList = (List<Map<String,Object>>) dataMap.get("s2sBeanList");
+			Map<String, Object> result = GsonUtils.fromJsonToMap(response);
+			Map<String, Object> dataMap = (Map<String, Object>) result.get("dataMap");
+			Map<String, Object> directTrainInfo = (Map<String, Object>) dataMap.get("directTrainInfo");
+			System.err.println("directTrainInfo: " + directTrainInfo);
+			List<Map<String, Object>> trains = (List<Map<String, Object>>) directTrainInfo.get("trains");
 			Calendar calendar = Calendar.getInstance();
 			String currentDate = DSDF.format(calendar.getTime());
 			calendar.add(Calendar.HOUR_OF_DAY, 1);
 			Date upperTime = calendar.getTime();
 			calendar.add(Calendar.HOUR_OF_DAY, 2);
 			Date lowerTime = calendar.getTime();
-			for (int i = 0, len = s2sBeanList.size(); i < len; i++) {
-				Map<String, Object> s2sBean = s2sBeanList.get(i);
-				Object trainNo = s2sBean.get("trainNo").toString().replace("\"", "");
-				Object dptStationName = s2sBean.get("dptStationName").toString().replace("\"", "");
-				Object endStationName = s2sBean.get("endStationName").toString().replace("\"", "");
-				Object dptTime = s2sBean.get("dptTime").toString().replace("\"", "");
-				System.err.println(currentDate + " " + dptTime + ":00");
-				Date tDptTime = TSDF.parse(currentDate + " " + dptTime + ":00");
+			for (int i = 0, len = trains.size(); i < len; i++) {
+				Map<String, Object> train = trains.get(i);
+				Object dTime = train.get("dTime").toString().replace("\"", "");
+				System.err.println("dtime: " + currentDate + " " + dTime + ":00");
+				Date tDptTime = TSDF.parse(currentDate + " " + dTime + ":00");
 				if (tDptTime.before(upperTime) || tDptTime.after(lowerTime)) continue;
-				Object dptDate = ((Map<String,Object>) s2sBean.get("extraBeanMap")).get("dptDate").toString().replace("\"", "");
-				Map<String, Map<String, Object>> seats = (Map<String, Map<String, Object>>) s2sBean.get("seats");
-				for (Map.Entry<String, Map<String, Object>> entry : seats.entrySet()) {
-					Map<String, Object> seatInfo = entry.getValue();
-					int seatCount = Integer.parseInt(String.valueOf(seatInfo.get("count")));
-					if (seatCount <= 0) continue;
-					Map<String,Object> trainNumberInfo = new HashMap<>();
-					trainNumberInfo.put("trainNo", trainNo);
-					trainNumberInfo.put("dptStationName", dptStationName);
-					trainNumberInfo.put("endStationName", endStationName);
-					trainNumberInfo.put("startDate", dptDate);
-					trainNumberInfo.put("dptTime", dptTime);
-					trainNumberInfo.put("seatType", entry.getKey());
-					trainNumberInfo.put("seatCount", seatCount);
+				List<Map<String, Object>> ticketInfos = (List<Map<String, Object>>) train.get("ticketInfos"); 
+				for (int j = 0, jLen = ticketInfos.size(); j < jLen; j++) {
+					Map<String, Object> ticketInfo = ticketInfos.get(j);
+					int count = Integer.parseInt(String.valueOf(ticketInfo.get("count")));
+					if (count <= 0) continue;
+					Map<String, Object> trainNumberInfo = new HashMap<String, Object>();
+					trainNumberInfo.put("trainNumber", train.get("trainNumber").toString());
+					trainNumberInfo.put("dStation", train.get("dStation").toString());
+					trainNumberInfo.put("aStation", train.get("aStation").toString());
+					trainNumberInfo.put("dTimeStr", train.get("dTimeStr").toString());
+					trainNumberInfo.put("aTimeStr", train.get("aTimeStr").toString());
+					trainNumberInfo.put("date", train.get("date").toString().replace("\"", ""));
+					trainNumberInfo.put("distance", train.get("distance").toString());
+					trainNumberInfo.put("timeInMinute", train.get("timeInMinute").toString());
+					trainNumberInfo.put("price", ticketInfo.get("price").toString());
+					trainNumberInfo.put("type", ticketInfo.get("type").toString());
+					trainNumberInfo.put("ticketId",  ticketInfo.get("ticketId").toString());
+					trainNumberInfo.put("count", count);
+					trainNumberInfo.put("dTime", dTime);
 					trainNumberInfos.add(trainNumberInfo);
 				}
 			}
@@ -253,7 +256,5 @@ class TrainNumberService {
 		}
 		return trainNumberInfos;
 	}
-	
-	
 	
 }
