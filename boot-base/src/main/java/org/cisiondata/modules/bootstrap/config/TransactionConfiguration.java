@@ -24,6 +24,7 @@ import org.springframework.transaction.interceptor.NameMatchTransactionAttribute
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 @Configuration
@@ -48,19 +49,22 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 		return transactionManager();
 	}
 	
-	@Bean(name = "transactionInterceptor")
-    public TransactionInterceptor transactionInterceptor(){
+	public TransactionAttributeSource transactionAttributeSource() {
 		NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
 		RuleBasedTransactionAttribute readOnlyTx = new RuleBasedTransactionAttribute();
 		readOnlyTx.setReadOnly(true);
 		readOnlyTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		RuleBasedTransactionAttribute requiredTx = new RuleBasedTransactionAttribute();
 		List<RollbackRuleAttribute> rollbackRuleAttributes = new ArrayList<RollbackRuleAttribute>();
 		rollbackRuleAttributes.add(new RollbackRuleAttribute(Exception.class));
 		rollbackRuleAttributes.add(new RollbackRuleAttribute(RuntimeException.class));
+		RuleBasedTransactionAttribute requiredTx = new RuleBasedTransactionAttribute();
 		requiredTx.setRollbackRules(rollbackRuleAttributes);
 		requiredTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		requiredTx.setTimeout(20);
+		RuleBasedTransactionAttribute requiredNewTx = new RuleBasedTransactionAttribute();
+		requiredNewTx.setRollbackRules(rollbackRuleAttributes);
+		requiredNewTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		requiredNewTx.setTimeout(20);
 		Map<String, TransactionAttribute> nameMap = new HashMap<String, TransactionAttribute>();
 		nameMap.put("add*", requiredTx);
 		nameMap.put("save*", requiredTx);
@@ -74,8 +78,19 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 		nameMap.put("read*", readOnlyTx);
 		nameMap.put("query*", readOnlyTx);
 		nameMap.put("select*", readOnlyTx);
+		nameMap.put("mget*", requiredNewTx);
+		nameMap.put("mfind*", requiredNewTx);
+		nameMap.put("mload*", requiredNewTx);
+		nameMap.put("mread*", requiredNewTx);
+		nameMap.put("mquery*", requiredNewTx);
+		nameMap.put("mselect*", requiredNewTx);
 		transactionAttributeSource.setNameMap(nameMap);
-        return new TransactionInterceptor(transactionManager(), transactionAttributeSource);
+		return transactionAttributeSource;
+	}
+	
+	@Bean(name = "transactionInterceptor")
+    public TransactionInterceptor transactionInterceptor(){
+        return new TransactionInterceptor(transactionManager(), transactionAttributeSource());
     }
 	
 	@Bean  
