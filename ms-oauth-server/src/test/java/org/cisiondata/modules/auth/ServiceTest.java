@@ -52,7 +52,9 @@ public class ServiceTest {
 	}
 	
 	@Test
-	public void testReadClientById() {
+	public void testReadClientByClientId() {
+		Client client = clientService.readClientByClientId("web_client");
+		System.err.println(client);
 	}
 
 	@Test

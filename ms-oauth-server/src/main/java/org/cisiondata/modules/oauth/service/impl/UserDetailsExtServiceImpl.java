@@ -2,9 +2,11 @@ package org.cisiondata.modules.oauth.service.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.oauth.entity.Role;
 import org.cisiondata.modules.oauth.entity.User;
 import org.cisiondata.modules.oauth.service.IRoleService;
 import org.cisiondata.modules.oauth.service.IUserService;
@@ -30,13 +32,10 @@ public class UserDetailsExtServiceImpl implements UserDetailsService {
         	throw new UsernameNotFoundException("用户名："+ username + "不存在！");
         }
         Collection<SimpleGrantedAuthority> collection = new HashSet<SimpleGrantedAuthority>();
-        collection.add(new SimpleGrantedAuthority("ADMIN"));
-        /**
-        Iterator<String> iterator =  userRoleService.findRoles(user.getId()).iterator();
-        while (iterator.hasNext()){
-            collection.add(new SimpleGrantedAuthority(iterator.next()));
+        List<Role> roles = roleService.readRolesByUserId(user.getId());
+        for (int i = 0, len = roles.size(); i < len; i++) {
+        	collection.add(new SimpleGrantedAuthority(roles.get(i).getName()));
         }
-		*/
         return new org.springframework.security.core.userdetails.User(username, user.getPassword(), collection);
     }
 

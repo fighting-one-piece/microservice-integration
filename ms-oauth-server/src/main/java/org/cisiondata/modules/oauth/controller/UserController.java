@@ -42,8 +42,23 @@ public class UserController {
 		return webResult;
 	}
 	
+	@RequestMapping(value = "/{id}", method = RequestMethod.POST, headers = "Accept=application/json")
+	public WebResult insertUser(@PathVariable("id") Long id, @RequestBody User user) {
+		WebResult webResult = new WebResult();
+		try {
+			user.setId(id);
+			userService.update(user);
+			webResult.setCode(ResultCode.SUCCESS.getCode());
+			webResult.setData(ResultCode.SUCCESS.getDesc());
+		} catch (Exception e) {
+			webResult.setCode(ResultCode.FAILURE.getCode());
+			webResult.setFailure(e.getMessage());
+		}
+		return webResult;
+	}
+	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public WebResult readUserById(@PathVariable("id") long id) {
+	public WebResult readUserById(@PathVariable("id") Long id) {
 		WebResult webResult = new WebResult();
 		try {
 			webResult.setCode(ResultCode.SUCCESS.getCode());

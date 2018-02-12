@@ -25,13 +25,21 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 	
 	@Override
 	protected void preHandle(Object object) throws BusinessException {
-		
+		if (object instanceof User) {
+			User user = (User) object;
+			Long id = user.getId();
+			if (null != id) {
+				User dbUser = userDAO.readDataByPK(id);
+				if (null == dbUser) {
+					throw new BusinessException("user not exists!");
+				}
+			}
+		}
 	}
 	
 	@Override
 	public void insert(Object object) throws BusinessException {
 		super.insert(object);
-//		throw new RuntimeException("error!");
 	}
 	
 	@Override

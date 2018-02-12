@@ -23,13 +23,13 @@ public class Client extends PKAutoEntity<Long> {
 	/** 资源ID */
 	@Column(name = "RESOURCE_IDS")
 	private String resourceIds = null;
-	/** 域 */
+	/** 客户端的作用域,如果scope未定义或者为空(默认值),则客户端作用域不受限制 */
 	@Column(name = "SCOPE")
 	private String scope = null;
-	/** 授权 */
+	/** 授权给客户端的权限 */
 	@Column(name = "AUTHORITIES")
 	private String authorities = null;
-	/** 授权类型 */
+	/** 授权给客户端使用的权限类型 */
 	@Column(name = "AUTHORIZED_GRANT_TYPES")
 	private String authorizedGrantTypes = null;
 	/** Token有效时间 */

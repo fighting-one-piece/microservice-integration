@@ -24,6 +24,20 @@ public class ClientServiceImpl extends GenericServiceImpl<Client, Long> implemen
 	}
 	
 	@Override
+	protected void preHandle(Object object) throws BusinessException {
+		if (object instanceof Client) {
+			Client client = (Client) object;
+			Long id = client.getId();
+			if (null != id) {
+				Client dbClient = clientDAO.readDataByPK(id);
+				if (null == dbClient) {
+					throw new BusinessException("client not exists!");
+				}
+			}
+		}
+	}
+	
+	@Override
 	public Client readClientByClientId(String clientId) throws BusinessException {
 		if (null == clientId || "".equals(clientId)) throw new BusinessException(ResultCode.PARAM_NULL);
 		Query query = new Query();

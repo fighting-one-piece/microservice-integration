@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.oauth.dao.UserRoleDAO">
+
+	<resultMap type="UserRole" id="userRoleResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="userId" column="USER_ID"/>  
+        <result property="roleId" column="ROLE_ID"/>
+        <result property="priority" column="PRIORITY"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, USER_ID, ROLE_ID, PRIORITY</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.userId != null">
+    			AND USER_ID = #{condition.userId}
+    		</if>
+    		<if test="condition.resourceId != null">
+    			AND ROLE_ID = #{condition.roleId}
+    		</if>
+    		<if test="condition.priority != null">
+    			AND PRIORITY = #{condition.priority}
+    		</if>
+    	</where>
+    </sql>
+    
+    <select id="readDataListByCondition" resultMap="userRoleResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_ROLE
+            <include refid="whereClause"/>
+    </select>
+    
+</mapper>

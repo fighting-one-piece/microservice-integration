@@ -19,10 +19,12 @@ public class UserRole extends PKAutoEntity<Long> {
 	/**用户ID */
 	@ManyToOne(cascade=CascadeType.REFRESH, optional=true)
 	@JoinColumn(name="USER_ID")
+	private Long userId = null;
 	private User user = null;
 	/**角色ID */
 	@ManyToOne(cascade=CascadeType.REFRESH, optional=true)
 	@JoinColumn(name="ROLE_ID")
+	private Long roleId = null;
 	private Role role = null;
 	/**优先权*/
 	@Column(name="PRIORITY")
@@ -31,12 +33,28 @@ public class UserRole extends PKAutoEntity<Long> {
 	@Column(name = "DELETE_FLAG")
 	private Boolean deleteFlag = false;
 
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
 	public User getUser() {
 		return this.user;
 	}
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public Long getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
 	}
 
 	public Role getRole() {

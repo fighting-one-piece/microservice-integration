@@ -22,5 +22,5 @@ public interface IUserService extends IGenericService<User, Long> {
 	 * @throws BusinessException
 	 */
 	public User readUserByUsernameAndPassword(String username, String password) throws BusinessException;
-
+	
 }

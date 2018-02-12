@@ -120,14 +120,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
     	security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+    	/**
+    	security.tokenKeyAccess("hasAuthority('TRUSTED')").checkTokenAccess("hasAuthority('TRUSTED')");
+    	*/
     }
-    
-    /**
-    @Override
-	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-    	security.tokenKeyAccess("hasAuthority('ROLE_TRUSTED_CLIENT')").checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");
-	}
-	**/
     
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
@@ -142,7 +138,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.withClientDetails(clientDetailsService);
-//		clients.inMemory().clients(clientDetailsService);
 		
 		/**
 		clients.inMemory()
@@ -150,7 +145,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	        .secret("app_secret")
 	        .scopes("read", "write", "trust") 
 	        .resourceIds(resourceId)
-	        .authorities(AuthorityType.TRUSTED_CLIENT.toString())
+	        .authorities(AuthorityType.TRUSTED.toString())
 	        .authorizedGrantTypes("client_credentials", "password", "authorization_code", "refresh_token")
 	        .accessTokenValiditySeconds(accessTokenValiditySeconds)
 	        .refreshTokenValiditySeconds(refreshTokenValiditySeconds) 
@@ -159,7 +154,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	        .secret("web_secret")
 	        .scopes("read", "write", "trust")
 	        .resourceIds(resourceId)
-	        .authorities(AuthorityType.TRUSTED_CLIENT.toString())
+	        .authorities(AuthorityType.TRUSTED.toString())
 	        .authorizedGrantTypes("client_credentials", "password", "authorization_code", "refresh_token", "implicit")
 	        .accessTokenValiditySeconds(accessTokenValiditySeconds)
 	        .refreshTokenValiditySeconds(refreshTokenValiditySeconds);

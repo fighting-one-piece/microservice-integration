@@ -1,10 +1,10 @@
 package org.cisiondata.modules.oauth.entity;
 
-public enum AuthorityType {
+public enum Authority {
 	
 	USER,
     ADMIN,
     REGISTER,
-    TRUSTED_CLIENT,
-    CLIENT
+    TRUSTED
+    
 }
