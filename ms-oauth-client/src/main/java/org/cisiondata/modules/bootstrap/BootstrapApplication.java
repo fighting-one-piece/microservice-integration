@@ -2,6 +2,7 @@ package org.cisiondata.modules.bootstrap;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
@@ -50,7 +53,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @EnableAuthorizationServer
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class BootstrapApplication extends WebSecurityConfigurerAdapter {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(BootstrapApplication.class);
 
 	@Bean()
@@ -61,10 +64,25 @@ public class BootstrapApplication extends WebSecurityConfigurerAdapter {
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		return objectMapper;
 	}
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(BootstrapApplication.class, args);
 		LOG.info("OAuth Server Bootstrap");
+	}
+	
+    @Bean
+    public OAuth2RestOperations restTemplate(OAuth2ClientContext oauth2ClientContext) {
+        return new OAuth2RestTemplate(resource(), oauth2ClientContext);
+    }
+
+	private OAuth2ProtectedResourceDetails resource() {
+		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
+		resource.setClientId("");
+		resource.setClientSecret("");
+		resource.setAccessTokenUri("");
+		resource.setUserAuthorizationUri("");
+		resource.setScope(Arrays.asList("read"));
+		return resource;
 	}
 
 	@Autowired
@@ -130,12 +148,11 @@ public class BootstrapApplication extends WebSecurityConfigurerAdapter {
 	}
 
 	private Filter ssoFilter(ClientResources client, String path) {
-		OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(
-				path);
+		OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(path);
 		OAuth2RestTemplate template = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
 		filter.setRestTemplate(template);
-		UserInfoTokenServices tokenServices = new UserInfoTokenServices(
-				client.getResource().getUserInfoUri(), client.getClient().getClientId());
+		UserInfoTokenServices tokenServices = new UserInfoTokenServices(client.getResource().getUserInfoUri(),
+				client.getClient().getClientId());
 		tokenServices.setRestTemplate(template);
 		filter.setTokenServices(tokenServices);
 		return filter;

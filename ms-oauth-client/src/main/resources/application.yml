@@ -28,6 +28,9 @@ security:
       client-secret: acmesecret
       scope: read,write
       auto-approve-scopes: '.*'
+      accessTokenUri: http://localhost:8081/oauth/token
+      authorizationUri: http://localhost:8081/oauth/authorize
+      resourceURI: http://localhost:8082/api/
 
 facebook:
   client:
