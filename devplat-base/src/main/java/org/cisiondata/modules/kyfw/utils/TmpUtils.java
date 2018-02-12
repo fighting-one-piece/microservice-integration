@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.cisiondata.utils.date.DateFormatter;
+import org.cisiondata.utils.endecrypt.RSAUtils;
 import org.cisiondata.utils.file.DefaultLineHandler;
 import org.cisiondata.utils.file.FileUtils;
 import org.cisiondata.utils.http.HttpClientUtils;
@@ -125,8 +126,15 @@ public class TmpUtils {
 		}
 	}
 	
+	public static void e() throws Exception {
+//		String encryptTxt = RSAUtils.encryptNoPaddingAndBase64("王仕恩");
+		String encryptTxt = "a4+lwJCfdmHBVpbr6kVB4GwNOtsPpco9mnqUNwpkCENKGCU6/aSVg+nH8wrvinEg17cGfqeEtF72NkALGeHu9IZPMP3HxUo4skufkAQEk5SsB5PoRpg8p1gYnyAh+jQP6Shf72eA8FOc1LkBx7u6lldD5NnBUmdHwCBxdUMGNl4=";
+		System.err.println(encryptTxt.length());
+		System.err.println(new String(RSAUtils.decryptNoPaddingAndBase64(encryptTxt)));
+	}
+	
 	public static void main(String[] args) throws Exception {
-		c();
+		e();
 	}
 
 }
