@@ -1,6 +1,7 @@
 package org.cisiondata.modules.bootstrap;
 
 import org.cisiondata.modules.abstr.web.filter.XssStringJsonSerializer;
+import org.cisiondata.modules.bootstrap.annotation.ComponentScanExclude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -11,6 +12,7 @@ import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -23,7 +25,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 @Configuration
 @SpringBootApplication
 @EnableAutoConfiguration
-@ComponentScan(basePackages = { "org.cisiondata" })
+@ComponentScan(basePackages = { "org.cisiondata" }, excludeFilters = {@ComponentScan.Filter(
+	type = FilterType.ANNOTATION, value = ComponentScanExclude.class)})
 public class BaseBootstrapApplication {
 
 	protected static Logger LOG = LoggerFactory.getLogger(BaseBootstrapApplication.class);
