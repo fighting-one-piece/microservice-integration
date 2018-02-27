@@ -35,6 +35,7 @@
 		<mybatis.version>3.4.5</mybatis.version>
 		<mybatis.spring.version>1.3.1</mybatis.spring.version>
 		<mybatis.spring.boot.version>1.3.1</mybatis.spring.boot.version>
+		<mybatis.generator.core.version>1.3.6</mybatis.generator.core.version>
 		<aspectj.version>1.8.10</aspectj.version>
 		<jedis.version>2.9.0</jedis.version>
 		<swagger.version>2.6.1</swagger.version>
@@ -254,6 +255,12 @@
 			<version>${mybatis.spring.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.mybatis.generator</groupId>
+			<artifactId>mybatis-generator-core</artifactId>
+			<version>${mybatis.generator.core.version}</version>
+		</dependency>
+		
 		<!--  
 		<dependency>
 		    <groupId>org.mybatis.spring.boot</groupId>
@@ -433,7 +440,7 @@
 			<plugin>
 				<groupId>org.mybatis.generator</groupId>
 				<artifactId>mybatis-generator-maven-plugin</artifactId>
-				<version>1.3.2</version>
+				<version>1.3.6</version>
 				<configuration>
 					<verbose>true</verbose>
 					<overwrite>true</overwrite>
@@ -449,7 +456,7 @@
                         <!-- 混淆时刻，这里是打包的时候混淆-->
                         <phase>package</phase>
                         <goals>
-                            <!-- 使用插件的什么功能，当然是混淆-->
+                            <!-- 使用插件的混淆功能-->
                             <goal>proguard</goal>
                         </goals>
                     </execution>
@@ -462,49 +469,79 @@
                     <!-- 指定生成文件分类 -->
                     <attachArtifactClassifier>pg</attachArtifactClassifier>
                     <options>
-                        <!-- JDK目标版本1.7-->
+                        <option>-dontnote</option>
+                        <!-- JDK目标版本1.8-->
                         <option>-target 1.8</option>
                         <!-- 不做收缩（删除注释、未被引用代码）-->
                         <option>-dontshrink</option>
                         <!-- 不做优化（变更代码实现逻辑）-->
                         <option>-dontoptimize</option>
+                        <!--忽略所有告警-->
+                        <option>-ignorewarnings</option>
                         <!-- 不路过非公用类文件及成员-->
                         <option>-dontskipnonpubliclibraryclasses</option>
                         <option>-dontskipnonpubliclibraryclassmembers</option>
                         <!-- 优化时允许访问并修改有修饰符的类和类的成员 -->
                         <option>-allowaccessmodification</option>
                         <!-- 确定统一的混淆类的成员名称来增加混淆-->
+                        <!--  
                         <option>-useuniqueclassmembernames</option>
+                        -->
                         <!-- 不混淆所有包名，测试混淆后WEB项目问题实在太多，毕竟Spring配置中有大量固定写法的包名-->
+                        <!--  
                         <option>-keeppackagenames</option>
+                        -->
                         <!-- 不混淆所有特殊的类-->
                         <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,LocalVariable*Table,*Annotation*,Synthetic,EnclosingMethod</option>
                         <!-- 不混淆所有的set/get方法，如果项目中使用的部分第三方框架（例如Shiro）会用到大量的set/get映射-->
                         <option>-keepclassmembers public class * {void set*(***);*** get*();}</option>
                         
-                        <!-- 不混淆model包中的所有类以及类的属性及方法，实体包，混淆了会导致ORM框架及前端无法识别-->
+                        <!--以下配置第三方包不参与混淆-->
+                 		<option>-keepclassmembers class org.springframework.** { *;}</option>
+                 		<option>-dontwarn org.springframework.**</option>
+                 		<option>-keep class org.springframework.** {*;}</option>
+                        
+                        <option>-dontwarn org.cisiondata.modules.abstr.**</option>
+                        <option>-dontwarn org.cisiondata.modules.auth.web.**</option>
+                        <option>-dontwarn org.cisiondata.utils.exception.**</option>
+                        
+						<option>-keep class org.cisiondata.modules.bootstrap.** {*;}</option>                        
+                        <!-- 不混淆entity包中的所有类以及类的属性及方法，混淆了会导致ORM框架及前端无法识别-->
                         <option>-keep class org.cisiondata.modules.*.entity.** {*;}</option>
                         <!-- 以下两个包因为大部分是Spring管理的Bean，不对包类的类名进行混淆，但对类中的属性和方法混淆-->
+                        <!--  
                         <option>-keep class org.cisiondata.modules.*.service.** </option>
                         <option>-keep class org.cisiondata.modules.*.dao.**</option>
+                    	-->
                     </options>
-                    <!-- 添加依赖，这里你可以按你的需要修改，这里测试只需要一个JRE的Runtime包就行了 -->
-                    <libs>
-                        <lib>${JAVA_HOME}/jre/lib/rt.jar</lib>
-                    </libs>
                     <!-- 加载文件的过滤器，就是你的工程目录了-->
                     <!--  
-                    <inFilter>com/cisiondata/modules/**</inFilter>
+                    <inFilter>com/cisiondata/**</inFilter>
                     -->
                     <!-- 对什么东西进行加载，这里仅有classes成功，毕竟你也不可能对配置文件及JSP混淆吧-->
-                    <!--
+                    <!--  
                     <injar>classes</injar>
                     -->
                     <injar>${project.build.finalName}.jar</injar>
                     <outjar>${project.build.finalName}-pg.jar</outjar>
+                    <!-- 添加依赖，这里你可以按你的需要修改，这里测试只需要一个JRE的Runtime包就行了 -->
+                    <libs>                           
+	                    <lib>${JAVA_HOME}/jre/lib/rt.jar</lib>
+	                    <!--  
+	                    <lib>${JAVA_HOME}/jre/lib/jce.jar</lib>
+	                	-->
+	                </libs>  
+	                <addMavenDescriptor>false</addMavenDescriptor>
                     <!-- 输出目录-->
                     <outputDirectory>${project.build.directory}</outputDirectory>
                 </configuration>
+                <dependencies>
+                	<dependency>
+					    <groupId>net.sf.proguard</groupId>
+					    <artifactId>proguard-base</artifactId>
+					    <version>5.2.1</version>
+					</dependency>
+                </dependencies>
             </plugin>
 		</plugins>
 
