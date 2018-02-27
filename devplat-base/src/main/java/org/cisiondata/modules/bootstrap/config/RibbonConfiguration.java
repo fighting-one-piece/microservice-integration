@@ -1,8 +1,10 @@
 package org.cisiondata.modules.bootstrap.config;
 
 import org.cisiondata.modules.bootstrap.annotation.ComponentScanExclude;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.WeightedResponseTimeRule;
@@ -16,5 +18,10 @@ public class RibbonConfiguration {
 		return new WeightedResponseTimeRule();
 	}
 	
+	@LoadBalanced
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 	
 }
