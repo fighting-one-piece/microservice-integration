@@ -6,6 +6,7 @@ import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.oauth.entity.Client;
 import org.cisiondata.modules.oauth.service.IClientService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class ClientController {
 	@Resource(name = "clientService")
 	private IClientService clientService = null;
 	
+	@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
 	public WebResult insertClient(@RequestBody Client client) {
 		WebResult webResult = new WebResult();
@@ -33,6 +35,7 @@ public class ClientController {
 		return webResult;
 	}
 	
+	@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, headers = "Accept=application/json")
 	public WebResult updateClient(@PathVariable Long id, @RequestBody Client client) {
 		WebResult webResult = new WebResult();
@@ -48,6 +51,7 @@ public class ClientController {
 		return webResult;
 	}
 	
+	@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public WebResult readClient(@PathVariable Long id) {
 		WebResult webResult = new WebResult();

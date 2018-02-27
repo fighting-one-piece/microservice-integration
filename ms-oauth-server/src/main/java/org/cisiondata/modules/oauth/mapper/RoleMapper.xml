@@ -32,29 +32,48 @@
     	</where>
     </sql>
     
-     <insert id="insert" parameterType="Role">
-            INSERT INTO T_ROLE(NAME, IDENTITY, DESCRIPTION, DELETE_FLAG) 
-            VALUES(#{name},#{identity},#{desc},#{deleteFlag})  
+    <insert id="insert" keyProperty="id" parameterType="Role">
+	    INSERT INTO T_ROLE(NAME, IDENTITY, DESCRIPTION, DELETE_FLAG) 
+	    VALUES(#{name},#{identity},#{desc},#{deleteFlag})  
     </insert>
     
+    <update id="update" parameterType="Role">
+	    UPDATE T_ROLE
+		<set>
+			<if test="name != null">
+				NAME = #{name},
+			</if>
+			<if test="identity != null">
+				IDENTITY = #{identity},
+			</if>
+			<if test="desc != null">
+				DESCRIPTION = #{desc},
+			</if>
+			<if test="deleteFlag != null">
+				DELETE_FLAG = #{deleteFlag},
+			</if>
+		</set>
+		WHERE ID = #{id} 
+    </update>
+    
     <select id="readDataByPK" resultMap="roleResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_ROLE WHERE ID = #{id}
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM T_ROLE WHERE ID = #{id}
     </select>
     
     <select id="readDataByCondition" resultMap="roleResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_ROLE
-            <include refid="whereClause"/>
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM T_ROLE
+	    <include refid="whereClause"/>
     </select>
     
     <select id="readDataListByCondition" resultMap="roleResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_ROLE
-            <include refid="whereClause"/>
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ROLE
+        <include refid="whereClause"/>
     </select>
     
     <select id="readDataPaginationByCondition" resultMap="roleResultMap">  
@@ -64,11 +83,11 @@
     </select>
     
     <select id="readDataListByUserId" parameterType="Long" resultMap="roleResultMap">  
-            SELECT r.* FROM T_ROLE r, T_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = #{userId};
+        SELECT r.* FROM T_ROLE r, T_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = #{userId};
     </select>
     
     <select id="readDataListByGroupId" parameterType="Long" resultMap="roleResultMap">  
-            SELECT r.* FROM T_ROLE r, T_GROUP_ROLE gr WHERE r.ID = gr.ROLE_ID AND gr.GROUP_ID = #{groupId};
+        SELECT r.* FROM T_ROLE r, T_GROUP_ROLE gr WHERE r.ID = gr.ROLE_ID AND gr.GROUP_ID = #{groupId};
     </select>
     
 </mapper>

@@ -28,6 +28,7 @@ public class UserController {
 		return user;
 	}
 	
+	@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
 	public WebResult insertUser(@RequestBody User user) {
 		WebResult webResult = new WebResult();
@@ -42,6 +43,7 @@ public class UserController {
 		return webResult;
 	}
 	
+	@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, headers = "Accept=application/json")
 	public WebResult insertUser(@PathVariable("id") Long id, @RequestBody User user) {
 		WebResult webResult = new WebResult();
@@ -57,6 +59,7 @@ public class UserController {
 		return webResult;
 	}
 	
+	@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public WebResult readUserById(@PathVariable("id") Long id) {
 		WebResult webResult = new WebResult();
@@ -70,8 +73,8 @@ public class UserController {
 		return webResult;
 	}
 	
-	@PreAuthorize("hasRole('admin')")
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('USER-ADMIN')")
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public WebResult readAllUsers() {
 		WebResult webResult = new WebResult();
 		try {

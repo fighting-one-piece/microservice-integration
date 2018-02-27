@@ -39,7 +39,7 @@ public class ServiceTest {
 		client.setClientSecret("web_secret");
 		client.setResourceIds("oauth2_resource_id");
 		client.setScope("read,write,trust");
-		client.setAuthorities("TRUSTED_CLIENT");
+		client.setAuthorities("TRUSTED");
 		client.setAuthorizedGrantTypes("client_credentials,password,authorization_code,refresh_token");
 		client.setAccessTokenValidity(10000);
 		client.setRefreshTokenValidity(30000);

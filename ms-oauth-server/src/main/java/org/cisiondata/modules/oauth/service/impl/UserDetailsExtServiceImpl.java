@@ -34,7 +34,7 @@ public class UserDetailsExtServiceImpl implements UserDetailsService {
         Collection<SimpleGrantedAuthority> collection = new HashSet<SimpleGrantedAuthority>();
         List<Role> roles = roleService.readRolesByUserId(user.getId());
         for (int i = 0, len = roles.size(); i < len; i++) {
-        	collection.add(new SimpleGrantedAuthority(roles.get(i).getName()));
+        	collection.add(new SimpleGrantedAuthority("ROLE_" + roles.get(i).getIdentity()));
         }
         return new org.springframework.security.core.userdetails.User(username, user.getPassword(), collection);
     }

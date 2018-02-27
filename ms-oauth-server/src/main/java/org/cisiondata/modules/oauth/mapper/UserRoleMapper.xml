@@ -25,11 +25,29 @@
     	</where>
     </sql>
     
+    <insert id="insert" keyProperty="id" parameterType="UserRole">
+    	INSERT INTO T_USER_ROLE(USER_ID,ROLE_ID,PRIORITY)
+    	VALUES (#{userId},#{roleId},#{priority})
+    </insert>
+    
+    <update id="update" parameterType="UserRole">
+    	UPDATE T_ROLE
+		<set>
+			<if test="priority != null">
+				PRIORITY = #{priority},
+			</if>
+			<if test="deleteFlag != null">
+				DELETE_FLAG = #{deleteFlag},
+			</if>
+		</set>
+		WHERE USER_ID = #{userId} and ROLE_ID = #{roleId} 
+    </update>
+    
     <select id="readDataListByCondition" resultMap="userRoleResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_USER_ROLE
-            <include refid="whereClause"/>
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM T_USER_ROLE
+	    <include refid="whereClause"/>
     </select>
     
 </mapper>

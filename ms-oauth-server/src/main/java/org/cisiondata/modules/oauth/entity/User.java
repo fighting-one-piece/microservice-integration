@@ -21,6 +21,9 @@ public class User extends PKAutoEntity<Long> {
 	
 	private static final long serialVersionUID = 1L;
 	
+	/** 客户ID */
+	@Column(name = "CLIENT_ID")
+	private Long clientId = null;
 	/** 用户名 */
 	@Column(name = "USERNAME")
     private String username = null;
@@ -41,8 +44,16 @@ public class User extends PKAutoEntity<Long> {
 	private Boolean deleteFlag = false;
 	
     private List<Role> roles = new ArrayList<Role>();
+    
+    public Long getClientId() {
+		return clientId;
+	}
 
-    public String getUsername() {
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getUsername() {
         return username;
     }
 

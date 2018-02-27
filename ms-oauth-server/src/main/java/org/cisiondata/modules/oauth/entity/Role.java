@@ -17,6 +17,9 @@ public class Role extends PKAutoEntity<Long> {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public static final String USER_ADMIN = "USER-ADMIN";
+	public static final String CLIENT_ADMIN = "CLIENT-ADMIN";
+	
 	/** 角色名称 */
 	@Column(name="NAME")
 	private String name = null;

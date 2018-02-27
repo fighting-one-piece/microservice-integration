@@ -39,7 +39,7 @@ public class RoleServiceImpl extends GenericServiceImpl<Role, Long> implements I
 		List<UserRole> urs = userRoleDAO.readDataListByCondition(query);
 		List<Role> roles = new ArrayList<Role>();
 		for (int i = 0, len = urs.size(); i < len; i++) {
-			Role role = roleDAO.readDataByPK(urs.get(i).getId());
+			Role role = roleDAO.readDataByPK(urs.get(i).getRoleId());
 			if (null != role) roles.add(role);
 		}
 		return roles;
