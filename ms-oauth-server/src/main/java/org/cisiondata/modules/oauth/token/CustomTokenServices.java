@@ -6,8 +6,11 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.token.TokenUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -36,6 +39,8 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class CustomTokenServices implements AuthorizationServerTokenServices, ResourceServerTokenServices,
 	ConsumerTokenServices, InitializingBean {
@@ -258,8 +263,10 @@ public class CustomTokenServices implements AuthorizationServerTokenServices, Re
 		Object userObj = authentication.getPrincipal();
 		if (null != userObj) {
 			User user = (User) userObj;
-			value = TokenUtils.genAuthenticationMD5Token(user.getUsername(), 
-				user.getPassword(), DDF.format(calendar.getTime()));
+			HttpServletRequest httpServletRequest = ((ServletRequestAttributes) 
+				RequestContextHolder.getRequestAttributes()).getRequest();
+			value = TokenUtils.genAuthenticationMD5Token(user.getUsername(), user.getPassword(), 
+				IPUtils.getIPAddress(httpServletRequest), DDF.format(calendar.getTime()));
 		} else {
 			value = UUID.randomUUID().toString();
 		}
