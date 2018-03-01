@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/elastic")
 public class ElasticController {
 
 	public Logger LOG = LoggerFactory.getLogger(ElasticController.class);

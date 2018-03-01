@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.cisiondata</groupId>
-	<artifactId>ms-zuul</artifactId>
+	<artifactId>ms-turbine</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>MS ZUUL Server</name>
+	<name>MS TURBINE Server</name>
 	<url>http://maven.apache.org</url>
 
 	<parent>
@@ -68,25 +68,11 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+	        <groupId>org.springframework.cloud</groupId>
+	        <artifactId>spring-cloud-starter-turbine</artifactId>
+	    </dependency>
 
 		<!-- Spring Cloud依赖包 -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zuul</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.zuul.version}</version>
-			-->
-			<exclusions>
-				<exclusion>
-					<groupId>com.netflix.servo</groupId>
-		    		<artifactId>servo-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
 		<!--
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -98,42 +84,35 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.eureka.version}</version>
-			-->
 		</dependency>
 		
 		<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-ribbon</artifactId>
-            <!--  
-            <version>${spring.cloud.starter.ribbon.version}</version>
-            -->
         </dependency>
         
         <dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-starter-security</artifactId>
-		    <!--  
-		    <version>${spring.cloud.starter.security.version}</version>
-		    -->
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-hystrix</artifactId>
 		</dependency>
 		
 		<dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-starter-oauth2</artifactId>
-		    <!--  
-		    <version>${spring.cloud.starter.oauth2.version}</version>
-		    -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+        </dependency>
+        
+        <!--  
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
 		</dependency>
-		
-		<!-- Servo-core依赖包 -->
+        -->
+        
 		<dependency>
-		    <groupId>com.netflix.servo</groupId>
-		    <artifactId>servo-core</artifactId>
-		    <version>0.12.17</version><!--$NO-MVN-MAN-VER$-->
-		</dependency>
-
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-turbine</artifactId>
+        </dependency>
+		
 		<!-- JUnit依赖包 -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -177,30 +156,6 @@
 			<version>0.1.4</version>
 		</dependency>
 		
-		<!-- Jackon依赖包 -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		
-		<!-- Gson依赖包 -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		
-		<!-- FastJSON依赖包 -->
-		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>fastjson</artifactId>
-		    <version>${fastjson.version}</version>
-		</dependency>
-		
 	</dependencies>
 	
 	<dependencyManagement>
@@ -216,7 +171,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>ms-zuul</finalName>
+		<finalName>ms-turbine</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>

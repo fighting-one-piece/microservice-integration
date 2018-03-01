@@ -76,6 +76,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
 		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
+		<spring.cloud.version>Camden.SR7</spring.cloud.version>
 		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
 		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
 		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
@@ -109,31 +110,26 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<version>${spring.cloud.starter.eureka.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-feign</artifactId>
-		    <version>${spring.cloud.starter.feign.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-hystrix</artifactId>
-		    <version>${spring.cloud.starter.hystrix.version}</version>
 		</dependency>
 		
 		<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
-            <version>${spring.cloud.starter.hystrix.version}</version>
         </dependency>
 		
 		<!-- Tokenizer依赖包 -->
@@ -151,6 +147,18 @@
         </dependency>
 		
 	</dependencies>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring.cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	
 	<build>
 		<finalName>devplat-base</finalName>
