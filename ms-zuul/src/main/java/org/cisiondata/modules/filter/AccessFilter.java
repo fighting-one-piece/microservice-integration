@@ -1,9 +1,14 @@
 package org.cisiondata.modules.filter;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.cisiondata.modules.oauth.IOAuthService;
+import org.cisiondata.utils.json.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -11,6 +16,9 @@ import com.netflix.zuul.context.RequestContext;
 public class AccessFilter extends ZuulFilter  {
 	
     private static Logger LOG = LoggerFactory.getLogger(AccessFilter.class);
+    
+    @Autowired
+    private IOAuthService oauthService = null;
     
     /**
      * 返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：
@@ -37,7 +45,7 @@ public class AccessFilter extends ZuulFilter  {
      */
     @Override
     public boolean shouldFilter() {
-        return false;
+        return true;
     }
     
     /**
@@ -50,15 +58,17 @@ public class AccessFilter extends ZuulFilter  {
     public Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        LOG.info(String.format("%s request to %s", request.getMethod(), request.getRequestURL().toString()));
-        Object accessToken = request.getParameter("accessToken");
-        if(accessToken == null) {
-            LOG.warn("access token is empty");
-            ctx.setSendZuulResponse(false);
-            ctx.setResponseStatusCode(401);
-            return null;
+        String accessToken = request.getHeader("accessToken");
+        if(null != accessToken && !"".equals(accessToken)) {
+        	LOG.info(String.format("request %s token %s", request.getRequestURL().toString(), accessToken));
+        	//Authorization:Basic Y2lzaW9uZGF0YTpjaXNpb25kYXRh
+        	Map<String, Object> result = oauthService.checkToken("Basic Y2lzaW9uZGF0YTpjaXNpb25kYXRh", accessToken);
+            if (result.containsKey("error")) {
+            	ctx.setSendZuulResponse(false);
+            	ctx.setResponseStatusCode(401);
+            	ctx.setResponseBody(GsonUtils.fromMapToJson(result));
+            }
         }
-        LOG.info("access token ok");
         return null;
     }
 

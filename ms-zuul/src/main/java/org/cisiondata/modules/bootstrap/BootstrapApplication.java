@@ -1,5 +1,6 @@
 package org.cisiondata.modules.bootstrap;
 
+import org.cisiondata.modules.filter.AccessFilter;
 import org.cisiondata.modules.filter.CustomFilterProcessor;
 import org.cisiondata.modules.filter.ErrorExtFilter;
 import org.slf4j.Logger;
@@ -12,19 +13,21 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomi
 import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 
-@Configuration
+@EnableHystrix
 @EnableOAuth2Sso
 @EnableZuulProxy
 @EnableEurekaClient
 @SpringCloudApplication  
 @EnableAutoConfiguration  
 @ComponentScan(basePackages={"org.cisiondata"})
+@EnableFeignClients(basePackages = { "org.cisiondata.modules" })
 public class BootstrapApplication {
 
 	private static Logger LOG = LoggerFactory.getLogger(BootstrapApplication.class);
@@ -32,6 +35,11 @@ public class BootstrapApplication {
 	@Bean
 	public CustomFilterProcessor CustomFilterProcessor() {
 		return new CustomFilterProcessor();
+	}
+	
+	@Bean
+	public AccessFilter accessFilter() {
+		return new AccessFilter();
 	}
 	
 	@Bean
@@ -56,6 +64,5 @@ public class BootstrapApplication {
 		SpringApplication.run(BootstrapApplication.class, args);
 		LOG.info("API Gateway Server Bootstrap");
 	}
-	
 	
 }
