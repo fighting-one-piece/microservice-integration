@@ -26,9 +26,15 @@ public class DataSourceConfiguration {
 		return DataSourceBuilder.create().type(dataSourceType).build();
 	}
 	
-	@Bean(name = "slaveDataSource")
-	@ConfigurationProperties(prefix = "datasource.slave")
-	public javax.sql.DataSource slaveDataSource(){
+	@Bean(name = "slave1DataSource")
+	@ConfigurationProperties(prefix = "datasource.slave1")
+	public javax.sql.DataSource slave1DataSource(){
+		return DataSourceBuilder.create().type(dataSourceType).build();
+	}
+	
+	@Bean(name = "slave2DataSource")
+	@ConfigurationProperties(prefix = "datasource.slave2")
+	public javax.sql.DataSource slave2DataSource(){
 		return DataSourceBuilder.create().type(dataSourceType).build();
 	}
 	
@@ -37,7 +43,8 @@ public class DataSourceConfiguration {
 		DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource();
 		Map<Object, Object> targetDataResources = new HashMap<Object, Object>();
 		targetDataResources.put(DataSource.MASTER, masterDataSource());
-		targetDataResources.put(DataSource.SLAVE, slaveDataSource());
+		targetDataResources.put(DataSource.SLAVE1, slave1DataSource());
+		targetDataResources.put(DataSource.SLAVE2, slave2DataSource());
 		routingDataSource.setDefaultTargetDataSource(masterDataSource());
 		routingDataSource.setTargetDataSources(targetDataResources);
 		return routingDataSource;
