@@ -2,8 +2,8 @@ package org.cisiondata.utils.endecrypt;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +12,11 @@ public class Base64Utils {
 	private static Logger LOG = LoggerFactory.getLogger(Base64Utils.class);
 
 	public static String encode(byte[] input) {
-		return Base64.getEncoder().encodeToString(input);
+		return Base64.encodeBase64String(input);
 	}
 	
 	public static String encode(String input) {
-		return Base64.getEncoder().encodeToString(input.getBytes());
+		return Base64.encodeBase64String(input.getBytes());
 	}
 	
 	public static String encodeWithSunMisc(byte[] input) {
@@ -28,12 +28,12 @@ public class Base64Utils {
 	}
 
 	public static byte[] decode(String input) {
-		return Base64.getDecoder().decode(input);
+		return Base64.decodeBase64(input);
 	}
 	
 	public static String decode(String input, String charset) {
 		try {
-			return new String(Base64.getDecoder().decode(input), charset);
+			return new String(Base64.decodeBase64(input), charset);
 		} catch (UnsupportedEncodingException e) {
 			LOG.error(e.getMessage(), e);
 		}

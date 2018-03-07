@@ -485,41 +485,51 @@
                         <option>-dontoptimize</option>
                         <!--忽略所有告警-->
                         <option>-ignorewarnings</option>
-                        <!-- 不路过非公用类文件及成员-->
+                        <option>-adaptclassstrings</option>
+                        <!-- 不跳过非公用类文件及成员-->
                         <option>-dontskipnonpubliclibraryclasses</option>
                         <option>-dontskipnonpubliclibraryclassmembers</option>
                         <!-- 优化时允许访问并修改有修饰符的类和类的成员 -->
                         <option>-allowaccessmodification</option>
                         <!-- 确定统一的混淆类的成员名称来增加混淆-->
-                        <!--  
                         <option>-useuniqueclassmembernames</option>
-                        -->
+                        <option>-keepdirectories</option>
                         <!-- 不混淆所有包名，测试混淆后WEB项目问题实在太多，毕竟Spring配置中有大量固定写法的包名-->
                         <!--  
                         <option>-keeppackagenames</option>
                         -->
+						<option>-keepattributes **</option>
                         <!-- 不混淆所有特殊的类-->
+                        <!--  
                         <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,LocalVariable*Table,*Annotation*,Synthetic,EnclosingMethod</option>
+                        -->
                         <!-- 不混淆所有的set/get方法，如果项目中使用的部分第三方框架（例如Shiro）会用到大量的set/get映射-->
                         <option>-keepclassmembers public class * {void set*(***);*** get*();}</option>
                         
                         <!--以下配置第三方包不参与混淆-->
+                 		<option>-keep class org.springframework.** {*;}</option>
                  		<option>-keepclassmembers class org.springframework.** { *;}</option>
                  		<option>-dontwarn org.springframework.**</option>
-                 		<option>-keep class org.springframework.** {*;}</option>
                         
                         <option>-dontwarn org.cisiondata.modules.abstr.**</option>
                         <option>-dontwarn org.cisiondata.modules.auth.web.**</option>
                         <option>-dontwarn org.cisiondata.utils.exception.**</option>
                         
-						<option>-keep class org.cisiondata.modules.bootstrap.** {*;}</option>                        
+						<option>-keep class org.cisiondata.modules.abstr.** {*;}</option>
+						<option>-keep class org.cisiondata.modules.bootstrap.** {*;}</option>
                         <!-- 不混淆entity包中的所有类以及类的属性及方法，混淆了会导致ORM框架及前端无法识别-->
                         <option>-keep class org.cisiondata.modules.*.entity.** {*;}</option>
+                        <option>-keep class org.cisiondata.modules.*.dao.** {*;}</option>
                         <!-- 以下两个包因为大部分是Spring管理的Bean，不对包类的类名进行混淆，但对类中的属性和方法混淆-->
+                        <option>-keep class org.cisiondata.modules.*.controller.**</option>
                         <!--  
-                        <option>-keep class org.cisiondata.modules.*.service.** </option>
-                        <option>-keep class org.cisiondata.modules.*.dao.**</option>
+                        <option>-keep class org.cisiondata.modules.*.service.**</option>
                     	-->
+                    	<option>-keepclassmembers class * {
+                                @org.springframework.beans.factory.annotation.Autowired *;
+                                @org.springframework.beans.factory.annotation.Value *;
+                            }
+                        </option>
                     </options>
                     <!-- 加载文件的过滤器，就是你的工程目录了-->
                     <!--  
