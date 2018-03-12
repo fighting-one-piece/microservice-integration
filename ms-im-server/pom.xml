@@ -1,0 +1,303 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.cisiondata</groupId>
+	<artifactId>ms-im-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>MS Instant Messaging Server Project</name>
+	<url>http://maven.apache.org</url>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>1.5.9.RELEASE</version>
+	    <relativePath/>
+	</parent>
+	
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<target-env>development</target-env>
+				<repo-host>192.168.0.124:8081</repo-host>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<target-env>test</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<target-env>production</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>public</id>
+			<name>public repository</name>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		
+		<repository> 
+            <id>maven-restlet</id> 
+            <name>Public Online Restlet Repository</name> 
+            <url>http://maven.restlet.org</url> 
+        </repository> 
+        
+         <repository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+	</repositories>
+	
+	<pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
+		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
+		<spring.cloud.version>Camden.SR7</spring.cloud.version>
+		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
+		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
+		<netty.version>4.1.22.Final</netty.version>
+		<netty.socketio.version>1.7.14</netty.socketio.version>
+		<socketio.client.version>1.0.0</socketio.client.version>
+		<jedis.version>2.9.0</jedis.version>
+		<kafka.version>0.10.0.0</kafka.version>
+		<zookeeper.version>3.4.8</zookeeper.version>
+		<zkclient.version>0.1</zkclient.version>
+	</properties>
+ 
+	<dependencies>
+		<dependency>
+			<groupId>jdk.tools</groupId>
+			<artifactId>jdk.tools</artifactId>
+			<version>1.8</version>
+			<scope>system</scope>
+            <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
+  		</dependency>
+	
+		<!-- Boot-Base依赖包-->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>boot-base</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+      	
+      	<!-- Spring Cloud依赖包 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+		
+		<!-- Netty依赖包 -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-all</artifactId>
+		    <version>${netty.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.corundumstudio.socketio</groupId>
+		    <artifactId>netty-socketio</artifactId>
+		    <version>${netty.socketio.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>io.socket</groupId>
+		    <artifactId>socket.io-client</artifactId>
+		    <version>${socketio.client.version}</version>
+		</dependency>
+		
+		<!-- Jackson依赖包 -->
+		<!--  
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		    <version>2.9.4</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.9.4</version>
+		</dependency>
+		-->
+		
+	    <!-- Kafka依赖包 -->
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka_2.11</artifactId>
+		    <version>${kafka.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-clients</artifactId>
+		    <version>${kafka.version}</version>
+		</dependency>
+		
+		<!-- Zookeeper依赖包 -->
+		<dependency>
+		    <groupId>org.apache.zookeeper</groupId>
+		    <artifactId>zookeeper</artifactId>
+		    <version>${zookeeper.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.sgroschupf</groupId>
+			<artifactId>zkclient</artifactId>
+			<version>${zkclient.version}</version>
+		</dependency>
+		
+	</dependencies>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring.cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<finalName>ms-im-server</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<defaultGoal>install</defaultGoal>
+		<filters>
+			<filter>src/main/resources/application.properties</filter>
+			<filter>src/main/resources/application-${target-env}.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>maven</groupId>
+				<artifactId>maven-test-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/libs
+                            </outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Jar Maven Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.cisiondata.modules.bootstrap.BootstrapApplication</mainClass>
+							<addClasspath>true</addClasspath>
+					        <classpathPrefix>libs/</classpathPrefix>
+						</manifest>
+					</archive>
+					<manifestEntries>
+						<Class-Path>.</Class-Path>
+					</manifestEntries>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+	
+	<distributionManagement>
+		<repository>  
+            <id>user-release</id>  
+            <name>User Project Release</name>  
+            <url>http://${repo-host}/nexus/content/repositories/releases/</url>  
+        </repository>  
+  
+        <snapshotRepository>  
+            <id>user-snapshots</id>  
+            <name>User Project SNAPSHOTS</name>  
+            <url>http://${repo-host}/nexus/content/repositories/snapshots/</url>  
+        </snapshotRepository>  
+	</distributionManagement>
+	
+</project>
