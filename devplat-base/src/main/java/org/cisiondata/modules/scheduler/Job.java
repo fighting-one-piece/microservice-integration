@@ -21,6 +21,7 @@ public abstract class Job {
 	public static final String C_THREAD_POOL_NUM = "C_THREAD_POOL_NUM";
 	public static final String USE_BLOCKING_QUEUE = "USE_BLOCKING_QUEUE";
 	public static final String QUEUE_CAPACITY = "QUEUE_CAPACITY";
+	public static final String USE_PRODUCER_MODEL = "USE_PRODUCER_MODEL";
 	public static final String USE_CONSUMER_MODEL = "USE_CONSUMER_MODEL";
 	public static final String CONSUME_DELAY_SECONDS = "CONSUME_DELAY_SECONDS";
 	
@@ -41,7 +42,8 @@ public abstract class Job {
 	
 	private BlockingQueue<String> queue = null;
 	
-	private boolean useConsumerModel = false;
+	private boolean useProducerModel = true;
+	private boolean useConsumerModel = true;
 	
 	private int consumeDelaySeconds = 10;
 	
@@ -102,23 +104,25 @@ public abstract class Job {
 	public void startup() {
 		initializeJobConf();
 		initializeJobParams();
-		startupProducers();
-		if (!useConsumerModel) return;
-		startupConsumers();
+		if (useProducerModel) startupProducers();
+		if (useConsumerModel) startupConsumers();
 	}
 	
 	public void shutdown() {
-		for (int i = 0, len = pFutures.size(); i < len; i++) {
-			Future<?> future = pFutures.get(i);
-			while (!future.isDone()) {}
+		if (useProducerModel) {
+			for (int i = 0, len = pFutures.size(); i < len; i++) {
+				Future<?> future = pFutures.get(i);
+				while (!future.isDone()) {}
+			}
+			pExecutorService.shutdown();
 		}
-		pExecutorService.shutdown();
-		if (!useConsumerModel) return;
-		for (int i = 0, len = cFutures.size(); i < len; i++) {
-			Future<?> future = cFutures.get(i);
-			while (!future.isDone()) {}
+		if (useConsumerModel) {
+			for (int i = 0, len = cFutures.size(); i < len; i++) {
+				Future<?> future = cFutures.get(i);
+				while (!future.isDone()) {}
+			}
+			cExecutorService.shutdown();
 		}
-		cExecutorService.shutdown();
 	}
 	
 	/**
@@ -126,17 +130,20 @@ public abstract class Job {
 	 * @param jobConf
 	 */
 	private void initializeJobParams() {
-		pThreadPoolNum = (int) getJobConf().getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
-		pExecutorService = Executors.newFixedThreadPool(pThreadPoolNum);
-		cThreadPoolNum = (int) getJobConf().getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
-		cExecutorService = Executors.newFixedThreadPool(cThreadPoolNum);
+		useProducerModel = (boolean) getJobConf().getOrDefault(USE_PRODUCER_MODEL, true);
+		if (useProducerModel) {
+			pThreadPoolNum = (int) getJobConf().getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
+			pExecutorService = Executors.newFixedThreadPool(pThreadPoolNum);
+		}
 		useBlockingQueue = (boolean) getJobConf().getOrDefault(USE_BLOCKING_QUEUE, false);
 		if (useBlockingQueue) {
 			int queueCapaciy = (int) getJobConf().getOrDefault(QUEUE_CAPACITY, DEFAULT_QUEUE_CAPACITY);
 			queue = new ArrayBlockingQueue<String>(queueCapaciy);
 		}
-		useConsumerModel = (boolean) getJobConf().getOrDefault(USE_CONSUMER_MODEL, false);
+		useConsumerModel = (boolean) getJobConf().getOrDefault(USE_CONSUMER_MODEL, true);
 		if (useConsumerModel) {
+			cThreadPoolNum = (int) getJobConf().getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
+			cExecutorService = Executors.newFixedThreadPool(cThreadPoolNum);
 			consumeDelaySeconds = (int) getJobConf().getOrDefault(
 				CONSUME_DELAY_SECONDS, DEFAULT_CONSUME_DELAY_SECONDS);
 		}
