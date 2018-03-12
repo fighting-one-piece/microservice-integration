@@ -12,7 +12,7 @@ public class CSocketIOClient {
 		IO.Options options = new IO.Options();    
         options.forceNew = true;
         options.reconnection = true;
-    	Socket socket = IO.socket("http://localhost:9092?deviceId=ZYLPC", options);
+    	Socket socket = IO.socket("http://localhost:8081?clientid=client1", options);
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 			
 			@Override
