@@ -128,13 +128,21 @@ public class TmpUtils {
 	
 	public static void e() throws Exception {
 //		String encryptTxt = RSAUtils.encryptNoPaddingAndBase64("王仕恩");
-		String encryptTxt = "a4+lwJCfdmHBVpbr6kVB4GwNOtsPpco9mnqUNwpkCENKGCU6/aSVg+nH8wrvinEg17cGfqeEtF72NkALGeHu9IZPMP3HxUo4skufkAQEk5SsB5PoRpg8p1gYnyAh+jQP6Shf72eA8FOc1LkBx7u6lldD5NnBUmdHwCBxdUMGNl4=";
-		System.err.println(encryptTxt.length());
-		System.err.println(new String(RSAUtils.decryptNoPaddingAndBase64(encryptTxt)));
+//		String encryptTxt = "a4+lwJCfdmHBVpbr6kVB4GwNOtsPpco9mnqUNwpkCENKGCU6/aSVg+nH8wrvinEg17cGfqeEtF72NkALGeHu9IZPMP3HxUo4skufkAQEk5SsB5PoRpg8p1gYnyAh+jQP6Shf72eA8FOc1LkBx7u6lldD5NnBUmdHwCBxdUMGNl4=";
+//		System.err.println(encryptTxt.length());
+//		System.err.println(new String(RSAUtils.decryptNoPaddingAndBase64(encryptTxt)));
+		String txt = "AQu+G9jT/4rm5ZvaRr1TIpePu9Oau7JAno8Nm+MtniAQE6k7uXlLv/7WyiqjigoF5f7D7wfJAtKNufNo/XP8S0xt8uP8CdgLX8DStZteE/rBI8agVHNBzvg66ngO7W7CCBYpGGsMNx8vc2odX6dhhZwqzC0KW0seX7Wqxy/DA+0=";
+		String realTxt = new String(RSAUtils.decryptNoPaddingAndBase64(txt));
+		System.err.println(realTxt);
+		String encryptTxt = RSAUtils.encryptNoPaddingAndBase64(realTxt);
+		System.err.println(encryptTxt);
+		System.err.println(new String(RSAUtils.decryptNoPaddingAndBase64("JlaQ/k2O3h7jOQDnympUl8HZMjM0G5cMm4m3qpgg04jCrA/shl3kLcz9/6/F8vVZCeP4EagBJh2nBu2P+iI+XTeXpZo05TgiGjFOhLa1J3DD3QOI75HfGcAv6tVlc3uJVILryyZo8rU8I2jcw+TqOHFua1fD2qTNt6Br4VRFyGY=")));
+		System.err.println(new String(RSAUtils.decryptNoPaddingAndBase64("WfI9iDbVV9utWIcExC9qCSusjzrvje/MSvUnR5GOJUAnNalSqrxzVdOfjXr9Hw1zbw6VOzevKf4XYuRQaQl9wtEGN1wmHLCpX8Jhy2J6ikpEUI6OAAwhNaiCLRZVMmYDBnGxZ1auqy5CLw47BD5W1w9htrThwcqazkTOEg7zYA8=")));
 	}
 	
 	public static void main(String[] args) throws Exception {
 		e();
+		System.exit(0);
 	}
 
 }
