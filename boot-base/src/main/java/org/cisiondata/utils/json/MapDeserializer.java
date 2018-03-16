@@ -68,7 +68,7 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 			}
 			return list;
 		} else {
-			return isNumberic(element.getAsString()) ? element.getAsLong() : element;
+			return isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString();
 		}
 	}
 
