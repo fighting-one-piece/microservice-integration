@@ -41,6 +41,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -561,6 +562,22 @@ public class HttpClientUtils {
 	 */
 	public static String sendPost(String url, String params, int connectTimeout, 
 			String encode, HttpHost proxy, String... headers) {
+		return sendPost(url, params, connectTimeout, null, encode, proxy, headers);
+	}
+	
+	/**
+	 * HTTP POST请求
+	 * @param url
+	 * @param params
+	 * @param connectTimeout
+	 * @param contentType
+	 * @param encode
+	 * @param proxy
+	 * @param headers
+	 * @return
+	 */
+	public static String sendPost(String url, String params, int connectTimeout, 
+			ContentType contentType, String encode, HttpHost proxy, String... headers) {
 		String responseTxt = null;
 		HttpPost httpPost = new HttpPost(url);
 		try {
@@ -572,9 +589,10 @@ public class HttpClientUtils {
 			RequestConfig requestConfig = builder.build();
 			httpPost.setConfig(requestConfig);
 			if (null == encode) encode = ENCODE_UTF8;
-			StringEntity stringEntity = new StringEntity(params, ENCODE_UTF8);
-        	stringEntity.setContentType("application/x-www-form-urlencoded");
-            httpPost.setEntity(stringEntity);
+			StringEntity stringEntity = new StringEntity(params, encode);
+			stringEntity.setContentType(null == contentType ? 
+					"application/x-www-form-urlencoded" : contentType.getMimeType());
+			httpPost.setEntity(stringEntity);
 			if (null != headers) {
 				for (int i = 0, len = headers.length; i < len;) {
             		httpPost.setHeader(headers[i], headers[i + 1]);

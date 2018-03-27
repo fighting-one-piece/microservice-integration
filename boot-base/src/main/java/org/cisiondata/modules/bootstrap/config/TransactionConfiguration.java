@@ -60,11 +60,11 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 		RuleBasedTransactionAttribute requiredTx = new RuleBasedTransactionAttribute();
 		requiredTx.setRollbackRules(rollbackRuleAttributes);
 		requiredTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		requiredTx.setTimeout(20);
+		requiredTx.setTimeout(60);
 		RuleBasedTransactionAttribute requiredNewTx = new RuleBasedTransactionAttribute();
 		requiredNewTx.setRollbackRules(rollbackRuleAttributes);
 		requiredNewTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		requiredNewTx.setTimeout(20);
+		requiredNewTx.setTimeout(60);
 		Map<String, TransactionAttribute> nameMap = new HashMap<String, TransactionAttribute>();
 		nameMap.put("add*", requiredTx);
 		nameMap.put("save*", requiredTx);

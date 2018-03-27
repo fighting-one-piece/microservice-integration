@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 public class SHAUtils {
 
 	/**
-	 * 
 	 * @param input
 	 * @return
 	 */
@@ -15,7 +14,6 @@ public class SHAUtils {
 	}
 
 	/**
-	 * 
 	 * @param input
 	 * @return
 	 */
@@ -24,7 +22,6 @@ public class SHAUtils {
 	}
 
 	/**
-	 * 
 	 * @param input
 	 * @return
 	 */
@@ -33,7 +30,6 @@ public class SHAUtils {
 	}
 
 	/**
-	 * 
 	 * @param input
 	 * @return
 	 */
@@ -42,7 +38,6 @@ public class SHAUtils {
 	}
 
 	/**
-	 * 
 	 * @param input
 	 * @param type
 	 * @return

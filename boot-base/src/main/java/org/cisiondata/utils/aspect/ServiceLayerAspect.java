@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.cisiondata.modules.abstr.web.ResultCode;
+import org.cisiondata.modules.bootstrap.annotation.ServiceAspectExclude;
 import org.cisiondata.modules.bootstrap.config.ds.DataSource;
 import org.cisiondata.modules.bootstrap.config.ds.DataSourceContextHolder;
 import org.cisiondata.utils.exception.BusinessException;
@@ -39,29 +40,32 @@ public class ServiceLayerAspect {
 	/**
 	@Before(EXECUTION)
 	public void logBefore(JoinPoint joinPoint){
-//		LOG.info("------Log Before Method------" + joinPoint.getSignature().getName());
+		LOG.info("------Log Before Method------" + joinPoint.getSignature().getName());
 	}
 
 	@After(EXECUTION)
 	public void logAfter(JoinPoint joinPoint){
-//		LOG.info("------Log After Method------" + joinPoint.getSignature().getName());
+		LOG.info("------Log After Method------" + joinPoint.getSignature().getName());
 	}
 
 	@AfterReturning(pointcut = EXECUTION, returning = "result")
 	public void logAfterReturn(JoinPoint joinPoint, Object result) {
-//		LOG.info("------Log After Returning Method------" + joinPoint.getSignature().getName());
-//		LOG.info("------Log After Returning Method Return Value------" + result);
+		LOG.info("------Log After Returning Method------" + joinPoint.getSignature().getName());
+		LOG.info("------Log After Returning Method Return Value------" + result);
 	}
 
 	@AfterThrowing(pointcut = EXECUTION, throwing = "exception")
 	public void logAfterThrowing(JoinPoint joinPoint, Throwable exception){
-//		LOG.info("------Log After Throwing Method------" + joinPoint.getSignature().getName());
-//		LOG.error(exception.getMessage(), exception);
+		LOG.info("------Log After Throwing Method------" + joinPoint.getSignature().getName());
+		LOG.error(exception.getMessage(), exception);
 	}
 	*/
 
 	@Around(EXECUTION)
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+		ServiceAspectExclude serviceAspectExclude = proceedingJoinPoint.getTarget()
+			.getClass().getAnnotation(ServiceAspectExclude.class);
+		if (null != serviceAspectExclude) return proceedingJoinPoint.proceed();
 		long startTime = System.currentTimeMillis();
 		String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
 		String methodName = proceedingJoinPoint.getSignature().getName();

@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.cisiondata.utils.endecrypt.MD5Utils;
+
 public class IDGenerator {
 	
 	public static String generateByMapValues(Map<String, Object> map, String... excludeKeys) {
