@@ -37,8 +37,7 @@ public class TomcatConfiguration {
 			protocol.setKeyAlias("springboot");
 			return connector;
 		} catch (Exception ex) {
-			throw new IllegalStateException("cant access keystore: ["
-					+ "keystore" + "]  ", ex);
+			throw new IllegalStateException("cant access keystore: [" + "keystore" + "]  ", ex);
 		}
 	}
 

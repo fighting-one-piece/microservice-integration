@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnection;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -19,7 +18,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
-@ConditionalOnClass({ JedisConnection.class, RedisOperations.class, Jedis.class })
+@ConditionalOnClass({Jedis.class, JedisConnection.class, JedisConnectionFactory.class, RedisTemplate.class})
 public class RedisConfiguration {
 
 	private Logger LOG = LoggerFactory.getLogger(RedisConfiguration.class);

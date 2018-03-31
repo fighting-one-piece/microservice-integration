@@ -9,6 +9,7 @@ import org.mybatis.spring.CustomSqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 @Configuration
+@ConditionalOnClass({SqlSessionFactoryBean.class})
 @AutoConfigureAfter(DataSourceConfiguration.class)
 @PropertySource("classpath:mybatis/mybatis.properties")
 /**

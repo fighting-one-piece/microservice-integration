@@ -3,6 +3,7 @@ package org.cisiondata.modules.bootstrap.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +19,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
+@ConditionalOnClass({ApiInfoBuilder.class})
 public class SwaggerConfiguration {
 
 	//http://localhost:8080/v2/api-docs

@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 @Configuration
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(exposeProxy = true)
+@AutoConfigureAfter(DataSourceConfiguration.class)
 public class TransactionConfiguration implements TransactionManagementConfigurer {
 	
 	private static final String POINTCUT_EXPRESSION = "execution(* org.cisiondata.modules.*.service.impl.*.*(..))";  

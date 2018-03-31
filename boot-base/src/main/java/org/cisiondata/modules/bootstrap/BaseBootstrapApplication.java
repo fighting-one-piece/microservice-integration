@@ -4,14 +4,13 @@ import org.cisiondata.modules.abstr.web.filter.XssStringJsonSerializer;
 import org.cisiondata.modules.bootstrap.annotation.ComponentScanExclude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
@@ -22,8 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-@Configuration
-@SpringBootApplication
+@SpringBootConfiguration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = { "org.cisiondata" }, excludeFilters = {@ComponentScan.Filter(
 	type = FilterType.ANNOTATION, value = ComponentScanExclude.class)})
