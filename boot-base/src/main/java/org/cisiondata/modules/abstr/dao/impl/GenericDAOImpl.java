@@ -14,17 +14,23 @@ public class GenericDAOImpl<Entity extends Serializable, PK extends Serializable
 	@Override
 	public void insert(Entity entity) throws DataAccessException {
 	}
+	
+	public void insert(List<Entity> entities) throws DataAccessException {
+	}
 
 	@Override
-	public void insert(List<Entity> entities) throws DataAccessException {
+	public void insertBatch(List<Entity> entities) throws DataAccessException {
 	}
 
 	@Override
 	public void update(Entity entity) throws DataAccessException {
 	}
+	
+	public void update(List<Entity> entities) throws DataAccessException {
+	}
 
 	@Override
-	public void update(List<Entity> entities) throws DataAccessException {
+	public void updateBatch(List<Entity> entities) throws DataAccessException {
 	}
 
 	@Override
@@ -57,6 +63,11 @@ public class GenericDAOImpl<Entity extends Serializable, PK extends Serializable
 
 	@Override
 	public List<Entity> readDataListByCondition(Map<String, Object> condition) throws DataAccessException {
+		return null;
+	}
+	
+	@Override
+	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
 		return null;
 	}
 

@@ -88,7 +88,7 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 	}
 	
 	@Override
-	public void insert(List<Entity> entities) throws DataAccessException {
+	public void insertBatch(List<Entity> entities) throws DataAccessException {
 		List<CEntityData> entityDatas = new ArrayList<CEntityData>();
 		for (int i = 0, len = entities.size(); i < len; i++) {
 			Entity entity = entities.get(i);
@@ -100,7 +100,7 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 				entityDatas.add(entityData);
 			}
 		}
-		centityDataDAO.insert(entityDatas);
+		centityDataDAO.insertBatch(entityDatas);
 	}
 	
 	@Override
@@ -156,7 +156,7 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 	}
 	
 	@Override
-	public void update(List<Entity> entities) throws DataAccessException {
+	public void updateBatch(List<Entity> entities) throws DataAccessException {
 		List<CEntity> centities = new ArrayList<CEntity>();
 		List<CEntityData> insertEntityDatas = new ArrayList<CEntityData>();
 		List<CEntityData> updateEntityDatas = new ArrayList<CEntityData>();
@@ -182,12 +182,12 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 				}
 			}
 		}
-		centityDAO.update(centities);
+		centityDAO.updateBatch(centities);
 		if (insertEntityDatas.size() > 0) {
 			insertEntityData(insertEntityDatas);
 		}
 		if (updateEntityDatas.size() > 0) {
-			centityDataDAO.update(updateEntityDatas);
+			centityDataDAO.updateBatch(updateEntityDatas);
 		}
 	}
 	
@@ -379,6 +379,11 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 	
 	@Override
 	public List<Entity> readDataListByCondition(Map<String, Object> condition) throws DataAccessException {
+		return null;
+	}
+	
+	@Override
+	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
 		return null;
 	}
 	

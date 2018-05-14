@@ -80,6 +80,15 @@ public class GsonUtils {
 		return builder().fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 	}
 	
+	/** 
+	 * JSON 转换  Map
+	 * @param json
+	 * @return
+	 */
+	public static Map<String, ?> fromJsonToMapExt(String json) {
+		return builder().fromJson(json, new TypeToken<Map<String, ?>>(){}.getType());
+	}
+	
 	/**
 	 * Map 转换 JSON
 	 * @param map
@@ -87,6 +96,15 @@ public class GsonUtils {
 	 */
 	public static String fromMapToJson(Map<String, Object> map) {
 		return builder().toJson(map, new TypeToken<Map<String, Object>>(){}.getType());
+	}
+	
+	/**
+	 * Map 转换 JSON
+	 * @param map
+	 * @return
+	 */
+	public static String fromMapExtToJson(Map<String, ?> map) {
+		return builder().toJson(map, new TypeToken<Map<String, ?>>(){}.getType());
 	}
 	
 }

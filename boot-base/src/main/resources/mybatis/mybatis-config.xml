@@ -28,4 +28,8 @@
 		<setting name="defaultStatementTimeout" value="25000" />
 	</settings>
 	
+	<plugins>  
+    	<plugin interceptor="org.cisiondata.modules.abstr.dao.interceptor.PaginationInterceptor"/>  
+	</plugins> 
+	
 </configuration>

@@ -2,14 +2,23 @@
 <!-- 属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 
 	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<!--在控制台显示日志颜色-->  
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>  
+    <conversionRule conversionWord="wtpc"  
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>  
+    <conversionRule conversionWord="ewtpc"  
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/> 
+
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
 	<property name="LOG_HOME" value="logs" />
 	<property name="MAX_HISTORY" value="30" />
 	<property name="PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n" />
+	<!--控制台格式配置-->  
+    <property name="PATTERN_CONSOLE_LOG" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%ewtpc}}"/>  
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>${PATTERN}</pattern>
+			<pattern>${PATTERN_CONSOLE_LOG}</pattern>
 		</encoder>
 	</appender>
 

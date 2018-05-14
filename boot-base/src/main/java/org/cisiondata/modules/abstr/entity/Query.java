@@ -90,18 +90,15 @@ public class Query implements Serializable {
 
 	public void setPagination(boolean isPagination) {
 		this.isPagination = isPagination;
-		condition.put(IS_PAGINATION, isPagination);
+		condition.put(IS_PAGINATION, this.isPagination);
 	}
 
 	public int getCurrentPageNum() {
-		if (currentPageNum <= 1) {
-			currentPageNum = 1;
-		}
-		return currentPageNum;
+		return this.currentPageNum <= 1 ? 1 : currentPageNum;
 	}
 
 	public void setCurrentPageNum(int currentPageNum) {
-		this.currentPageNum = currentPageNum;
+		this.currentPageNum = (currentPageNum <= 1 ? 1 : currentPageNum);
 	}
 
 	public int getRowNumPerPage() {
@@ -110,14 +107,13 @@ public class Query implements Serializable {
 
 	public void setRowNumPerPage(int rowNumPerPage) {
 		this.rowNumPerPage = rowNumPerPage;
-		condition.put(LIMIT, rowNumPerPage);
+		condition.put(OFFSET, (this.currentPageNum - 1) * this.rowNumPerPage);
+		condition.put(LIMIT, this.rowNumPerPage);
 	}
 
 	public Map<String, Object> getCondition() {
-		if (null == condition) {
-			condition = new HashMap<String, Object>();
-		}
-		return condition;
+		if (null == this.condition) this.condition = new HashMap<String, Object>();
+		return this.condition;
 	}
 
 	public void setCondition(Map<String, Object> condition) {

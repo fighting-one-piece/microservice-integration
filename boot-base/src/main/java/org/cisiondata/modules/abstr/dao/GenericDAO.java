@@ -22,7 +22,7 @@ public interface GenericDAO <Entity extends Serializable, PK extends Serializabl
 	 * @param entities
 	 * @throws DataAccessException
 	 */
-	public void insert(List<Entity> entities) throws DataAccessException;
+	public void insertBatch(List<Entity> entities) throws DataAccessException;
 
 	/**
 	 * 更新实体对象
@@ -36,7 +36,7 @@ public interface GenericDAO <Entity extends Serializable, PK extends Serializabl
 	 * @param entities
 	 * @throws DataAccessException
 	 */
-	public void update(List<Entity> entities) throws DataAccessException;
+	public void updateBatch(List<Entity> entities) throws DataAccessException;
 
 	/**
 	 * 删除实体对象
@@ -92,6 +92,14 @@ public interface GenericDAO <Entity extends Serializable, PK extends Serializabl
 	 */
 	public List<Entity> readDataListByCondition(Map<String, Object> condition) throws DataAccessException;
 
+	/**
+	 * 根据条件读取实体对象分页列表
+	 * @param condition
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException;
+	
 	/**
 	 * 根据条件读取实体对象分页列表
 	 * @param query
