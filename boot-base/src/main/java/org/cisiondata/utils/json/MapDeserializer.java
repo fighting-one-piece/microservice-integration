@@ -17,6 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 
 public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 
@@ -68,7 +69,20 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 			}
 			return list;
 		} else {
-			return isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString();
+			JsonPrimitive jsonPrimitive = element.getAsJsonPrimitive();
+			if (jsonPrimitive.isString()) {
+				return element.getAsString();
+			} else if (jsonPrimitive.isBoolean()) {
+				return element.getAsBoolean();
+			} else if (jsonPrimitive.isNumber()) {
+				if (element.getAsString().indexOf(".") != -1) {
+					return element.getAsDouble();
+				} else {
+					return element.getAsLong();
+				}
+			} else {
+				return isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString();
+			}
 		}
 	}
 
