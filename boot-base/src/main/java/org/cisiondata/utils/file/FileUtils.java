@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -48,6 +49,10 @@ public class FileUtils {
 			}
 		}
 		return result;
+	}
+	
+	public static void write(String dest, String... lines) {
+		write(dest, Arrays.asList(lines));
 	}
 	
 	public static void write(String dest, List<String> lines) {

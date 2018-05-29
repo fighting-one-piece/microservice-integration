@@ -58,6 +58,7 @@ public class PaginationInterceptor implements Interceptor {
 	    	condition = (Map<String, Object>) parameterObject;
 	    }
 	    if (null != condition && !condition.isEmpty()) {
+	    	if (!condition.containsKey(Query.IS_PAGINATION)) return invocation.proceed();
 	    	Object pv = condition.get(Query.IS_PAGINATION);
 	    	if (null == pv || !((Boolean) pv)) return invocation.proceed();
             //获取MyBatis配置信息
