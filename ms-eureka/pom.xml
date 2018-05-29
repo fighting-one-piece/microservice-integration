@@ -61,11 +61,6 @@
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
 		<!-- Spring Cloud依赖包 -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -101,19 +96,19 @@
 		<dependency>
 		    <groupId>ch.qos.logback</groupId>
 		    <artifactId>logback-classic</artifactId>
-		    <version>${logback.version}</version>
+		    <version>${logback.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<dependency>
 		    <groupId>ch.qos.logback</groupId>
 		    <artifactId>logback-core</artifactId>
-		    <version>${logback.version}</version>
+		    <version>${logback.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<dependency>
 		    <groupId>ch.qos.logback</groupId>
 		    <artifactId>logback-access</artifactId>
-		    <version>${logback.version}</version>
+		    <version>${logback.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<dependency>
