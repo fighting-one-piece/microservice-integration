@@ -283,14 +283,19 @@ public class RedisClusterUtils {
 	}
 	
 	/**
-	 * 删除SET数据集合
+	 * 新增SET数据集合
 	 * @param key
 	 * @param members
 	 * @return
 	 */
-	public long srem(String key, String... members) {
+	public long sadd(String key, Object... members) {
 		try {
-			return jedisCluster.srem(key, members);
+			if (null == members|| members.length == 0) return 0;
+			byte[][] bmembers = new byte[members.length][];
+			for (int i = 0, len = members.length; i < len; i++) {
+				bmembers[i] = SerializerUtils.write(members[i]);
+			}
+			return jedisCluster.sadd(SerializerUtils.write(key), bmembers);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
@@ -320,6 +325,74 @@ public class RedisClusterUtils {
 	public long scard(String key) {
 		try {
 			return jedisCluster.scard(key);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * 获取KEY中SET数据集合
+	 * @param key
+	 * @return
+	 */
+	public Set<String> smembers(String key) {
+		try {
+			return jedisCluster.smembers(key);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取KEY中SET数据集合
+	 * @param key
+	 * @return
+	 */
+	public Set<Object> smembers2obj(String key) {
+		Set<Object> results = new HashSet<Object>();
+		try {
+			Set<byte[]> bresults = jedisCluster.smembers(SerializerUtils.write(key));
+			if (null == bresults || bresults.isEmpty()) return results;
+			for (byte[] bresult : bresults) {
+				results.add(SerializerUtils.read(bresult));
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return results;
+	}
+	
+	/**
+	 * 删除SET数据集合
+	 * @param key
+	 * @param members
+	 * @return
+	 */
+	public long srem(String key, String... members) {
+		try {
+			return jedisCluster.srem(key, members);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * 删除SET数据集合
+	 * @param key
+	 * @param members
+	 * @return
+	 */
+	public long srem(String key, Object... members) {
+		try {
+			if (null == members|| members.length == 0) return 0;
+			byte[][] bmembers = new byte[members.length][];
+			for (int i = 0, len = members.length; i < len; i++) {
+				bmembers[i] = SerializerUtils.write(members[i]);
+			}
+			return jedisCluster.srem(SerializerUtils.write(key), bmembers);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
@@ -557,6 +630,118 @@ public class RedisClusterUtils {
 	public long hdel(String key, String... fields) {
 		try {
 			return jedisCluster.hdel(SerializerUtils.write(key), SerializerUtils.write(fields));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * SortedSet新增成员
+	 * @param key
+	 * @param member
+	 * @param score
+	 * @return
+	 */
+	public long zadd(String key, Object member, double score) {
+		try {
+			return jedisCluster.zadd(SerializerUtils.write(key), score, SerializerUtils.write(member));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * SortedSet新增成员
+	 * @param key
+	 * @param member
+	 * @param score
+	 * @return
+	 */
+	public long zadd(String key, Map<Object, Double> members) {
+		try {
+			Map<byte[], Double> scoreMembers = new HashMap<byte[], Double>();
+			for (Map.Entry<Object, Double> entry : members.entrySet()) {
+				scoreMembers.put(SerializerUtils.write(entry.getKey()), entry.getValue());
+			}
+			return jedisCluster.zadd(SerializerUtils.write(key), scoreMembers);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * SortedSet读取成员
+	 * @param key
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public Set<Object> zrange(String key, long start, long end) {
+		Set<Object> results = new HashSet<Object>();
+		try {
+			Set<byte[]> bresults = jedisCluster.zrange(SerializerUtils.write(key), start, end);
+			if (null == bresults || bresults.isEmpty()) return results;
+			for (byte[] bresult : bresults) {
+				results.add(SerializerUtils.read(bresult));
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return results;
+	}
+	
+	/**
+	 * SortedSet读取成员
+	 * @param key
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public Set<Object> zrevrange(String key, long start, long end) {
+		Set<Object> results = new HashSet<Object>();
+		try {
+			Set<byte[]> bresults = jedisCluster.zrevrange(SerializerUtils.write(key), start, end);
+			if (null == bresults || bresults.isEmpty()) return results;
+			for (byte[] bresult : bresults) {
+				results.add(SerializerUtils.read(bresult));
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return results;
+	}
+	
+	/**
+	 * SORTEDSET数据集合长度
+	 * @param key
+	 * @return
+	 */
+	public long zcard(String key) {
+		try {
+			return jedisCluster.zcard(SerializerUtils.write(key));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * SortedSet移除成员
+	 * @param key
+	 * @param member
+	 * @return
+	 */
+	public long zrem(String key, Object... members) {
+		try {
+			if (null == members|| members.length == 0) return 0;
+			byte[][] bmembers = new byte[members.length][];
+			for (int i = 0, len = members.length; i < len; i++) {
+				bmembers[i] = SerializerUtils.write(members[i]);
+			}
+			return jedisCluster.zrem(SerializerUtils.write(key), bmembers);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}

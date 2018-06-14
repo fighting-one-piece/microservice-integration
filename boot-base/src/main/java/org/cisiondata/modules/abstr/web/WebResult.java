@@ -52,6 +52,7 @@ public class WebResult implements Serializable {
 		} else {
 			this.code = code.getCode();
 		}
+		this.data = code.getDesc();
 	}
 	
 	public WebResult buildFailure(int code, String failure) {

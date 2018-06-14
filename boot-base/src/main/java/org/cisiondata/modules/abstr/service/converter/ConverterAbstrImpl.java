@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.cisiondata.modules.abstr.entity.PKEntity;
 import org.cisiondata.utils.exception.BusinessException;
+import org.cisiondata.utils.reflect.ReflectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,13 +125,16 @@ public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO 
 			clazz = objectFrom.getClass();
 		} else {
 			String className = objectFromClassName.substring(0, objectFromClassName.indexOf("$$"));
+			if (className.indexOf("_") != -1) {
+				className = className.substring(0, className.lastIndexOf("_"));
+			}
 			try {
 				clazz = Class.forName(className);
 			} catch (ClassNotFoundException e) {
 				throw new BusinessException("数据转换异常: " + e.getMessage());
 			}
 		}
-		for (Field fieldFrom : clazz.getDeclaredFields()) {
+		for (Field fieldFrom : ReflectUtils.getFields(clazz)) {
 			if (Modifier.isStatic(fieldFrom.getModifiers())) continue;
 			String name = fieldFrom.getName();
 			Class<?> type = fieldFrom.getType();

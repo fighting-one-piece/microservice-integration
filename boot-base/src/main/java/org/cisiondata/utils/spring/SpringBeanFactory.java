@@ -2,7 +2,6 @@ package org.cisiondata.utils.spring;
 
 import java.util.Map;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -29,7 +28,7 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      * @return Object 一个以所给名字注册的bean的实例
      * @throws org.springframework.beans.BeansException
      */
-    @SuppressWarnings({ "unchecked", "hiding" })
+    @SuppressWarnings({ "unchecked" })
     public static <T> T getBean(String name) throws BeansException {
         return (T) beanFactory.getBean(name);
     }
@@ -40,7 +39,6 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      * @return
      * @throws org.springframework.beans.BeansException
      */
-    @SuppressWarnings("hiding")
 	public static <T> T getBean(Class<T> clz) throws BeansException {
         return (T) beanFactory.getBean(clz);
     }
@@ -88,7 +86,6 @@ public final class SpringBeanFactory implements BeanFactoryPostProcessor {
      * @param type
      * @return
      */
-    @SuppressWarnings("hiding")
 	public static <T> Map<String, T> getBeansOfType(Class<T> type) {
     	return beanFactory.getBeansOfType(type);
     }
