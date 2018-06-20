@@ -87,7 +87,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		registrationBean.setServlet(demoServlet);
 		List<String> urlMappings = new ArrayList<String>();
-		urlMappings.add("/demoservlet");////访问，可以添加多个
+		urlMappings.add("/demoservlet");//访问，可以添加多个
 		registrationBean.setUrlMappings(urlMappings);
 		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
@@ -98,12 +98,9 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 		MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = jackson2HttpMessageConverter.getObjectMapper();
-        //不显示为null的字段
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        
 		/**
         SimpleModule simpleModule1 = new SimpleModule();
         simpleModule1.addSerializer(Integer.class, ToStringSerializer.instance);
@@ -125,9 +122,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         simpleModule4.addSerializer(Double.TYPE, ToStringSerializer.instance);
         objectMapper.registerModule(simpleModule4);
 		*/
-
         jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        
         converters.add(0, jackson2HttpMessageConverter);
 	}
 	

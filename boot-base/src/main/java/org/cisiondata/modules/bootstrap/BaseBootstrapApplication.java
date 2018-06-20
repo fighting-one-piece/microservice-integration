@@ -33,6 +33,9 @@ public class BaseBootstrapApplication {
 	@Primary
 	public ObjectMapper xssObjectMapper(Jackson2ObjectMapperBuilder builder) {
 		ObjectMapper objectMapper = builder.createXmlMapper(false).build(); 
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		SimpleModule xssModule = new SimpleModule("XssStringJsonSerializer");
 		xssModule.addSerializer(new XssStringJsonSerializer());
 		objectMapper.registerModule(xssModule);
