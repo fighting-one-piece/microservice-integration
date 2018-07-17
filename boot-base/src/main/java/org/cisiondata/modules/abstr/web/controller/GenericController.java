@@ -1,4 +1,4 @@
-package org.cisiondata.modules.abstr.web;
+package org.cisiondata.modules.abstr.web.controller;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;

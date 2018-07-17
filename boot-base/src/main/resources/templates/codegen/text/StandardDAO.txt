@@ -1,0 +1,10 @@
+package org.cisiondata.modules.[(${module})].dao;
+
+import org.cisiondata.modules.abstr.dao.GenericDAO;
+import org.cisiondata.modules.[(${module})].entity.[(${entity})];
+import org.springframework.stereotype.Repository;
+
+@Repository("[(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]DAO")
+public interface [(${entity})]DAO extends GenericDAO<[(${entity})], Long> {
+
+}

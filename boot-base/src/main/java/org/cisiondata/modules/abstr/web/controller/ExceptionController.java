@@ -1,4 +1,4 @@
-package org.cisiondata.modules.abstr.web;
+package org.cisiondata.modules.abstr.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 

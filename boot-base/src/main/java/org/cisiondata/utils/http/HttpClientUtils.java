@@ -293,7 +293,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url) {
-		return sendGetThenRespAndHeaders(url, null, ENCODE_UTF8);
+		return sendGetThenRespAndHeaders(url, null, connectTimeout, soTimeout);
 	}
 	
 	/**

@@ -48,6 +48,7 @@ public class DAOLayerAspect {
 		try {
 			result = proceedingJoinPoint.proceed();
 		} catch (DuplicateKeyException dke) {
+			LOG.error(dke.getMessage(), dke);
 			throw new BusinessException(ResultCode.DATA_EXISTED);
 		} catch (DataException | DataAccessException de) {
 			LOG.error(de.getMessage(), de);

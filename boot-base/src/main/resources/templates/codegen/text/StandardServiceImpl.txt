@@ -1,0 +1,24 @@
+package org.cisiondata.modules.[(${module})].service.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import org.cisiondata.modules.abstr.dao.GenericDAO;
+import org.cisiondata.modules.abstr.service.impl.GenericServiceImpl;
+import org.cisiondata.modules.[(${module})].dao.[(${entity})]DAO;
+import org.cisiondata.modules.[(${module})].entity.[(${entity})];
+import org.cisiondata.modules.[(${module})].service.I[(${entity})]Service;
+
+@Service("[(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]Service")
+public class [(${entity})]ServiceImpl extends GenericServiceImpl<[(${entity})], Long> implements I[(${entity})]Service {
+
+	@Resource(name = "[(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]DAO")
+	private [(${entity})]DAO [(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]DAO = null;
+
+	@Override
+	public GenericDAO<[(${entity})], Long> obtainDAOInstance() {
+		return [(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]DAO;
+	}
+
+}
