@@ -85,12 +85,6 @@
 		    <artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
 
-		<dependency>  
-        	<groupId>org.springframework.boot</groupId>  
-          	<artifactId>spring-boot-starter-redis</artifactId>  
-          	<version>${spring.boot.redis.version}</version>
-      	</dependency> 
-            	
 		<!--Commons IO依赖包 -->
 		<dependency>
 			<groupId>commons-io</groupId>
