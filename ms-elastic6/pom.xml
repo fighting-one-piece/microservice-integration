@@ -85,7 +85,7 @@
 		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
 		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
 		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
-		<elasticsearch.version>6.0.0</elasticsearch.version>
+		<elasticsearch.version>6.3.0</elasticsearch.version>
 		<jedis.version>2.9.0</jedis.version>
 		<hbase.version>1.2.3</hbase.version>
 		<kafka.version>0.10.0.0</kafka.version>
@@ -256,11 +256,11 @@
             -->
         </dependency>
         
-        <!-- ElasticSearch 6.0.0 -->
+        <!-- ElasticSearch依赖包 -->
 		<dependency>
 		    <groupId>org.elasticsearch</groupId>
 		    <artifactId>elasticsearch</artifactId>
-	        <version>${elasticsearch.version}</version>  
+	        <version>${elasticsearch.version}</version><!--$NO-MVN-MAN-VER$--> 
 		</dependency>
 		
 		<dependency>  

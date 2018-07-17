@@ -341,7 +341,6 @@ public class ElasticV2ServiceImpl extends ElasticV2AbstractServiceImpl implement
 			SearchHit hit = hits[i];
 			source = hit.getSource();
 			source.put("score", hit.getScore());
-			for (Object obj : hit.getSortValues()) System.err.println("sv: " + obj);
 			if (params.isHighLight()) wrapperHighLight(source, hit.getHighlightFields());
 			qr.getResultList().add(source);
 		}

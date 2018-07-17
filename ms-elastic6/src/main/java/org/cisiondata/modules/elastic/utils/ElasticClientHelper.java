@@ -28,9 +28,6 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.search.MultiSearchRequestBuilder;
-import org.elasticsearch.action.search.MultiSearchResponse;
-import org.elasticsearch.action.search.MultiSearchResponse.Item;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -44,10 +41,17 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
+import org.elasticsearch.search.aggregations.metrics.avg.AvgAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
+import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -519,102 +523,18 @@ public class ElasticClientHelper {
 		}
 	}
 	
-	public static void test01() {
-		Client client = ElasticClient.getInstance().getClient();
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("financial").setTypes("logistics");
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("city", "成都"));
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("orderTime", "2015/1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("orderTime", "2015-1"));
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("endTime", "2015/1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("endTime", "2015-1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("sourceFile", "台湾"));
-		searchRequestBuilder.setQuery(boolQueryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setSize(1000).setExplain(false);
-		searchRequestBuilder.addSort("updateTime", SortOrder.DESC);
-		SearchResponse response = searchRequestBuilder.execute().actionGet();
-		SearchHit[] hits = response.getHits().getHits();
-		for (int i = 0, len = hits.length; i < len; i++) {
-			System.out.println(hits[i].getSourceAsMap());
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static void test02() {
-		List<String> qqNumList1 = new ArrayList<String>();
-		long qqNum1 = 561243625L;
-		for (int i = 0; i < 100; i++) {
-			qqNumList1.add(String.valueOf(qqNum1 + i));
-		}
-		
-		List<String> qqNumList2 = new ArrayList<String>();
-		long qqNum2 = 471246431L;
-		for (int i = 0; i < 100; i++) {
-			qqNumList2.add(String.valueOf(qqNum2 + i));
-		}
-		
-		List<String> qqNumList3 = new ArrayList<String>();
-		long qqNum3 = 621247490;
-		for (int i = 0; i < 100; i++) {
-			qqNumList3.add(String.valueOf(qqNum3 + i));
-		}
-		
-		Client client = ElasticClient.getInstance().getClient();
-		long startTime1 = System.currentTimeMillis();
-		MultiSearchRequestBuilder msrb = client.prepareMultiSearch();
-		for (int i = 0, len = qqNumList1.size(); i < len; i++) {
-			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList1.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-			searchRequestBuilder.setSize(100).setExplain(false);
-			msrb.add(searchRequestBuilder);
-		}
-		MultiSearchResponse msr = msrb.execute().actionGet();
-		Item[] items = msr.getResponses();
-//		System.out.println("items size: " + items.length);
-		for (int i = 0, len = items.length; i < len; i++) {
-			Item item = items[i];
-			SearchResponse sr = item.getResponse();
-			System.out.println("total hits: " + sr.getHits().getTotalHits());
-		}
-		long endTime1 = System.currentTimeMillis();
-		System.out.println("multi query spend time " + (endTime1 - startTime1) / 1000);
-		long startTime2 = System.currentTimeMillis();
-		for (int i = 0, len = qqNumList2.size(); i < len; i++) {
-			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList2.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-			searchRequestBuilder.setSize(100).setExplain(false);
-			SearchResponse sr = searchRequestBuilder.execute().actionGet();
-			System.out.println("total hits: " + sr.getHits().getTotalHits());
-		}
-		long endTime2 = System.currentTimeMillis();
-		System.out.println("single query spend time " + (endTime2 - startTime2) / 1000);
-		long startTime3 = System.currentTimeMillis();
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-		BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
-		for (int i = 0, len = qqNumList3.size(); i < len; i++) {
-			queryBuilder.should(QueryBuilders.termQuery("qqNum", qqNumList3.get(i)));
-		}
-		searchRequestBuilder.setQuery(queryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-		searchRequestBuilder.setSize(100).setExplain(false);
-		SearchResponse sr = searchRequestBuilder.execute().actionGet();
-		System.out.println("total hits: " + sr.getHits().getTotalHits());
-		long endTime3 = System.currentTimeMillis();
-		System.out.println("one query spend time " + (endTime3 - startTime3) / 1000);
-		client.close();
-	}
-	
-	public static String test03(String scrollId) {
+	public static String test01(String scrollId) {
 		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
-				.prepareSearch("financial").setTypes("logistics");
-		searchRequestBuilder.setExplain(false);
-		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("name", "*王*"));
+				.prepareSearch("accesslog-201806").setTypes("pocommunication");
+		RangeQueryBuilder queryBuilder = QueryBuilders.rangeQuery("time_local");
+		queryBuilder.from("2018-06-21 14:00:00").to("2018-06-21 15:00:00");
+//		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("request_url", "*"));
+		searchRequestBuilder.setQuery(queryBuilder);
 		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
 		searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
-		searchRequestBuilder.setSize(5);
+		searchRequestBuilder.setExplain(false);
+		searchRequestBuilder.setSize(10);
+		searchRequestBuilder.addSort("time_local", SortOrder.DESC);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		LOG.info("scrollId: " + response.getScrollId());
 		if (StringUtils.isNotBlank(scrollId)) {
@@ -630,5 +550,34 @@ public class ElasticClientHelper {
 		return response.getScrollId();
 	}
 	
+	public static void test02() {
+		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
+				.prepareSearch("accesslog-201806").setTypes("pocommunication");
+		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("request_url", "/api/v1/thirdpart/*"));
+		SumAggregationBuilder sumAggregationBuilder = AggregationBuilders.sum("sumAgg").field("userId");
+		AvgAggregationBuilder avgAggregationBuilder = AggregationBuilders.avg("avgAgg").field("userId");
+		searchRequestBuilder.addAggregation(sumAggregationBuilder);
+		searchRequestBuilder.addAggregation(avgAggregationBuilder);
+		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+		searchRequestBuilder.setExplain(false);
+		SearchResponse response = searchRequestBuilder.execute().actionGet();
+		Aggregations aggregations = response.getAggregations();
+		Map<String, Aggregation> map = aggregations.getAsMap();
+		for (Map.Entry<String, Aggregation> entry : map.entrySet()) {
+			System.err.println(entry.getKey());
+			Aggregation aggregation = entry.getValue();
+			System.err.println(aggregation);
+			System.err.println(aggregation.getName());
+			System.err.println(aggregation.getType());
+			System.err.println(aggregation.toString());
+			System.err.println(aggregation.getMetaData());
+		}
+		InternalSum sum = response.getAggregations().get("sumAgg");
+		System.err.println(sum.getValue());
+	}
+	
+	public static void main(String[] args) {
+		test02();
+	}
 
 }

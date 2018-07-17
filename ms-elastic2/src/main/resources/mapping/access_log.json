@@ -1,0 +1,73 @@
+{
+	"dynamic": "strict",
+	"_source": {
+		"excludes": ["type"]
+	},
+	"properties": {
+		"remote_addr": {
+			"type": "ip",
+			"term_vector": "with_positions_offsets"
+		},
+		"body_bytes_sent": {
+			"analyzer": "ik_smart",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"time_local": {
+			"type": "date",
+			"format": "yyyy-MM-dd HH:mm:ss"
+		},
+		"request_method": {
+			"index": "not_analyzed",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"type": {
+			"index": "not_analyzed",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"request_url": {
+			"analyzer": "ik_smart",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"userId": {
+			"type": "long",
+			"term_vector": "with_positions_offsets"
+		},
+		"http_user_agent": {
+			"analyzer": "ik_smart",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"remote_user": {
+			"analyzer": "ik_smart",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"@timestamp": {
+			"type": "date",
+			"format": "strict_date_optional_time||epoch_millis",
+			"term_vector": "with_positions_offsets"
+		},
+		"request_time": {
+			"type": "double",
+			"term_vector": "with_positions_offsets"
+		},
+		"http_referer": {
+			"index": "not_analyzed",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"http_x_forwarded_for": {
+			"analyzer": "ik_smart",
+			"type": "string",
+			"term_vector": "with_positions_offsets"
+		},
+		"status": {
+			"type": "integer",
+			"term_vector": "with_positions_offsets"
+		}
+	}
+}

@@ -1,0 +1,98 @@
+{
+	"template": "accesslog*",
+	"order": 1,
+	"settings": {
+		"index.number_of_shards": 5,
+		"number_of_replicas": 1,
+		"index.refresh_interval": "60s"
+	},
+	"mappings": {
+		"_default_": {
+			"_all": {
+				"enabled": true
+			},
+			"dynamic_templates": [{
+				"string_fields": {
+					"match": "*",
+					"match_mapping_type": "string",
+					"mapping": {
+						"type": "string",
+						"index": "not_analyzed",
+						"omit_norms": true,
+						"doc_values": true,
+						"fields": {
+							"request_method": {
+								"type": "string",
+								"index": "not_analyzed",
+								"ignore_above": 256,
+								"doc_values": true
+							}
+						}
+					}
+				}
+			}],
+			"dynamic": "strict",
+			"_source": {
+				"excludes": ["type"]
+			},
+			"properties": {
+				"remote_addr": {
+					"type": "ip"
+				},
+				"body_bytes_sent": {
+					"analyzer": "ik_smart",
+					"type": "string"
+				},
+				"time_local": {
+					"type": "date",
+					"format": "yyyy-MM-dd HH:mm:ss"
+				},
+				"request_method": {
+					"index": "not_analyzed",
+					"type": "string"
+				},
+				"type": {
+					"index": "not_analyzed",
+					"type": "string"
+				},
+				"request_url": {
+					"index": "not_analyzed",
+					"type": "string"
+				},
+				"request_params": {
+					"analyzer": "ik_smart",
+					"type": "string"
+				},
+				"userId": {
+					"type": "long"
+				},
+				"http_user_agent": {
+					"analyzer": "ik_smart",
+					"type": "string"
+				},
+				"remote_user": {
+					"analyzer": "ik_smart",
+					"type": "string"
+				},
+				"@timestamp": {
+					"type": "date",
+					"format": "strict_date_optional_time||epoch_millis"
+				},
+				"request_time": {
+					"type": "double"
+				},
+				"http_referer": {
+					"index": "not_analyzed",
+					"type": "string"
+				},
+				"http_x_forwarded_for": {
+					"analyzer": "ik_smart",
+					"type": "string"
+				},
+				"status": {
+					"type": "integer"
+				}
+			}
+		}
+	}
+}

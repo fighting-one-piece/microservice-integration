@@ -24,7 +24,7 @@ public class SearchParams {
 		super();
 		this.indices = indices;
 		this.types = types;
-		this.keywords = keywords;
+		this.keywords = keywords.trim();
 		this.highLight = highLight;
 	}
 	
@@ -33,7 +33,7 @@ public class SearchParams {
 		this.indices = indices;
 		this.types = types;
 		this.fields = fields;
-		this.keywords = keywords;
+		this.keywords = keywords.trim();
 		this.highLight = highLight;
 	}
 	
@@ -42,7 +42,7 @@ public class SearchParams {
 		super();
 		this.indices = indices;
 		this.types = types;
-		this.keywords = keywords;
+		this.keywords = keywords.trim();
 		this.highLight = highLight;
 		this.currentPageNum = currentPageNum;
 		this.rowNumPerPage = rowNumPerPage;
@@ -54,7 +54,7 @@ public class SearchParams {
 		this.indices = indices;
 		this.types = types;
 		this.fields = fields;
-		this.keywords = keywords;
+		this.keywords = keywords.trim();
 		this.highLight = highLight;
 		this.currentPageNum = currentPageNum;
 		this.rowNumPerPage = rowNumPerPage;
@@ -65,7 +65,7 @@ public class SearchParams {
 		this.indices = indices;
 		this.types = types;
 		this.fields = fields;
-		this.keywords = keywords;
+		this.keywords = keywords.trim();
 		this.highLight = highLight;
 		this.scrollId = scrollId;
 	}
@@ -83,7 +83,7 @@ public class SearchParams {
 	}
 	
 	public String[] keywords() {
-		return keywords.trim().indexOf(" ") == -1 ? new String[]{keywords} : keywords.split(" ");
+		return keywords.indexOf(" ") == -1 ? new String[]{keywords} : keywords.split(" ");
 	}
 	
 	public boolean isHighLight() {

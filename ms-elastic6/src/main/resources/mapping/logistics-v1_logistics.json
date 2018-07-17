@@ -212,9 +212,7 @@
 			"type": "text"
 		},
 		"linkName": {
-			"index": "not_analyzed",
-			"term_vector": "with_positions_offsets",
-			"type": "text"
+			"type": "keyword"
 		},
 		"linkNameAlias": {
 			"analyzer": "ik_smart",
@@ -277,9 +275,7 @@
 			"type": "text"
 		},
 		"name": {
-			"index": "not_analyzed",
-			"term_vector": "with_positions_offsets",
-			"type": "text"
+			"type": "keyword"
 		},
 		"nameAlias": {
 			"analyzer": "ik_smart",
@@ -440,14 +436,10 @@
 			"type": "text"
 		},
 		"inputPerson": {
-			"index": "not_analyzed",
-			"term_vector": "with_positions_offsets",
-			"type": "text"
+			"type": "keyword"
 		},
 		"sourceFile": {
-			"index": "not_analyzed",
-			"term_vector": "with_positions_offsets",
-			"type": "text"
+			"type": "keyword"
 		},
 		"insertTime": {
 			"type": "date",

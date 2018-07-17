@@ -1,0 +1,68 @@
+{
+	"template": "accesslog*",
+	"settings": {
+		"index.number_of_shards": 5,
+		"number_of_replicas": 0,
+		"index.refresh_interval": "60s"
+	},
+	"mappings": {
+		"pocommunication": {
+			"dynamic": "strict",
+			"_source": {
+				"excludes": ["type"]
+			},
+			"properties": {
+				"remote_addr": {
+					"type": "ip"
+				},
+				"body_bytes_sent": {
+					"type": "keyword"
+				},
+				"time_local": {
+					"type": "date",
+					"format": "yyyy-MM-dd HH:mm:ss"
+				},
+				"request_method": {
+					"type": "keyword"
+				},
+				"type": {
+					"type": "keyword"
+				},
+				"request_url": {
+					"type": "keyword"
+				},
+				"request_params": {
+					"analyzer": "ik_smart",
+					"type": "text"
+				},
+				"userId": {
+					"type": "long"
+				},
+				"http_user_agent": {
+					"analyzer": "ik_smart",
+					"type": "text"
+				},
+				"remote_user": {
+					"analyzer": "ik_smart",
+					"type": "text"
+				},
+				"@timestamp": {
+					"type": "date",
+					"format": "strict_date_optional_time||epoch_millis"
+				},
+				"request_time": {
+					"type": "double"
+				},
+				"http_referer": {
+					"type": "keyword"
+				},
+				"http_x_forwarded_for": {
+					"type": "keyword"
+				},
+				"status": {
+					"type": "integer"
+				}
+			}
+		}
+	}
+}
