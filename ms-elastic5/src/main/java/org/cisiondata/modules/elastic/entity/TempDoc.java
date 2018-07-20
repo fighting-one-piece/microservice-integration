@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.springframework.data.annotation.Id; 
 import org.springframework.data.elasticsearch.annotations.Document;  
 
+@SuppressWarnings("serial")
 @Document(indexName="es_temp_inx", type="temp_doc", indexStoreType="fs", shards=5, replicas=1, refreshInterval="-1")
 public class TempDoc implements Serializable {
 

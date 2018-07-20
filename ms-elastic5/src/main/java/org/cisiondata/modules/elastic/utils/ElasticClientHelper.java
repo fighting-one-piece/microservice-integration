@@ -53,8 +53,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.elasticsearch.search.aggregations.metrics.avg.Avg;
 import org.elasticsearch.search.aggregations.metrics.sum.Sum;
 import org.slf4j.Logger;
@@ -349,67 +347,6 @@ public class ElasticClientHelper {
 			datas.add(hitArray[i].getSource());
 		}
 		return datas;
-	}
-	
-	/**
-	 * 根据列名读取索引类型表的分组信息
-	 * @param index
-	 * @param type
-	 * @param groupFieldName
-	 */
-	public static void readIndexTypeDatasWithGroup(String index, String type, String groupFieldName) {
-		String groupFieldAgg = groupFieldName + "Agg";
-		Client client = ElasticClient.getInstance().getClient();
-		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
-				.size(Integer.MAX_VALUE).field(groupFieldName);
-		SearchResponse response = client.prepareSearch(index).setTypes(type)
-				.setQuery(QueryBuilders.matchAllQuery())
-					.addAggregation(termsBuilder).execute().actionGet();
-		Terms terms = response.getAggregations().get(groupFieldAgg);
-		if (null != terms) {
-			List<Bucket> buckets = terms.getBuckets();
-			for (int i = 0, len = buckets.size(); i < len; i++) {
-				Bucket bucket = buckets.get(i);
-				System.out.println(bucket.getKey() + " - " + bucket.getDocCount());
-			}
-		}
-	}
-	
-	/**
-	 * 根据列名读取索引类型表的分组信息，二次分组
-	 * @param index
-	 * @param type
-	 * @param groupFieldName
-	 * @param subGroupFieldName
-	 */
-	public static void readIndexTypeDatasWithGroup(String index, String type, String groupFieldName,
-			String subGroupFieldName) {
-		String groupFieldAgg = groupFieldName + "Agg";
-		String subGroupFieldAgg = subGroupFieldName + "Agg";
-		Client client = ElasticClient.getInstance().getClient();
-		AggregationBuilder subTermsBuilder = AggregationBuilders.terms(subGroupFieldAgg)
-				.size(Integer.MAX_VALUE).field(subGroupFieldName);
-		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
-				.size(Integer.MAX_VALUE).field(groupFieldName).subAggregation(subTermsBuilder);
-		SearchResponse response = client.prepareSearch(index).setTypes(type)
-				.setQuery(QueryBuilders.matchAllQuery())
-					.addAggregation(termsBuilder).execute().actionGet();
-		Terms terms = response.getAggregations().get(groupFieldAgg);
-		if (null != terms) {
-			List<Bucket> buckets = terms.getBuckets();
-			for (int i = 0, len = buckets.size(); i < len; i++) {
-				Bucket bucket = buckets.get(i);
-				System.out.println(bucket.getKey() + " - " + bucket.getDocCount());
-				Terms subTerms = bucket.getAggregations().get(subGroupFieldAgg);
-				if (null != subTerms) {
-					List<Bucket> subBuckets = subTerms.getBuckets();
-					for (int j = 0, slen = subBuckets.size(); j < slen; j++) {
-						Bucket subBucket = subBuckets.get(j);
-						System.out.println(subBucket.getKey() + " - " + subBucket.getDocCount());
-					}
-				}
-			}
-		}
 	}
 	
 	/**
