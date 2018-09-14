@@ -22,14 +22,12 @@ public class IPUtils {
 			ip = request.getHeader("X-Forwarded-For");
 		}
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("X-Real-IP");
 		}
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
+		ip = ip.contains(",") ? ip.trim().split(",")[0] : ip;
 		LOG.info("ip address: {}", ip);
 		return ip;
 	}

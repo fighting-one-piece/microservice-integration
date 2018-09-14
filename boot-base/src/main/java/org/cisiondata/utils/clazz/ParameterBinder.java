@@ -247,7 +247,7 @@ public class ParameterBinder {
 		StringBuilder sb = new StringBuilder();
 		sb.append(method.getName()).append("(");
 		for(Class<?> type : method.getParameterTypes()){
-			sb.append(type.getName()).append(",");
+			sb.append(type.getTypeName()).append(",");
 		}
 		if(method.getParameterTypes().length>0) sb.delete(sb.length()-1, sb.length());
 		sb.append(")");

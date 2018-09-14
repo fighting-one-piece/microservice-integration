@@ -1,7 +1,5 @@
 package org.cisiondata.utils.exception;
 
-import org.cisiondata.utils.message.MessageUtils;
-
 /** 基础异常 */
 public class GenericException extends RuntimeException {
 
@@ -27,14 +25,6 @@ public class GenericException extends RuntimeException {
         this(module, code, args, null);
     }
 
-    public GenericException(String module, String defaultMessage) {
-        this(module, 0, null, defaultMessage);
-    }
-
-    public GenericException(int code, Object[] args) {
-        this(null, code, args, null);
-    }
-    
     public GenericException(int code, String defaultMessage) {
         this(null, code, null, defaultMessage);
     }
@@ -45,15 +35,16 @@ public class GenericException extends RuntimeException {
 
     @Override
     public String getMessage() {
+        return defaultMessage;
+        /**
         String message = null;
         if (code != 0) {
-            message = MessageUtils.getInstance().getMessage(
-            		"exception." + String.valueOf(code), args);
+            message = MessageUtils.getInstance().getMessage("exception." + String.valueOf(code), args);
         }
         if (message == null) {
             message = defaultMessage;
         }
-        return message;
+        */
     }
 
     public String getModule() {

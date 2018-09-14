@@ -1,8 +1,13 @@
 package org.cisiondata.utils.redis;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Tuple;
 import redis.clients.util.SafeEncoder;
 
 public class RedisClusterUtils {
@@ -694,6 +700,35 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * SortedSet读取成员和分数
+	 * @param key
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public List<Map.Entry<String, Double>> zrangeWithScores(String key, long start, long end) {
+		List<Map.Entry<String, Double>> resultList = new ArrayList<Map.Entry<String, Double>>();
+		try {
+			Set<Tuple> tuples = jedisCluster.zrangeWithScores(SerializerUtils.write(key), start, end);
+			if (null == tuples || tuples.isEmpty()) return resultList;
+			Map<String, Double> results = new HashMap<String, Double>();
+			for (Tuple tuple : tuples) {
+				results.put(String.valueOf(SerializerUtils.read(tuple.getBinaryElement())), tuple.getScore());
+			}
+			resultList.addAll(results.entrySet());
+			Collections.sort(resultList, new Comparator<Map.Entry<String, Double>>(){
+				@Override
+				public int compare(Entry<String, Double> o1, Entry<String, Double> o2) {
+					return o1.getValue().compareTo(o2.getValue());
+				}
+			});
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return resultList;
+	}
+	
+	/**
 	 * SortedSet读取成员
 	 * @param key
 	 * @param start
@@ -712,6 +747,35 @@ public class RedisClusterUtils {
 			LOG.error(e.getMessage(), e);
 		}
 		return results;
+	}
+	
+	/**
+	 * SortedSet读取成员和分数
+	 * @param key
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public List<Map.Entry<String, Double>> zrevrangeWithScores(String key, long start, long end) {
+		List<Map.Entry<String, Double>> resultList = new ArrayList<Map.Entry<String, Double>>();
+		try {
+			Set<Tuple> tuples = jedisCluster.zrevrangeWithScores(SerializerUtils.write(key), start, end);
+			if (null == tuples || tuples.isEmpty()) return resultList;
+			Map<String, Double> results = new HashMap<String, Double>();
+			for (Tuple tuple : tuples) {
+				results.put(String.valueOf(SerializerUtils.read(tuple.getBinaryElement())), tuple.getScore());
+			}
+			resultList.addAll(results.entrySet());
+			Collections.sort(resultList, new Comparator<Map.Entry<String, Double>>(){
+				@Override
+				public int compare(Entry<String, Double> o1, Entry<String, Double> o2) {
+					return -o1.getValue().compareTo(o2.getValue());
+				}
+			});
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return resultList;
 	}
 	
 	/**
