@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.cisiondata.modules.abstr.dao.GenericDAO;
 import org.cisiondata.modules.abstr.entity.Query;
@@ -104,13 +105,15 @@ public abstract class GenericServiceImpl<Entity extends Serializable, PK extends
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public QueryResult<?> readDataPaginationByCondition(Query query, boolean isConvert) throws BusinessException {
-		QueryResult<?> queryResult = obtainDAOInstance().readDataPaginationByCondition(query);
-		if (!isConvert) return queryResult;
+		Map<String, Object> condition = query.getCondition();
+		List<?> dataList = obtainDAOInstance().readDataPaginationByCondition(condition);
+		Long totalRowNum = (Long) condition.get(Query.TOTAL_ROW_NUM);
+		if (!isConvert) return new QueryResult(totalRowNum, dataList);
 		List<Object> resultList = new ArrayList<Object>();
-		for (Object object : queryResult.getResultList()) {
-			resultList.add(obtainConverter().convertObject(object));
+		for (int i = 0, len = dataList.size(); i < len; i++) {
+			resultList.add(obtainConverter().convertObject(dataList.get(i)));
 		}
-		return new QueryResult(queryResult.getTotalRowNum(), resultList);
+		return new QueryResult(totalRowNum, resultList);
 	}
 	
 }

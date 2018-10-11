@@ -189,6 +189,35 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * 递增KEY
+	 * @param key
+	 * @return
+	 */
+	public Long incr(Object key) {
+		try {
+			return jedisCluster.incr(SerializerUtils.write(key));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0L;
+	}
+	
+	/**
+	 * 递增KEY
+	 * @param key
+	 * @param incr
+	 * @return
+	 */
+	public Long incrBy(Object key, long incr) {
+		try {
+			return jedisCluster.incrBy(SerializerUtils.write(key), incr);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0L;
+	}
+	
+	/**
 	 * 读取数据
 	 * @param key
 	 * @return

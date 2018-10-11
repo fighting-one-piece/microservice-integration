@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
+import org.cisiondata.modules.abstr.web.filter.XssStringJsonSerializer;
 import org.cisiondata.modules.bootstrap.filter.XSSFilter;
+import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -18,8 +25,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.util.IntrospectorCleanupListener;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
@@ -57,9 +66,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public FilterRegistrationBean hiddenHttpMethodFilter(){
-		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
 		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-		filterRegistrationBean.setFilter(hiddenHttpMethodFilter);
+		filterRegistrationBean.setFilter(new HiddenHttpMethodFilter());
 		List<String> urlPatterns = new ArrayList<String>();
 		urlPatterns.add("/*");//拦截路径，可以添加多个
 		filterRegistrationBean.setUrlPatterns(urlPatterns);
@@ -69,10 +77,9 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public FilterRegistrationBean xssFilter(){
-		XSSFilter xssFilter = new XSSFilter();
 		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-		filterRegistrationBean.setFilter(xssFilter);
-		filterRegistrationBean.setName("xssFilter");
+		filterRegistrationBean.setFilter(new XSSFilter());
+		filterRegistrationBean.setName("XSSFilter");
 		List<String> urlPatterns = new ArrayList<String>();
 		urlPatterns.add("/*");//拦截路径，可以添加多个
 		filterRegistrationBean.setUrlPatterns(urlPatterns);
@@ -93,6 +100,41 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 		return registrationBean;
 	}
 	**/
+	
+	@Bean
+	public ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		return objectMapper;
+	}
+	
+	@Bean
+	@Primary
+	public ObjectMapper xssObjectMapper(Jackson2ObjectMapperBuilder builder) {
+		ObjectMapper objectMapper = builder.createXmlMapper(false).build(); 
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		SimpleModule xssModule = new SimpleModule("XssStringJsonSerializer");
+		xssModule.addSerializer(new XssStringJsonSerializer());
+		objectMapper.registerModule(xssModule);
+		return objectMapper;
+	}
+	
+	@Bean
+	public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer() {    
+	    return new EmbeddedServletContainerCustomizer(){        
+	        @Override        
+	         public void customize(ConfigurableEmbeddedServletContainer container) {            
+	            container.addErrorPages(new ErrorPage(HttpStatus.BAD_REQUEST, "/error/400.html"));            
+	            container.addErrorPages(new ErrorPage(HttpStatus.UNAUTHORIZED, "/error/401.html"));            
+	            container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/error/404.html"));        
+	            container.addErrorPages(new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error/500.html"));            
+	        }    
+	    };
+	}
 	
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

@@ -74,11 +74,18 @@ public class ServiceLayerAspect {
 		try {
 			result = proceedingJoinPoint.proceed();
 		} catch (BusinessException be) {
+			/**
 			if (notPrintStackTraceResultCode.contains(be.getCode())) {
-				LOG.error(be.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.error(be.getMessage(), be);
+				} else {
+					LOG.error(be.getMessage());
+				}
 			} else {
 				LOG.error(be.getMessage(), be);
 			}
+			*/
+			LOG.error(be.getMessage(), be);
 			throw be;
 		} catch (ConnectException ce) {
 			DataSourceContextHolder.setDataSource(DataSource.MASTER);

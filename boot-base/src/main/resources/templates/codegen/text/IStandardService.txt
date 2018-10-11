@@ -1,8 +1,0 @@
-package org.cisiondata.modules.[(${module})].service;
-
-import org.cisiondata.modules.abstr.service.IGenericService;
-import org.cisiondata.modules.[(${module})].entity.[(${entity})];
-
-public interface I[(${entity})]Service extends IGenericService<[(${entity})], Long> {
-
-}

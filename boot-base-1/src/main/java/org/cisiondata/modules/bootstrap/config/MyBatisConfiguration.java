@@ -8,6 +8,8 @@ import org.cisiondata.modules.bootstrap.config.fs.SpringBootVFS;
 import org.mybatis.spring.CustomSqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
@@ -19,39 +21,40 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.stereotype.Repository;
 
 @Configuration
 @ConditionalOnClass({SqlSessionFactoryBean.class})
 @AutoConfigureAfter(DataSourceConfiguration.class)
 @PropertySource("classpath:mybatis/mybatis.properties")
-/**
-@MapperScan(basePackages = "org.cisiondata.modules.**.dao")
-*/
-public class MyBatisConfiguration implements EnvironmentAware {
+public class MyBatisConfiguration {
 
 	@Resource(name = "routingDataSouce")
 	private AbstractRoutingDataSource routingDataSouce = null;
-
-	private RelaxedPropertyResolver propertyResolver = null;
-
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.propertyResolver = new RelaxedPropertyResolver(environment, "mybatis.");
-	}
 	
+	@Value("${mybatis.basePackage}")
+	private String basePackage = null;
+	
+	@Value("${mybatis.configLocation}")
+	private String configLocation = null;
+	
+	@Value("${mybatis.mapperLocations}")
+	private String mapperLocations = null;
+	
+	@Value("${mybatis.typeAliasesPackage}")
+	private String typeAliasesPackage = null;
+
 	/** SqlSeesion配置 */
 	@Bean(name = "sqlSessionFactory")
 	public SqlSessionFactory sqlSessionFactoryBean() throws Exception {
 		VFS.addImplClass(SpringBootVFS.class);
 		SqlSessionFactoryBean sqlSessionFactoryBean = new CustomSqlSessionFactoryBean();
-		sqlSessionFactoryBean.setDataSource(routingDataSouce);
 		sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
-		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		DefaultResourceLoader loader = new DefaultResourceLoader();
-		sqlSessionFactoryBean.setConfigLocation(loader.getResource(propertyResolver.getProperty("configLocation")));
-		sqlSessionFactoryBean.setMapperLocations(resolver.getResources(propertyResolver.getProperty("mapperLocations")));
+		sqlSessionFactoryBean.setDataSource(routingDataSouce);
+		sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
+		sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(mapperLocations));
 		/**
-		sqlSessionFactoryBean.setTypeAliasesPackage(propertyResolver.getProperty("typeAliasesPackage"));
+		sqlSessionFactoryBean.setTypeAliasesPackage(typeAliasesPackage);
 		*/
 		return sqlSessionFactoryBean.getObject();
 	}
@@ -60,5 +63,32 @@ public class MyBatisConfiguration implements EnvironmentAware {
 	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
 		return new SqlSessionTemplate(sqlSessionFactory);
 	}
+	
+}
 
+@Configuration
+@AutoConfigureAfter(MyBatisConfiguration.class)
+@ConditionalOnClass({MapperScannerConfigurer.class})
+@PropertySource("classpath:mybatis/mybatis.properties")
+/**
+@MapperScan(basePackages = "org.cisiondata.modules.**.dao")
+*/
+class MyBatisMapperConfiguration implements EnvironmentAware {
+
+	private RelaxedPropertyResolver propertyResolver = null;
+
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.propertyResolver = new RelaxedPropertyResolver(environment, "mybatis.");  
+	}  
+	
+	@Bean
+    public MapperScannerConfigurer mapperScannerConfigurer() {
+        MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
+        mapperScannerConfigurer.setAnnotationClass(Repository.class);
+        mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
+        mapperScannerConfigurer.setBasePackage(propertyResolver.getProperty("basePackage"));
+        return mapperScannerConfigurer;
+    }
+	
 }
