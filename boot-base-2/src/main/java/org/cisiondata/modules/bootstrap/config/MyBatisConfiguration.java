@@ -63,21 +63,18 @@ public class MyBatisConfiguration {
 @Configuration
 @AutoConfigureAfter(MyBatisConfiguration.class)
 @ConditionalOnClass({MapperScannerConfigurer.class})
-@PropertySource("classpath:mybatis/mybatis.properties")
 /**
+@PropertySource("classpath:mybatis/mybatis.properties")
 @MapperScan(basePackages = "org.cisiondata.modules.**.dao")
 */
 class MyBatisMapperConfiguration {
 	
-	@Value("${mybatis.basePackage}")
-	private String basePackage = "org.cisiondata.modules.**.dao";
-
 	@Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
+        mapperScannerConfigurer.setBasePackage("org.cisiondata.modules.**.dao");
         mapperScannerConfigurer.setAnnotationClass(Repository.class);
-        mapperScannerConfigurer.setBasePackage(basePackage);
         return mapperScannerConfigurer;
     }
 	
