@@ -6,24 +6,24 @@
     
     <root level="INFO"/>
     
-    <logger name="org.cisiondata" level="INFO" />
+    <logger name="org.platform" level="INFO" />
     <logger name="org.springframework" level="ERROR"/>
     <logger name="org.apache.zookeeper" level="ERROR"/>
  
     <springProfile name="development">
-        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.platform" level="INFO" />
         <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>
  
     <springProfile name="test">
-        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.platform" level="INFO" />
         <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>
     
     <springProfile name="production">
-        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.platform" level="INFO" />
         <logger name="org.springboot" level="ERROR" />
     	<logger name="org.apache.zookeeper" level="ERROR"/>
     </springProfile>

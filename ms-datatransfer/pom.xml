@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.cisiondata</groupId>
+	<groupId>org.platform</groupId>
 	<artifactId>datatransfer-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -294,7 +294,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.cisiondata.modules.bootstrap.BootstrapApplication</mainClass>
+							<mainClass>org.platform.modules.bootstrap.BootstrapApplication</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
 							<useUniqueVersions>false</useUniqueVersions>
@@ -367,19 +367,19 @@
                  		<option>-keepclassmembers class org.springframework.** { *;}</option>
                  		<option>-dontwarn org.springframework.**</option>
                         
-                        <option>-dontwarn org.cisiondata.modules.abstr.**</option>
-                        <option>-dontwarn org.cisiondata.modules.auth.web.**</option>
-                        <option>-dontwarn org.cisiondata.utils.exception.**</option>
+                        <option>-dontwarn org.platform.modules.abstr.**</option>
+                        <option>-dontwarn org.platform.modules.auth.web.**</option>
+                        <option>-dontwarn org.platform.utils.exception.**</option>
                         
-						<option>-keep class org.cisiondata.modules.abstr.** {*;}</option>
-						<option>-keep class org.cisiondata.modules.bootstrap.** {*;}</option>
+						<option>-keep class org.platform.modules.abstr.** {*;}</option>
+						<option>-keep class org.platform.modules.bootstrap.** {*;}</option>
                         <!-- 不混淆entity包中的所有类以及类的属性及方法，混淆了会导致ORM框架及前端无法识别-->
-                        <option>-keep class org.cisiondata.modules.**.entity.** {*;}</option>
-                        <option>-keep class org.cisiondata.modules.**.dao.** {*;}</option>
+                        <option>-keep class org.platform.modules.**.entity.** {*;}</option>
+                        <option>-keep class org.platform.modules.**.dao.** {*;}</option>
                         <!-- 以下两个包因为大部分是Spring管理的Bean，不对包类的类名进行混淆，但对类中的属性和方法混淆-->
-                        <option>-keep class org.cisiondata.modules.**.controller.**</option>
+                        <option>-keep class org.platform.modules.**.controller.**</option>
                         <!--  
-                        <option>-keep class org.cisiondata.modules.*.service.**</option>
+                        <option>-keep class org.platform.modules.*.service.**</option>
                     	-->
                     	<option>-keepclassmembers class * {
                                 @org.springframework.beans.factory.annotation.Autowired *;
@@ -389,7 +389,7 @@
                     </options>
                     <!-- 加载文件的过滤器，就是你的工程目录了-->
                     <!--  
-                    <inFilter>com/cisiondata/**</inFilter>
+                    <inFilter>com/platform/**</inFilter>
                     -->
                     <!-- 对什么东西进行加载，这里仅有classes成功，毕竟你也不可能对配置文件及JSP混淆吧-->
                     <!--  

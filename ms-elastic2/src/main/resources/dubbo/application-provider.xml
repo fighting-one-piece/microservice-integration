@@ -21,6 +21,6 @@
    	<!-- 使用zookeeper注册中心暴露服务地址 -->    
    	<dubbo:registry address="zookeeper://192.168.0.124:2181" check="false" subscribe="false" register="true"></dubbo:registry> 
    	
-   	<dubbo:annotation package="org.cisiondata.modules.elastic" /> 
+   	<dubbo:annotation package="org.platform.modules.elastic" /> 
    	
 </beans>

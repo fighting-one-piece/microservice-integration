@@ -28,7 +28,7 @@ public class CustomSqlSessionFactoryBean extends SqlSessionFactoryBean {
 		Set<String> entityClassPackages = new HashSet<String>();
 		Map<String, String> entityToPackage = new HashMap<String, String>();
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		String basePackage = "org.cisiondata.modules";
+		String basePackage = "org.platform.modules";
 		try {
 			String packagePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
 					+ ClassUtils.convertClassNameToResourcePath(

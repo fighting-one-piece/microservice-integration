@@ -7,12 +7,12 @@
     <root level="INFO"/>
     
     <!--  
-    <logger name="org.cisiondata" level="INFO" />
+    <logger name="org.platform" level="INFO" />
     <logger name="org.springframework" level="ERROR"/>
  	-->
  
     <springProfile name="development">
-        <logger name="org.cisiondata" level="INFO">
+        <logger name="org.platform" level="INFO">
         	<appender-ref ref="CONSOLE"/>  
         	<appender-ref ref="FILE"/>  
         </logger>
@@ -23,12 +23,12 @@
     </springProfile>
  
     <springProfile name="test">
-        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.platform" level="INFO" />
         <logger name="org.springframework" level="ERROR" />
     </springProfile>
     
     <springProfile name="production">
-        <logger name="org.cisiondata" level="INFO" />
+        <logger name="org.platform" level="INFO" />
         <logger name="org.springframework" level="ERROR" />
     </springProfile>
       

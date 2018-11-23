@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.platform.modules.abstr.dao.CEntityDAO">
+
+	<resultMap type="CEntity" id="entityResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+        <result property="createTime" column="CREATE_TIME"/> 
+    </resultMap>
+    
+    <resultMap type="CEntity" id="entityWithDatasResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+        <result property="createTime" column="CREATE_TIME"/> 
+        <collection property="datas" ofType="CEntityData" javaType="ArrayList">
+        	<id property="entityId" column="ENTITY_ID"/> 
+       		<result property="attribute" column="ATTRIBUTE"/>
+       		<result property="value" column="VALUE"/>
+       		<result property="kind" column="KIND"/> 
+        </collection>
+    </resultMap>
+    
+    <resultMap type="CEntityData" id="entityDataResultMap">  
+    	<id property="entityId" column="ENTITY_ID"/> 
+       	<result property="attribute" column="ATTRIBUTE"/>
+       	<result property="value" column="VALUE"/>
+       	<result property="kind" column="KIND"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, DELETE_FLAG, CREATE_TIME</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="id != null">
+    			ID = #{id}
+    		</if>
+    		<if test="ids != null and ids.size() > 0">
+    			ID IN 
+    			<foreach collection="ids" index="index" item="item" open="(" separator="," close=")"> 
+            		#{item} 
+        		</foreach> 
+    		</if>
+    		<if test="deleteFlag != null">
+    			AND DELETE_FLAG = #{deleteFlag}
+    		</if>
+    		<if test="createTime != null">
+    			AND CREATE_TIME = #{createTime}
+    		</if>
+    		<if test="createTimeGT != null">
+    			AND CREATE_TIME &gt; #{createTimeGT}
+    		</if>
+    		<if test="createTimeGE != null">
+    			AND CREATE_TIME &gt;= #{createTimeGE}
+    		</if>
+    		<if test="createTimeLT != null">
+    			AND CREATE_TIME &lt; #{createTimeLT}
+    		</if>
+    		<if test="createTimeLE != null">
+    			AND CREATE_TIME &lt;= #{createTimeLE}
+    		</if>
+    	</where>
+    </sql>
+    
+    <sql id="whereClauseWithAlias">
+    	<where>
+    		<if test="id != null">
+    			T.ID = #{id}
+    		</if>
+    		<if test="ids != null and ids.size() > 0">
+    			T.ID IN 
+    			<foreach collection="ids" index="index" item="item" open="(" separator="," close=")"> 
+            		#{item} 
+        		</foreach> 
+    		</if>
+    		<if test="deleteFlag != null">
+    			AND DELETE_FLAG = #{deleteFlag}
+    		</if>
+    		<if test="createTime != null">
+    			AND T.CREATE_TIME = #{createTime}
+    		</if>
+    		<if test="createTimeGT != null">
+    			AND T.CREATE_TIME &gt; #{createTimeGT}
+    		</if>
+    		<if test="createTimeGE != null">
+    			AND T.CREATE_TIME &gt;= #{createTimeGE}
+    		</if>
+    		<if test="createTimeLT != null">
+    			AND T.CREATE_TIME &lt; #{createTimeLT}
+    		</if>
+    		<if test="createTimeLE != null">
+    			AND T.CREATE_TIME &lt;= #{createTimeLE}
+    		</if>
+    		<if test="dataOrderAttribute != null and dataOrderAttribute != ''">
+    			AND D.ATTRIBUTE = #{dataOrderAttribute}
+    		</if>
+    	</where>
+    </sql>
+    
+    <sql id="orderClause">
+    	<if test="orderAttribute != null and orderAttribute != ''">
+    		ORDER BY ${orderAttribute}
+    		<if test="orderType != null and orderType != ''">
+    			${orderType}
+    		</if>
+    	</if>
+    </sql>
+    
+    <sql id="orderClauseWithAliasE">
+    	<if test="orderAttribute != null and orderAttribute != ''">
+    		ORDER BY T.${orderAttribute}
+    		<if test="orderType != null and orderType != ''">
+    			${orderType}
+    		</if>
+    	</if>
+    </sql>
+    
+    <sql id="orderClauseWithAliasD">
+    	<if test="dataOrderAttribute != null and dataOrderAttribute != ''">
+    		ORDER BY D.VALUE
+    		<if test="orderType != null and orderType != ''">
+    			${orderType}
+    		</if>
+    	</if>
+    </sql>
+    
+    <insert id="insert" keyProperty="id" parameterType="CEntity">
+    	INSERT INTO ${table} (DELETE_FLAG, CREATE_TIME) 
+        VALUES(#{deleteFlag}, #{createTime})  
+    </insert>
+    
+    <update id="update" parameterType="CEntity">
+    	UPDATE ${table} 
+    	<set>
+    		<if test="deleteFlag != null">
+    			DELETE_FLAG = #{deleteFlag},
+    		</if>
+    		<if test="createTime != null">
+    			CREATE_TIME = #{createTime}
+    		</if>
+    	</set>
+    	WHERE ID = #{id}
+    </update>
+    
+    <update id="updateDeleteFlag" parameterType="map">
+    	UPDATE ${table} SET DELETE_FLAG = #{deleteFlag} WHERE ID = #{id}
+    </update>
+    
+    <delete id="delete" parameterType="CEntity">
+    	DELETE FROM ${table} WHERE ID = #{id}
+    </delete>
+    
+    <select id="readDataByPK" parameterType="map" resultType="CEntity" resultMap="entityWithDatasResultMap">
+	    SELECT T.ID, T.DELETE_FLAG, T.CREATE_TIME, D.ATTRIBUTE, D.VALUE, D.KIND 
+	    FROM ${entityTable} T LEFT JOIN ${entityDataTable} D ON T.ID = D.ENTITY_ID  
+	    WHERE T.ID = #{id}
+    </select>
+    
+    <select id="readDataById" parameterType="map" resultType="CEntity" resultMap="entityWithDatasResultMap">
+	    SELECT T.ID, T.DELETE_FLAG, T.CREATE_TIME, D.ATTRIBUTE, D.VALUE, D.KIND 
+	    FROM ${entityTable} T LEFT JOIN ${entityDataTable} D ON T.ID = D.ENTITY_ID  
+	    WHERE T.ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" parameterType="map" resultType="CEntity" resultMap="entityWithDatasResultMap">
+	    SELECT T.ID, T.DELETE_FLAG, T.CREATE_TIME, D.ATTRIBUTE, D.VALUE, D.KIND 
+	    FROM ${entityTable} T LEFT JOIN ${entityDataTable} D ON T.ID = D.ENTITY_ID  
+	    <include refid="whereClauseWithAlias"/>
+    </select>
+    
+    <select id="readDataByConditionV1" parameterType="map" resultType="CEntity" resultMap="entityResultMap">
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM ${table} 
+	    <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" parameterType="map" resultType="CEntity" resultMap="entityWithDatasResultMap">  
+        SELECT T.ID, T.DELETE_FLAG, T.CREATE_TIME, D.ATTRIBUTE, D.VALUE, D.KIND 
+	    FROM ${entityTable} T LEFT JOIN ${entityDataTable} D ON T.ID = D.ENTITY_ID  
+	    <include refid="whereClauseWithAlias"/>
+        <include refid="orderClauseWithAliasE"/>
+        <include refid="orderClauseWithAliasD"/>
+    </select>
+    
+    <select id="readDataListByConditionV1" parameterType="map" resultType="CEntity" resultMap="entityResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM ${table} 
+        <include refid="whereClause"/>
+        <include refid="orderClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultType="CEntity" resultMap="entityResultMap">  
+    	SELECT 
+        <include refid="columnClause"/>
+        FROM ${table} 
+        <include refid="whereClause"/>
+        <include refid="orderClause"/>
+    </select>
+    
+    <select id="readDataPaginationByConditionWithOrder" resultType="CEntity" resultMap="entityResultMap">  
+    	SELECT T.ID, T.DELETE_FLAG, T.CREATE_TIME
+        FROM ${entityTable} T LEFT JOIN ${entityDataTable} D ON T.ID = D.ENTITY_ID  
+        <include refid="whereClauseWithAlias"/>
+        <include refid="orderClauseWithAliasE"/>
+        <include refid="orderClauseWithAliasD"/>
+    </select>
+
+    <select id="readCountByCondition" resultType="java.lang.Long">  
+    	SELECT COUNT(1) FROM ${table}
+        <include refid="whereClause"/>
+    </select>
+    
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.platform.modules.recharge.dao.RechargeRecordDAO">
+
+	<resultMap type="RechargeRecord" id="rechargeRecordResultMap">
+		<id property="id" column="ID"></id>
+		<result property="userId" column="USER_ID" />
+		<result property="totalMoney" column="TOTAL_MONEY" />
+		<result property="rechargeMode" column="RECHARGE_MODE" />
+		<result property="channel" column="CHANNEL" />
+		<result property="outTradeNo" column="OUT_TRADE_NO" />
+		<result property="tradeNo" column="TRADE_NO" />
+		<result property="sign" column="SIGN" />
+		<result property="rechargeNote" column="RECHARGE_NOTE" />
+		<result property="resultNote" column="RESULT_NOTE" />
+		<result property="tradeStatus" column="TRADE_STATUS" />
+		<result property="insertTime" column="INSERT_TIME" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+	
+	<sql id="columnClause">
+		ID, USER_ID, TOTAL_MONEY, RECHARGE_MODE, CHANNEL, OUT_TRADE_NO, TRADE_NO,
+		SIGN, RECHARGE_NOTE, RESULT_NOTE, TRADE_STATUS, INSERT_TIME, DELETE_FLAG
+	</sql>
+	
+	<sql id="whereQClause">
+		<where>
+			<if test="condition.userId != null ">
+				USER_ID = #{condition.userId}
+			</if>
+			<if test="condition.outTradeNo != null and condition.outTradeNo != ''">
+				AND OUT_TRADE_NO = #{condition.outTradeNo}
+			</if>
+			<if test="condition.tradeStatus != null and condition.tradeStatus != ''">
+				AND TRADE_STATUS = #{condition.tradeStatus}
+			</if>
+			<if test="condition.deleteFlag != null">
+				AND DELETE_FLAG = #{condition.deleteFlag}
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="whereMClause">
+		<where>
+			<if test="userId != null ">
+				USER_ID = #{userId}
+			</if>
+			<if test="outTradeNo != null and outTradeNo != ''">
+				AND OUT_TRADE_NO = #{outTradeNo}
+			</if>
+			<if test="tradeStatus != null and tradeStatus != ''">
+				AND TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test="deleteFlag != null">
+				AND DELETE_FLAG = #{deleteFlag}
+			</if>
+		</where>
+	</sql>
+	
+	<insert id="insert" keyProperty="id" parameterType="RechargeRecord">
+		INSERT INTO T_RECHARGE_RECORD(USER_ID, TOTAL_MONEY, RECHARGE_MODE, CHANNEL, OUT_TRADE_NO, TRADE_NO,
+		SIGN, RECHARGE_NOTE, RESULT_NOTE, TRADE_STATUS, INSERT_TIME, DELETE_FLAG)
+		VALUES(#{userId}, #{totalMoney}, #{rechargeMode}, #{channel}, #{outTradeNo}, #{tradeNo},
+		#{sign}, #{rechargeNote}, #{resultNote}, #{tradeStatus}, #{insertTime}, #{deleteFlag})
+	</insert>
+
+	<update id="update" parameterType="RechargeRecord">
+		UPDATE T_RECHARGE_RECORD
+		<set>
+			<if test="rechargeMode != null and rechargeMode != ''">
+				RECHARGE_MODE = #{rechargeMode},
+			</if>
+			<if test="sign != null and sign != ''">
+				SIGN = #{sign}
+			</if>
+			<if test="tradeNo != null and tradeNo != ''">
+				TRADE_NO = #{tradeNo},
+			</if>
+			<if test="rechargeNote != null and rechargeNote  != ''">
+				RECHARGE_NOTE = #{rechargeNote},
+			</if>
+			<if test="resultNote != null and resultNote  != ''">
+				RESULT_NOTE = #{resultNote},
+			</if>
+			<if test="tradeStatus != null and tradeStatus != ''">
+				TRADE_STATUS = #{tradeStatus},
+			</if>
+			<if test="insertTime != null">
+				INSERT_TIME = #{insertTime},
+			</if>
+		</set>
+		<where>
+			<if test="userId != null ">
+				USER_ID = #{userId}
+			</if>
+			<if test="outTradeNo != null and outTradeNo != ''">
+				AND OUT_TRADE_NO = #{outTradeNo}
+			</if>
+		</where>
+	</update>
+	
+	<select id="readDataByPK" resultType="RechargeRecord" resultMap="rechargeRecordResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_RECORD WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultType="RechargeRecord" resultMap="rechargeRecordResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_RECORD
+		<include refid="whereQClause" />
+	</select>
+	
+	<select id="readDataListByCondition" resultMap="rechargeRecordResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_RECORD
+		<include refid="whereQClause" />
+	</select>
+	
+	<select id="readDataPaginationByCondition" resultMap="rechargeRecordResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_RECORD
+		<include refid="whereMClause" />
+		ORDER BY INSERT_TIME DESC
+	</select>
+	
+</mapper>

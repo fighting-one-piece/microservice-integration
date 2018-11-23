@@ -29,7 +29,7 @@
 	</settings>
 	
 	<plugins>  
-    	<plugin interceptor="org.cisiondata.modules.abstr.dao.interceptor.PaginationInterceptor"/>  
+    	<plugin interceptor="org.platform.modules.abstr.dao.interceptor.PaginationInterceptor"/>  
 	</plugins> 
 	
 </configuration>

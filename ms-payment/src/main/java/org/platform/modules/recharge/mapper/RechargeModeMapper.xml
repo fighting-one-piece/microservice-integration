@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.platform.modules.recharge.dao.RechargeModeDAO">
+
+	<resultMap type="RechargeMode" id="rechargeModeResultMap">
+		<id property="id" column="ID"></id>
+		<result property="name" column="NAME" />
+		<result property="identity" column="IDENTITY" />
+		<result property="desc" column="DESC" />
+		<result property="totalMoney" column="TOTAL_MONEY" />
+		<result property="rule" column="RULE" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+	
+	<sql id="columnClause">
+		ID, NAME, IDENTITY, `DESC`, TOTAL_MONEY, RULE, DELETE_FLAG
+	</sql>
+	
+	<sql id="whereClause">
+		<where>
+			<if test="condition.id != null">
+				AND ID = #{condition.id}
+			</if>
+			<if test="condition.name != null and condition.name != ''">
+				AND NAME = #{condition.name}
+			</if>
+			<if test="condition.identity != null and condition.identity != ''">
+				AND IDENTITY = #{condition.identity}
+			</if>
+			<if test="condition.deleteFlag != null">
+				AND DELETE_FLAG = #{condition.deleteFlag}
+			</if>
+		</where>
+	</sql>
+	
+	<insert id="insert" keyProperty="id" parameterType="RechargeMode">
+		INSERT INTO T_RECHARGE_MODE(NAME, IDENTITY, `DESC`, TOTAL_MONEY, RULE, DELETE_FLAG)
+		VALUES (#{name}, #{identity}, #{desc}, #{totalMoney}, #{rule}, #{deleteFlag})
+	</insert>
+	
+	<update id="update" parameterType="RechargeMode">
+		UPDATE T_RECHARGE_MODE
+		<set>
+			<if test="name != null and name != ''">NAME=#{name}</if>
+			<if test="identity != null and identity != ''">IDENTITY=#{identity}</if>
+			<if test="desc != null and desc != ''">`DESC`=#{desc}</if>
+			<if test="totalMoney != null">TOTAL_MONEY=#{totalMoney}</if>
+			<if test="rule != null and rule != ''">RULE=#{rule}</if>
+			<if test="deleteFlag != null">DELETE_FLAG=#{deleteFlag}</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+	
+	<select id="readDataByPK" resultMap="rechargeModeResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_MODE WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultMap="rechargeModeResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_MODE
+		<include refid="whereClause" />
+	</select>
+	
+	<select id="readDataListByCondition" resultMap="rechargeModeResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_RECHARGE_MODE
+		<include refid="whereClause" />
+	</select>
+	
+</mapper>

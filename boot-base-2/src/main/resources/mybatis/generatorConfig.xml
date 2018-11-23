@@ -14,7 +14,7 @@
         <property name="endingDelimiter" value="`"/>  
         <!-- 如果设置为true，生成的model类会直接使用column本身的名字，而不会再使用驼峰命名方法，比如BORN_DATE，生成的属性名字就是BORN_DATE,而不会是bornDate -->  
         <property name="useActualColumnNames" value="false"/>  
-        <property name="rootClass" value="org.cisiondata.modules.abstr.entity.PKAutoEntity"/>  
+        <property name="rootClass" value="org.platform.modules.abstr.entity.PKAutoEntity"/>  
         
 		<commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
 			<property name="suppressDate" value="true" />
@@ -30,24 +30,24 @@
 		</javaTypeResolver>
 		
 		<!--生成Model类存放位置 -->
-		<javaModelGenerator targetPackage="org.cisiondata.modules.abstr.entity"
+		<javaModelGenerator targetPackage="org.platform.modules.abstr.entity"
 			targetProject="src/main/java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		
 		<!--生成映射文件存放位置 -->
-		<sqlMapGenerator targetPackage="org.cisiondata.modules.abstr.mapper"
+		<sqlMapGenerator targetPackage="org.platform.modules.abstr.mapper"
 			targetProject="src/main/java">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		
 		<!--生成DAO类存放位置 -->
 		<javaClientGenerator type="XMLMAPPER"
-			targetPackage="org.cisiondata.modules.abstr.dao" targetProject="src/main/java">
+			targetPackage="org.platform.modules.abstr.dao" targetProject="src/main/java">
 			<property name="enableSubPackages" value="true" />
-			<property name="basePackage" value="org.cisiondata.modules.dao" />
-			<property name="rootInterface" value="org.cisiondata.modules.abstr.dao.GenericDAO"/>  
+			<property name="basePackage" value="org.platform.modules.dao" />
+			<property name="rootInterface" value="org.platform.modules.abstr.dao.GenericDAO"/>  
 		</javaClientGenerator>
 		<!--生成对应表及类名 -->
 		<!--

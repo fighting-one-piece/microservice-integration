@@ -9,10 +9,8 @@
 	  
 	    <include resource="logback-level-config.xml"/>  
 	  
-	  	<!--  
 	    <root level="DEBUG">  
 	        <appender-ref ref="STDOUT"/>  
-	    </root>
-	    -->  
+	    </root>  
 	</included>
 </configuration>  

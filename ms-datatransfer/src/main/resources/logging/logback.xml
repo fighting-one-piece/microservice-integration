@@ -126,7 +126,7 @@
 	</appender>
 
 	<springProfile name="development">
-		<logger name="org.cisiondata" level="DEBUG">
+		<logger name="org.platform" level="DEBUG">
 			<appender-ref ref="CONSOLE" />
 			<appender-ref ref="SYS_LOG" />
 			<appender-ref ref="DEBUG_LOG" />
@@ -146,7 +146,7 @@
 	</springProfile>
 
 	<springProfile name="test">
-		<logger name="org.cisiondata" level="INFO">
+		<logger name="org.platform" level="INFO">
 			<appender-ref ref="CONSOLE" />
 			<appender-ref ref="SYS_LOG" />
 			<appender-ref ref="INFO_LOG" />
@@ -159,7 +159,7 @@
 	</springProfile>
 
 	<springProfile name="production">
-		<logger name="org.cisiondata" level="INFO" />
+		<logger name="org.platform" level="INFO" />
 		<logger name="org.springframework" level="ERROR" />
 	</springProfile>
 
