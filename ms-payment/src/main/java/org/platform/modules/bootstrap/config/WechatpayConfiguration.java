@@ -6,38 +6,57 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WechatpayConfiguration {
 	
-	@Value("${alipay.gateway_url}")
-    private String gatewayUrl = null;
-	
-    @Value("${alipay.app_id}")
+	@Value("${wechatpay.app_id}")
     private String appId = null;
     
-    @Value("${alipay.merchant_private_key}")
-    private String merchantPrivateKey = null;
+    @Value("${wechatpay.app_secret}")
+    private String appSecret = null;
+	
+    @Value("${wechatpay.mch_id}")
+    private String mchId = null;
     
-    @Value("${alipay.alipay_public_key}")
-    private String alipayPublicKey = null;
+    @Value("${wechatpay.mch_secret}")
+    private String mchSecret = null;
     
-    @Value("${alipay.format}")
-    private String format = null;
+    @Value("${wechatpay.trade_type_app}")
+    private String tradeTypeApp = null;
     
-    @Value("${alipay.charset}")
-    private String charset = null;
+    @Value("${wechatpay.trade_type_native}")
+    private String tradeTypeNative = null;
     
-    @Value("${alipay.sign_type}")
-    private String signType = null;
+    @Value("${wechatpay.package}")
+    private String packageWechat = null;
     
-    @Value("${alipay.product_code}")
-    private String productCode = null;
-    
-    @Value("${alipay.seller_id}")
-    private String sellerId = null;
-    
-    @Value("${alipay.return_url}")
-    private String returnUrl = null;
-    
-    @Value("${alipay.notify_url}")
+    @Value("${wechatpay.notify_url}")
     private String notifyUrl = null;
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public String getAppSecret() {
+		return appSecret;
+	}
+
+	public String getMchId() {
+		return mchId;
+	}
+
+	public String getMchSecret() {
+		return mchSecret;
+	}
+
+	public String getTradeTypeApp() {
+		return tradeTypeApp;
+	}
+
+	public String getTradeTypeNative() {
+		return tradeTypeNative;
+	}
+
+	public String getPackageWechat() {
+		return packageWechat;
+	}
 
 	public String getNotifyUrl() {
 		return notifyUrl;

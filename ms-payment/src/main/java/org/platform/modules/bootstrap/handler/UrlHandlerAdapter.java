@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.platform.modules.abstr.annotation.ApiV1RestController;
 import org.platform.modules.abstr.annotation.ApiV2RestController;
 import org.platform.modules.abstr.web.ResultCode;
@@ -188,7 +189,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			ParameterBinder parameterBinder = new ParameterBinder();
 			Object[] params = parameterBinder.bindParameters(omp, omp.getParams(), request, response);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
-			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
+			return method.getReturnType() == void.class || response.isCommitted() ? null : result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			if (e.getCause() != null)
@@ -235,6 +236,8 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			ByteArrayOutputStream baos = (ByteArrayOutputStream) result;
 			response.getOutputStream().write(baos.toByteArray());
 			baos.close();
+		} else if (null == result || StringUtils.isBlank(String.valueOf(result))) {
+			
 		} else {
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/json");

@@ -16,8 +16,8 @@ public class AlipayConfiguration {
     @Value("${alipay.app_id}")
     private String appId = null;
     
-    @Value("${alipay.merchant_private_key}")
-    private String merchantPrivateKey = null;
+    @Value("${alipay.app_private_key}")
+    private String appPrivateKey = null;
     
     @Value("${alipay.alipay_public_key}")
     private String alipayPublicKey = null;
@@ -57,7 +57,7 @@ public class AlipayConfiguration {
     
     @Bean
     public AlipayClient alipayClient() {
-        return new DefaultAlipayClient(gatewayUrl, appId, merchantPrivateKey, format, charset, alipayPublicKey, signType);
+        return new DefaultAlipayClient(gatewayUrl, appId, appPrivateKey, format, charset, alipayPublicKey, signType);
     }
 
 	public String getGatewayUrl() {
@@ -68,8 +68,8 @@ public class AlipayConfiguration {
 		return appId;
 	}
 
-	public String getMerchantPrivateKey() {
-		return merchantPrivateKey;
+	public String getAppPrivateKey() {
+		return appPrivateKey;
 	}
 
 	public String getAlipayPublicKey() {

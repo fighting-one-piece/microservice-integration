@@ -40,37 +40,38 @@ public class AlipayWebPageServiceImpl implements IAlipayService {
 		
 		// 1、设置请求参数
         AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
+        alipayRequest.setApiVersion(alipayConfiguration.getVersion());
         // 页面跳转同步通知页面路径
-        //alipayRequest.setReturnUrl(alipayConfiguration.getReturnUrl());
+        alipayRequest.setReturnUrl(alipayConfiguration.getReturnUrl());
         // 服务器异步通知页面路径
         alipayRequest.setNotifyUrl(alipayConfiguration.getNotifyUrl());
 
-        // 2、SDK已经封装掉了公共参数，这里只需要传入业务参数，请求参数查阅开头Wiki
+        // 2、SDK已经封装掉了公共参数，这里只需要传入业务参数
         Map<String, String> map = new HashMap<String, String>(16);
         map.put("out_trade_no", outTradeNo);
-        map.put("total_amount", String.valueOf(money));
+        map.put("total_amount", String.format("%.2f", money));
         map.put("subject", "payment subject");
         map.put("body", "payment body");
-        // 销售产品码
-        map.put("product_code", "QUICK_MSECURITY_PAY");
-
+        map.put("product_code", "FAST_INSTANT_TRADE_PAY");
+        map.put("passback_params", "merchantBizType%3d3C%26merchantBizNo%3d2016010101111");
+        
         alipayRequest.setBizContent(GsonUtils.fromMapExtToJson(map));
-
+        
+        String result = "";
         try{
             // 3、生成支付表单
             AlipayTradePagePayResponse alipayResponse = alipayClient.pageExecute(alipayRequest);
             if(alipayResponse.isSuccess()) {
-                return alipayResponse.getBody();
+            	result = alipayResponse.getBody();
             } else {
                 LOG.error("【支付表单生成】失败，错误信息：{}", alipayResponse.getSubMsg());
-                return "error";
+                result = "error";
             }
         } catch (Exception e) {
             LOG.error("【支付表单生成】异常，异常信息：{}", e.getMessage());
             e.printStackTrace();
         }
-		
-		return null;
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -88,6 +89,16 @@ public class AlipayWebPageServiceImpl implements IAlipayService {
 			LOG.error(e.getMessage(), e);
 		}
 		return "success";
+	}
+	
+	/** 阿里APP支付字符串组合 */
+	public String genBizContent(Double totalMoney, String subject, String body, 
+			String outTradeNo) throws BusinessException {
+		String bizContent = "" + "{\"timeout_express\":\"" + alipayConfiguration.getTimeout() + "\"," 
+			+ "\"seller_id\":\"\"," + "\"product_code\":\"" + alipayConfiguration.getProductCode() + "\"," 
+				+ "\"total_amount\":\"" + totalMoney + "\"," + "\"subject\":\"" + subject + "\"," + "\"body\":\"" 
+					+ body + "\"," + "\"out_trade_no\":\"" + outTradeNo + "\"}";
+		return bizContent;
 	}
 	
 }

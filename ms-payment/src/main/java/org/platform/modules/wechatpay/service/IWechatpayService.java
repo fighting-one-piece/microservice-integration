@@ -1,7 +1,5 @@
 package org.platform.modules.wechatpay.service;
 
-import java.util.Map;
-
 import org.platform.utils.exception.BusinessException;
 
 public interface IWechatpayService {
@@ -12,7 +10,7 @@ public interface IWechatpayService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public Map<String, Object> mreadPaymentRequest(String identity) throws BusinessException;
+	public Object mreadPaymentRequest(String identity) throws BusinessException;
 
 
 	/**

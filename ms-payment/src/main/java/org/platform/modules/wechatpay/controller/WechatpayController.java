@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.platform.modules.abstr.annotation.ApiV1RestController;
 import org.platform.modules.abstr.web.ResultCode;
 import org.platform.modules.abstr.web.WebResult;
-import org.platform.modules.alipay.service.IAlipayService;
+import org.platform.modules.wechatpay.service.IWechatpayService;
 import org.platform.utils.exception.BusinessException;
+import org.platform.utils.image.ZXingImageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,46 +24,27 @@ public class WechatpayController {
 	
 	private Logger LOG = LoggerFactory.getLogger(WechatpayController.class);
 	
-	@Resource(name = "alipayWebPageService")
-	private IAlipayService alipayWebPageService = null;
+	@Resource(name = "wechatpayWebPageService")
+	private IWechatpayService wechatpayWebPageService = null;
 	
-	/** 阿里支付充值 */
-	@RequestMapping(value = "/recharge/ali/payment", method = RequestMethod.GET)
-	public void rechargeAliPayment(HttpServletResponse response) {
-		try {
-			response.setContentType("text/html;charset=utf-8");
-			response.getWriter().write(alipayWebPageService.mreadPaymentRequest(""));
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
+	@Resource(name = "wechatpayTerminalService")
+	private IWechatpayService wechatpayTerminalService = null;
 	
-	/** 阿里支付充值 */
-	@RequestMapping(value = "/recharge/ali/payment", method = RequestMethod.POST)
-	public void rechargeAliPayment(String identity, HttpServletResponse response) {
+	/** 微信支付充值 */
+	@RequestMapping(value = "/recharge/wechatpay/webpage", method = RequestMethod.GET)
+	public void rechargeWechatpayWebPage(String identity, HttpServletResponse response) {
 		try {
-			response.setContentType("text/html;charset=utf-8");
-			response.getWriter().write(alipayWebPageService.mreadPaymentRequest(identity));
+			ZXingImageUtils.writeToStream(300, 300, "png", String.valueOf(
+				wechatpayWebPageService.mreadPaymentRequest(identity)), response.getOutputStream());
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
-
-	/** 验证阿里支付充值结果 */
-	@RequestMapping(value = "/recharge/ali/payment/notify", method = RequestMethod.POST)
-	public void verifyAliPaymentNotify(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			LOG.info("payment notify invoked!");
-			alipayWebPageService.verifyPaymentNotifyCallback(request.getParameterMap());
-			response.getWriter().write("success");
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+			e.printStackTrace();
+			LOG.error("generate verification code error {}", e.getMessage());
 		}
 	}
 	
 	/** 微信支付充值 */
-	@RequestMapping(value = "/recharge/wx/payment", method = RequestMethod.POST)
-	public WebResult rechargeWxPayment(String identity) {
+	@RequestMapping(value = "/recharge/wechatpay/terminal", method = RequestMethod.POST)
+	public WebResult rechargeWechatpayTerminal(String identity) {
 		WebResult webResult = new WebResult();
 		try {
 			webResult.setCode(ResultCode.SUCCESS.getCode());
@@ -78,7 +60,7 @@ public class WechatpayController {
 	}
 	
 	/** 验证微信支付充值结果 */
-	@RequestMapping(value = "/recharge/wx/payment/notify", method = RequestMethod.POST)
+	@RequestMapping(value = "/recharge/wechatpay/notify", method = RequestMethod.POST)
 	public void verifyWxPaymentNotify(HttpServletRequest request, HttpServletResponse response) {
 		InputStream in = null;
 		ByteArrayOutputStream out = null;

@@ -63,7 +63,7 @@ public class AlipayTerminalServiceImpl implements IAlipayService {
 		params.put("timestamp", DateFormatter.TIME.get().format(new Date()));
 		try {
 			String sign = AlipaySignature.rsa256Sign(AlipaySignature.getSignContent(params),
-				alipayConfiguration.getMerchantPrivateKey(), alipayConfiguration.getCharset());
+				alipayConfiguration.getAppPrivateKey(), alipayConfiguration.getCharset());
 			params.put("sign", sign);
 		} catch (AlipayApiException e) {
 			throw new BusinessException(ResultCode.ALIPAY_SIGN_EXCEPTION);

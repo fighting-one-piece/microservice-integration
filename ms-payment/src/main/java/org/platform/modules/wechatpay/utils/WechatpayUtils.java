@@ -14,22 +14,24 @@ public class WechatpayUtils {
 	
 	private static Random random = new Random();
 	
-	public static SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmmss");
+	private static SimpleDateFormat SDF_1 = new SimpleDateFormat("yyyyMMdd");
+	
+	private static SimpleDateFormat SDF_2 = new SimpleDateFormat("yyyyMMddHHmmss");
 	
 	private static String CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	
 	/** 创建订单ID */
 	public static String genOutTradeNo() throws BusinessException {
-		return MD5Utils.hash(UUID.randomUUID().toString());
+		return SDF_1.format(new Date()) + MD5Utils.hash(UUID.randomUUID().toString());
 	}
 	
 	/** 微信签名 */
-	public static String genSignature(SortedMap<String, Object> params) {
+	public static String genSignature(SortedMap<String, Object> params, String mchSecretKey) {
 		StringBuilder sb = new StringBuilder(100);
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			sb.append(entry.getKey() + "=" + entry.getValue()+ "&");
 		}
-		sb.append("key=").append(WechatpayContants.MCH_SECRET);
+		sb.append("key=").append(mchSecretKey);
 		return MD5Utils.hash(sb.toString()).toUpperCase();
 	}
 	
@@ -67,7 +69,7 @@ public class WechatpayUtils {
 	
 	/** 生成微信参数time-start */
 	public static String genParamTimeV1() {
-		return SDF.format(new Date());
+		return SDF_2.format(new Date());
 	}
 	
 	/** 生成微信参数timestamp */
