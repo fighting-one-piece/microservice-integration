@@ -1,4 +1,4 @@
-package org.platform.utils.clazz;
+package org.cisiondata.utils.clazz;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -17,68 +17,72 @@ public class BeanUtil {
 	
 	@SuppressWarnings("rawtypes")
 	public static Object directConvert(String value, Class clazz) {
-		if (clazz.equals(String.class)) {
-			return value;
-		}
-		if (clazz.getName().equals("int") || clazz.equals(Integer.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return 0;
-			}
-			if (value.contains(".")) {
-				value = value.substring(0, value.indexOf("."));
-			}
+		if (clazz.equals(String.class)) return value;
+		String className = clazz.getName();
+		if (className.equals("int")) {
+			if (value == null || value.trim().length() == 0) return 0;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
 			return Integer.parseInt(value);
 		}
-		if (clazz.getName().equals("double") || clazz.equals(Double.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return 0D;
-			}
-			return Double.parseDouble(value);
+		if (clazz.equals(Integer.class)) {
+			if (value == null || value.trim().length() == 0) return null;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
+			return Integer.parseInt(value);
 		}
-		if (clazz.getName().equals("short") || clazz.equals(Short.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return 0;
-			}
-			if (value.contains(".")) {
-				value = value.substring(0, value.indexOf("."));
-			}
+		if (className.equals("double")) {
+			return value == null || value.trim().length() == 0 ? 0D : Double.parseDouble(value);
+		}
+		if (clazz.equals(Double.class)) {
+			return value == null || value.trim().length() == 0 ? null : Double.parseDouble(value);
+		}
+		if (className.equals("short")) {
+			if (value == null || value.trim().length() == 0) return 0;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
 			return Short.parseShort(value);
 		}
-		if (clazz.getName().equals("long") || clazz.equals(Long.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return 0L;
-			}
-			if (value.contains(".")) {
-				value = value.substring(0, value.indexOf("."));
-			}
+		if (clazz.equals(Short.class)) {
+			if (value == null || value.trim().length() == 0) return null;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
+			return Short.parseShort(value);
+		}
+		if (className.equals("long")) {
+			if (value == null || value.trim().length() == 0) return 0L;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
 			return Long.parseLong(value);
 		}
-		if (clazz.getName().equals("float") || clazz.equals(Float.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return 0;
-			}
-			return Float.parseFloat(value);
+		if (clazz.equals(Long.class)) {
+			if (value == null || value.trim().length() == 0) return null;
+			if (value.contains(".")) value = value.substring(0, value.indexOf("."));
+			return Long.parseLong(value);
+		}
+		if (className.equals("float")) {
+			return value == null || value.trim().length() == 0 ? 0 : Float.parseFloat(value);
+		}
+		if (clazz.equals(Float.class)) {
+			return value == null || value.trim().length() == 0 ? null : Float.parseFloat(value);
 		}
 		if (clazz.equals(BigDecimal.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return null;
-			}
-			return new BigDecimal(value);
+			return value == null || value.trim().length() == 0 ? null : new BigDecimal(value);
 		}
-		if (clazz.getName().equals("boolean") || clazz.equals(Boolean.class)) {
-			if (value == null || value.trim().length() == 0) {
-				return false;
-			}
+		if (className.equals("boolean")) {
+			if (value == null || value.trim().length() == 0) return false;
 			if (value.matches("(?i)yes|true")) {
 				return true;
 			} else if (value.matches("(?i)no|false")) {
 				return false;
 			} else if (value.matches("\\d+")) {
-				long l = Long.parseLong(value);
-				if (l == 0)
-					return false;
-				else
-					return true;
+				return Long.parseLong(value) == 0  ? false : true;
+			}
+			return Boolean.parseBoolean(value);
+		}
+		if (clazz.equals(Boolean.class)) {
+			if (value == null || value.trim().length() == 0) return null;
+			if (value.matches("(?i)yes|true")) {
+				return true;
+			} else if (value.matches("(?i)no|false")) {
+				return false;
+			} else if (value.matches("\\d+")) {
+				return Long.parseLong(value) == 0  ? false : true;
 			}
 			return Boolean.parseBoolean(value);
 		}
