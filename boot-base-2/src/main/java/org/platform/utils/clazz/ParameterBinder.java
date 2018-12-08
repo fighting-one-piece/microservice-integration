@@ -35,8 +35,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
@@ -46,7 +44,8 @@ public class ParameterBinder {
 
 	private Logger LOG = LoggerFactory.getLogger(ParameterBinder.class);
 	
-	private static final MultipartResolver MULTIPARTRESOLVER = new CommonsMultipartResolver();
+	/** private static final MultipartResolver MULTIPARTRESOLVER = new CommonsMultipartResolver(); */
+	
 	private static Map<String, Object> classMethodParamNames = new HashMap<String, Object>();
 
 	private String getParam(Map<String, String> params, HttpServletRequest request, String name) {
@@ -64,9 +63,7 @@ public class ParameterBinder {
 	@SuppressWarnings("rawtypes")
 	public Object[] bindParameters(ObjectMethodParams omp, Map<String, String> params, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if (MULTIPARTRESOLVER.isMultipart(request)) {
-			request = MULTIPARTRESOLVER.resolveMultipart(request);
-		}
+		/** if (MULTIPARTRESOLVER.isMultipart(request)) request = MULTIPARTRESOLVER.resolveMultipart(request); */
 		Method method = omp.getMethod();
 		List<String> parameterNames = this.parseMethodParamNames(method);
 		Class[] parameterTypes = method.getParameterTypes();
@@ -147,10 +144,18 @@ public class ParameterBinder {
 			} else if (MultipartFile.class.isAssignableFrom(typeClazz)) {
 				String fileName = parameterNames.get(i);
 				paramTarget[i] = ((MultipartHttpServletRequest) request).getFile(fileName);
+			} else if (List.class.isAssignableFrom(typeClazz)) {
+				Type type = method.getGenericParameterTypes()[i];
+				if (null != type && (type instanceof ParameterizedType)) {
+					ParameterizedType parameterizedType = (ParameterizedType) type;
+					Class actualClazz = (Class) parameterizedType.getActualTypeArguments()[0];
+					if (MultipartFile.class.isAssignableFrom(actualClazz)) {
+						paramTarget[i] = ((MultipartHttpServletRequest) request).getFiles(parameterNames.get(i));
+					} 
+				}
 			} else {
 				String value = getParam(params, request, parameterNames.get(i));
 				if (StringUtils.isNotBlank(value)) {
-					//兼容泛型 
 					Class actualClass = getGenericClass(omp.getObject(), omp.getMethod(), i);
 					paramTarget[i] = BeanUtil.directConvert(value, actualClass);
 				} else {

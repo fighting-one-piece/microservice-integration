@@ -1,4 +1,4 @@
-package org.cisiondata.utils.clazz;
+package org.platform.utils.clazz;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;

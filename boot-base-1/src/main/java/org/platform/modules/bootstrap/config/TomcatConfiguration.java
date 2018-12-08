@@ -18,6 +18,12 @@ public class TomcatConfiguration {
 		TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
 		tomcat.setUriEncoding(Charset.forName("UTF-8"));
 		/**
+		tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
+            if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
+                //-1 means unlimited
+                ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
+            }
+        });
 		tomcat.addAdditionalTomcatConnectors(createSslConnector());
 		**/
 		return tomcat;

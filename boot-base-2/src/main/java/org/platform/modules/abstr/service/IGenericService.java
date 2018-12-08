@@ -37,6 +37,15 @@ public interface IGenericService<Entity extends Serializable, PK extends Seriali
 	 * @return
 	 * @throws BusinessException
 	 */
+	public Entity readDataByPK(PK pk) throws BusinessException;
+	
+	/**
+	 * 根据主键读取对象
+	 * @param pk
+	 * @param isConvert
+	 * @return
+	 * @throws BusinessException
+	 */
 	public Object readDataByPK(PK pk, boolean isConvert) throws BusinessException;
 
 	/**
@@ -46,7 +55,25 @@ public interface IGenericService<Entity extends Serializable, PK extends Seriali
 	 * @return
 	 * @throws BusinessException
 	 */
+	public Entity readDataByCondition(Query query) throws BusinessException;
+	
+	/**
+	 * 根据条件读取对象
+	 * @param query
+	 * @param isConvert
+	 * @return
+	 * @throws BusinessException
+	 */
 	public Object readDataByCondition(Query query, boolean isConvert) throws BusinessException;
+	
+	/**
+	 * 根据条件读取对象列表
+	 * @param query
+	 * @param isConvert
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Entity> readDataListByCondition(Query query) throws BusinessException;
 
 	/**
 	 * 根据条件读取对象列表
@@ -56,6 +83,15 @@ public interface IGenericService<Entity extends Serializable, PK extends Seriali
 	 * @throws BusinessException
 	 */
 	public List<?> readDataListByCondition(Query query, boolean isConvert) throws BusinessException;
+	
+	/**
+	 * 根据条件读取对象分页列表
+	 * @param query
+	 * @param isConvert
+	 * @return
+	 * @throws BusinessException
+	 */
+	public QueryResult<Entity> readDataPaginationByCondition(Query query) throws BusinessException;
 	
 	/**
 	 * 根据条件读取对象分页列表

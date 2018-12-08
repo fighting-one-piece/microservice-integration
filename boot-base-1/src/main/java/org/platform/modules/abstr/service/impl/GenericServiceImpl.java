@@ -12,6 +12,7 @@ import org.platform.modules.abstr.entity.Query;
 import org.platform.modules.abstr.entity.QueryResult;
 import org.platform.modules.abstr.service.IGenericService;
 import org.platform.modules.abstr.service.converter.IConverter;
+import org.platform.modules.abstr.web.ResultCode;
 import org.platform.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,19 +77,38 @@ public abstract class GenericServiceImpl<Entity extends Serializable, PK extends
 	public void deleteByPK(PK pk) throws BusinessException {
 		obtainDAOInstance().deleteByPK(pk);
 	}
+	
+	@Override
+	public Entity readDataByPK(PK pk) throws BusinessException {
+		Entity entity = obtainDAOInstance().readDataByPK(pk);
+		if (null == entity) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+		return entity;
+	}
 
 	@Override
 	public Object readDataByPK(PK pk, boolean isConvert) throws BusinessException {
 		Object object = obtainDAOInstance().readDataByPK(pk);
-		if (null == object) throw new BusinessException("获取的对象不存在");
+		if (null == object) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		return isConvert ? obtainConverter().convertObject(object) : object;
+	}
+	
+	@Override
+	public Entity readDataByCondition(Query query) throws BusinessException {
+		Entity entity = obtainDAOInstance().readDataByCondition(query);
+		if (null == entity) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+		return entity;
 	}
 
 	@Override
 	public Object readDataByCondition(Query query, boolean isConvert) throws BusinessException {
 		Object object = obtainDAOInstance().readDataByCondition(query);
-		if (null == object) throw new BusinessException("获取的对象不存在");
+		if (null == object) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		return isConvert ? obtainConverter().convertObject(object) : object;
+	}
+	
+	@Override
+	public List<Entity> readDataListByCondition(Query query) throws BusinessException {
+		return obtainDAOInstance().readDataListByCondition(query);
 	}
 	
 	@Override
@@ -101,19 +121,26 @@ public abstract class GenericServiceImpl<Entity extends Serializable, PK extends
 		}
 		return resultList;
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public QueryResult<Entity> readDataPaginationByCondition(Query query) throws BusinessException {
+		Map<String, Object> condition = query.getCondition();
+		List<Entity> resultList = obtainDAOInstance().readDataPaginationByCondition(condition);
+		return new QueryResult((Long) condition.get(Query.TOTAL_ROW_NUM), resultList);
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public QueryResult<?> readDataPaginationByCondition(Query query, boolean isConvert) throws BusinessException {
 		Map<String, Object> condition = query.getCondition();
 		List<?> dataList = obtainDAOInstance().readDataPaginationByCondition(condition);
-		Long totalRowNum = (Long) condition.get(Query.TOTAL_ROW_NUM);
-		if (!isConvert) return new QueryResult(totalRowNum, dataList);
+		if (!isConvert) return new QueryResult((Long) condition.get(Query.TOTAL_ROW_NUM), dataList);
 		List<Object> resultList = new ArrayList<Object>();
 		for (int i = 0, len = dataList.size(); i < len; i++) {
 			resultList.add(obtainConverter().convertObject(dataList.get(i)));
 		}
-		return new QueryResult(totalRowNum, resultList);
+		return new QueryResult((Long) condition.get(Query.TOTAL_ROW_NUM), resultList);
 	}
 	
 }
