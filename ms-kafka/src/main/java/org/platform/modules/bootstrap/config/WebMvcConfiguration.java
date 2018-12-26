@@ -15,7 +15,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.util.IntrospectorCleanupListener;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @Configuration
-public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+public class WebMvcConfiguration implements WebMvcConfigurer {
 	
 	@Bean
 	public ServletListenerRegistrationBean<EventListener> requestContextListener(){
@@ -45,11 +45,11 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public FilterRegistrationBean characterEncodingFilter(){
+	public FilterRegistrationBean<CharacterEncodingFilter> characterEncodingFilter(){
 		CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
 		characterEncodingFilter.setEncoding("UTF-8");
 		characterEncodingFilter.setForceEncoding(true);
-		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+		FilterRegistrationBean<CharacterEncodingFilter> filterRegistrationBean = new FilterRegistrationBean<>();
 		filterRegistrationBean.setFilter(characterEncodingFilter);
 		List<String> urlPatterns = new ArrayList<String>();
 		urlPatterns.add("/*");//拦截路径，可以添加多个
@@ -59,10 +59,9 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public FilterRegistrationBean hiddenHttpMethodFilter(){
-		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
-		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-		filterRegistrationBean.setFilter(hiddenHttpMethodFilter);
+	public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter(){
+		FilterRegistrationBean<HiddenHttpMethodFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+		filterRegistrationBean.setFilter(new HiddenHttpMethodFilter());
 		List<String> urlPatterns = new ArrayList<String>();
 		urlPatterns.add("/*");//拦截路径，可以添加多个
 		filterRegistrationBean.setUrlPatterns(urlPatterns);

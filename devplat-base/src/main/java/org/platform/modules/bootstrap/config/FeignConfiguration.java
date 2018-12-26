@@ -3,7 +3,6 @@ package org.platform.modules.bootstrap.config;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
-import org.springframework.cloud.netflix.feign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -12,7 +11,6 @@ import feign.Contract;
 import feign.Feign;
 import feign.Logger;
 import feign.auth.BasicAuthRequestInterceptor;
-import feign.codec.Encoder;
 
 @Configuration
 public class FeignConfiguration {
@@ -47,8 +45,10 @@ public class FeignConfiguration {
 		}
 	};
 
+	/**
 	public Encoder feignEncoder() {
 		return new SpringEncoder(messageConvertersObjectFactory);
 	}
+	*/
 
 }

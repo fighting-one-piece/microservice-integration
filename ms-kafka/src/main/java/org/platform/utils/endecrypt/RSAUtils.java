@@ -12,8 +12,6 @@ import java.util.Base64;
 
 import javax.crypto.Cipher;
 
-import org.junit.Assert;
-
 public class RSAUtils {
 
 	private static final String ALGORITHM = "RSA";
@@ -110,7 +108,7 @@ public class RSAUtils {
 		signature.update(data.getBytes());
 		//进行验签，返回验签结果
 		boolean result = signature.verify(sign);
-		Assert.assertTrue(result);
+		System.err.println(result);
 	}
 	
 }

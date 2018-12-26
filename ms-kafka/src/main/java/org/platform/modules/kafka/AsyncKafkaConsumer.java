@@ -18,6 +18,7 @@ public class AsyncKafkaConsumer {
 	final int minBatchSize = 30;
 	List<ConsumerRecord<String, String>> buffer = new ArrayList<>();
 
+	@SuppressWarnings("deprecation")
 	public AsyncKafkaConsumer(String topic) {
 		props.put("bootstrap.servers", KafkaProperties.kafkaServer);
 		props.put("group.id", KafkaProperties.groupId);

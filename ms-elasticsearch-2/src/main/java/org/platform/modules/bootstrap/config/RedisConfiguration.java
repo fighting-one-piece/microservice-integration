@@ -13,6 +13,7 @@ public class RedisConfiguration {
 
 	private Logger LOG = LoggerFactory.getLogger(RedisConfiguration.class);
 	
+	@SuppressWarnings("rawtypes")
 	@Bean
 	@ConfigurationProperties(prefix = "spring.redis.pool")
 	public GenericObjectPoolConfig getGenericObjectPoolConfig() {

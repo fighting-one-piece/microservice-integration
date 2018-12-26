@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.platform</groupId>
-	<artifactId>ms-eureka</artifactId>
+	<artifactId>eureka-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>2.1.1.RELEASE</version>
 		<relativePath />
 	</parent>
 	
@@ -29,8 +29,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
-		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
-		<spring.cloud.starter.eureka.server.version>1.4.0.RELEASE</spring.cloud.starter.eureka.server.version>
+		<spring.cloud.config.version>2.0.2.RELEASE</spring.cloud.config.version>
+		<spring.cloud.eureka.server.version>2.0.2.RELEASE</spring.cloud.eureka.server.version>
 	</properties>
 
 	<dependencies>
@@ -52,26 +52,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-		
-		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
 		<!-- Spring Cloud依赖包 -->
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		    <version>${spring.cloud.eureka.server.version}</version>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka-server</artifactId>
-			<version>${spring.cloud.starter.eureka.server.version}</version>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-config</artifactId>
+		    <version>${spring.cloud.config.version}</version>
 		</dependency>
 
 		<!-- JUnit依赖包 -->
@@ -120,7 +115,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>ms-eureka</finalName>
+		<finalName>eureka-server</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>

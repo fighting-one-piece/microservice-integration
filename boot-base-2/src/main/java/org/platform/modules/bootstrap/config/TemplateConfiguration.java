@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring5.SpringWebFluxTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -51,8 +51,8 @@ public class TemplateConfiguration {
 	}
 
 	@Bean(name = "templateEngine")
-	public SpringTemplateEngine templateEngine() {
-		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+	public SpringWebFluxTemplateEngine templateEngine() {
+		SpringWebFluxTemplateEngine templateEngine = new SpringWebFluxTemplateEngine();
 		Set<ITemplateResolver> templateResolvers = new HashSet<ITemplateResolver>();
 		templateResolvers.add(xmlTemplateResolver());
 		templateResolvers.add(textTemplateResolver());

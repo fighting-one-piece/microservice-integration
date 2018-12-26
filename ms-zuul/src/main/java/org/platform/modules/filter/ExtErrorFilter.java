@@ -1,13 +1,11 @@
 package org.platform.modules.filter;
 
 import org.springframework.cloud.netflix.zuul.filters.post.SendErrorFilter;
-import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
-@Component
-public class ErrorExtFilter extends SendErrorFilter {
+public class ExtErrorFilter extends SendErrorFilter {
 	
     @Override
     public String filterType() {

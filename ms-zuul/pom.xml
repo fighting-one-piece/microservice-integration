@@ -3,39 +3,30 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.platform</groupId>
-	<artifactId>ms-zuul</artifactId>
+	<artifactId>api-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>MS ZUUL Server</name>
+	<name>MS Api Gateway Server</name>
 	<url>http://maven.apache.org</url>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>2.1.1.RELEASE</version>
 		<relativePath />
 	</parent>
 	
-	<!--  
-	<parent>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-starter-parent</artifactId>
-		<version>Brixton.SR4</version>
-		<relativePath />
-	</parent>
-	-->
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
-		<spring.cloud.version>Camden.SR7</spring.cloud.version>
-		<spring.cloud.starter.zuul.version>1.4.0.RELEASE</spring.cloud.starter.zuul.version>
-		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
-		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
-		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
-		<spring.cloud.starter.security.version>1.2.1.RELEASE</spring.cloud.starter.security.version>
-		<spring.cloud.starter.oauth2.version>1.2.1.RELEASE</spring.cloud.starter.oauth2.version>
+		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
+		<spring.cloud.eureka.client.version>2.0.2.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.zuul.version>2.0.2.RELEASE</spring.cloud.zuul.version>
+		<spring.cloud.ribbon.version>2.0.2.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.0.2.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.security.version>2.0.1.RELEASE</spring.cloud.security.version>
+		<spring.cloud.oauth2.version>2.0.1.RELEASE</spring.cloud.oauth2.version>
 		<fastjson.version>1.2.22</fastjson.version>
 	</properties>
 
@@ -58,23 +49,33 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-		
-		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-autoconfigure</artifactId>
+		    <version>2.0.7.RELEASE</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-properties-migrator</artifactId>
+		</dependency>
+		
 		<!-- Spring Cloud依赖包 -->
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zuul</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.zuul.version}</version>
-			-->
-			<exclusions>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		    <version>${spring.cloud.eureka.client.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+		    <version>${spring.cloud.zuul.version}</version><!--$NO-MVN-MAN-VER$-->
+		    <exclusions>
 				<exclusion>
 					<groupId>com.netflix.servo</groupId>
 		    		<artifactId>servo-core</artifactId>
@@ -82,56 +83,35 @@
 			</exclusions>
 		</dependency>
 		
-		<!--
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		    <version>${spring.cloud.ribbon.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-		-->
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.eureka.version}</version>
-			-->
-		</dependency>
-		
-		<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-ribbon</artifactId>
-            <!--  
-            <version>${spring.cloud.starter.ribbon.version}</version>
-            -->
-        </dependency>
         
         <dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-feign</artifactId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		    <version>${spring.cloud.feign.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
         
         <dependency>
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-security</artifactId>
-		    <!--  
-		    <version>${spring.cloud.starter.security.version}</version>
-		    -->
+		    <version>${spring.cloud.security.version}</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-oauth2</artifactId>
-		    <!--  
-		    <version>${spring.cloud.starter.oauth2.version}</version>
-		    -->
+		    <version>${spring.cloud.oauth2.version}</version>
 		</dependency>
 		
 		<!-- Servo-core依赖包 -->
 		<dependency>
 		    <groupId>com.netflix.servo</groupId>
 		    <artifactId>servo-core</artifactId>
-		    <version>0.12.17</version><!--$NO-MVN-MAN-VER$-->
+		    <version>0.12.25</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<!-- JUnit依赖包 -->
@@ -216,7 +196,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>ms-zuul</finalName>
+		<finalName>api-gateway</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>

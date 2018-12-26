@@ -19,12 +19,14 @@ public class ShardedJedisPoolWrapper {
     
     private ShardedJedisPool jedisPool = null;
     
-    public ShardedJedisPoolWrapper(GenericObjectPoolConfig config, String address) {
+    @SuppressWarnings("rawtypes")
+	public ShardedJedisPoolWrapper(GenericObjectPoolConfig config, String address) {
     	LOG.info("Redis started on address: " + address);
         jedisPool = new ShardedJedisPool(config, buildShardInfos(address, ""));
     }
     
-    public ShardedJedisPoolWrapper(GenericObjectPoolConfig config, String address, String password) {
+    @SuppressWarnings("rawtypes")
+	public ShardedJedisPoolWrapper(GenericObjectPoolConfig config, String address, String password) {
     	LOG.info("Redis started on address: " + address);
         jedisPool = new ShardedJedisPool(config, buildShardInfos(address, password));
     }

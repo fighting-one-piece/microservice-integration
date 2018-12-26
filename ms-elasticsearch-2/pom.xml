@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.platform</groupId>
-	<artifactId>ms-elastic2</artifactId>
+	<artifactId>ms-elastic-246</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-parent</artifactId>
-	    <version>1.5.9.RELEASE</version>
+	    <version>2.1.1.RELEASE</version>
 	    <relativePath/>
 	</parent>
 	
@@ -81,10 +81,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
-		<spring.cloud.version>Camden.SR7</spring.cloud.version>
-		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
-		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
+		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
+		<spring.cloud.eureka.client.version>2.0.2.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.ribbon.version>2.0.2.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.0.2.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.hystrix.version>2.0.2.RELEASE</spring.cloud.hystrix.version>
 		<elasticsearch.version>2.4.6</elasticsearch.version>
 		<elasticsearch.shield.version>2.4.1</elasticsearch.shield.version>
 		<jedis.version>2.9.0</jedis.version>
@@ -117,29 +118,32 @@
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
       	<!-- Spring Cloud依赖包 -->
-      	<!--  
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		    <version>${spring.cloud.eureka.client.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-		-->
-
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		    <version>${spring.cloud.ribbon.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.eureka.version}</version>
-			-->
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		    <version>${spring.cloud.feign.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<!--Commons Lang依赖包 -->
@@ -283,13 +287,13 @@
 		<dependency>
 		    <groupId>org.apache.kafka</groupId>
 		    <artifactId>kafka_2.11</artifactId>
-		    <version>${kafka.version}</version>
+		    <version>${kafka.version}</version><!--$NO-MVN-MAN-VER$-->  
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.apache.kafka</groupId>
 		    <artifactId>kafka-clients</artifactId>
-		    <version>${kafka.version}</version>
+		    <version>${kafka.version}</version><!--$NO-MVN-MAN-VER$-->  
 		</dependency>
 		
 		<!-- Redis客户端库 -->
@@ -347,7 +351,7 @@
 	</dependencyManagement>
 	
 	<build>
-		<finalName>ms-elastic2</finalName>
+		<finalName>ms-elastic-246</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -433,6 +437,113 @@
 					</manifestEntries>
 				</configuration>
 			</plugin>
+			<!-- ProGuard混淆插件-->
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.14</version>
+                <executions>
+                    <execution>
+                        <!-- 混淆时刻，这里是打包的时候混淆-->
+                        <phase>package</phase>
+                        <goals>
+                            <!-- 使用插件的混淆功能-->
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 是否将生成的PG文件安装部署-->
+                    <attach>true</attach>
+                    <!-- 是否混淆-->
+                    <obfuscate>true</obfuscate>
+                    <!-- 指定生成文件分类 -->
+                    <attachArtifactClassifier>pg</attachArtifactClassifier>
+                    <options>
+                        <option>-dontnote</option>
+                        <!-- JDK目标版本1.8-->
+                        <option>-target 1.8</option>
+                        <!-- 不做收缩（删除注释、未被引用代码）-->
+                        <option>-dontshrink</option>
+                        <!-- 不做优化（变更代码实现逻辑）-->
+                        <option>-dontoptimize</option>
+                        <!--忽略所有告警-->
+                        <option>-ignorewarnings</option>
+                        <option>-adaptclassstrings</option>
+                        <!-- 不跳过非公用类文件及成员-->
+                        <option>-dontskipnonpubliclibraryclasses</option>
+                        <option>-dontskipnonpubliclibraryclassmembers</option>
+                        <!-- 优化时允许访问并修改有修饰符的类和类的成员 -->
+                        <option>-allowaccessmodification</option>
+                        <!-- 确定统一的混淆类的成员名称来增加混淆-->
+                        <option>-useuniqueclassmembernames</option>
+                        <option>-keepdirectories</option>
+                        <!-- 不混淆所有包名，测试混淆后WEB项目问题实在太多，毕竟Spring配置中有大量固定写法的包名-->
+                        <!--  
+                        <option>-keeppackagenames</option>
+                        -->
+						<option>-keepattributes **</option>
+                        <!-- 不混淆所有特殊的类-->
+                        <!--  
+                        <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,LocalVariable*Table,*Annotation*,Synthetic,EnclosingMethod</option>
+                        -->
+                        <!-- 不混淆所有的set/get方法，如果项目中使用的部分第三方框架（例如Shiro）会用到大量的set/get映射-->
+                        <option>-keepclassmembers public class * {void set*(***);*** get*();}</option>
+                        
+                        <!--以下配置第三方包不参与混淆-->
+                 		<option>-keep class org.springframework.** {*;}</option>
+                 		<option>-keepclassmembers class org.springframework.** { *;}</option>
+                 		<option>-dontwarn org.springframework.**</option>
+                        
+                        <option>-dontwarn org.cisiondata.modules.abstr.**</option>
+                        <option>-dontwarn org.cisiondata.modules.auth.web.**</option>
+                        <option>-dontwarn org.cisiondata.utils.exception.**</option>
+                        
+						<option>-keep class org.cisiondata.modules.abstr.** {*;}</option>
+						<option>-keep class org.cisiondata.modules.bootstrap.** {*;}</option>
+                        <!-- 不混淆entity包中的所有类以及类的属性及方法，混淆了会导致ORM框架及前端无法识别-->
+                        <option>-keep class org.cisiondata.modules.*.entity.** {*;}</option>
+                        <option>-keep class org.cisiondata.modules.*.dao.** {*;}</option>
+                        <!-- 以下两个包因为大部分是Spring管理的Bean，不对包类的类名进行混淆，但对类中的属性和方法混淆-->
+                        <option>-keep class org.cisiondata.modules.**.controller.**</option>
+                        <!--  
+                        <option>-keep class org.cisiondata.modules.*.service.**</option>
+                    	-->
+                    	<option>-keepclassmembers class * {
+                                @org.springframework.beans.factory.annotation.Autowired *;
+                                @org.springframework.beans.factory.annotation.Value *;
+                            }
+                        </option>
+                    </options>
+                    <!-- 加载文件的过滤器，就是你的工程目录了-->
+                    <!--  
+                    <inFilter>com/cisiondata/**</inFilter>
+                    -->
+                    <!-- 对什么东西进行加载，这里仅有classes成功，毕竟你也不可能对配置文件及JSP混淆吧-->
+                    <!--  
+                    <injar>classes</injar>
+                    -->
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}-pg.jar</outjar>
+                    <!-- 添加依赖，这里你可以按你的需要修改，这里测试只需要一个JRE的Runtime包就行了 -->
+                    <libs>                           
+	                    <lib>${JAVA_HOME}/jre/lib/rt.jar</lib>
+	                    <!--  
+	                    <lib>${JAVA_HOME}/jre/lib/jce.jar</lib>
+	                	-->
+	                </libs>  
+	                <addMavenDescriptor>false</addMavenDescriptor>
+                    <!-- 输出目录-->
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+                <dependencies>
+                	<dependency>
+					    <groupId>net.sf.proguard</groupId>
+					    <artifactId>proguard-base</artifactId>
+					    <version>6.0.3</version>
+					</dependency>
+                </dependencies>
+            </plugin>
 			<!--  
 			<plugin>
                 <groupId>org.springframework.boot</groupId>

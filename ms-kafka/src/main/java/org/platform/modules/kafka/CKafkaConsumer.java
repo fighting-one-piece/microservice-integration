@@ -13,6 +13,7 @@ public class CKafkaConsumer {
 	private final KafkaConsumer<String, String> consumer;
 	private final Properties props = new Properties();
 
+	@SuppressWarnings("deprecation")
 	public CKafkaConsumer() {
 		props.put("bootstrap.servers", KafkaProperties.kafkaServer);
 		props.put("group.id", KafkaProperties.groupId);

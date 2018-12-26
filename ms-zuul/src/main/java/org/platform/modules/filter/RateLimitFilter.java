@@ -1,15 +1,10 @@
 package org.platform.modules.filter;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.SystemPublicMetrics;
-import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +20,10 @@ public class RateLimitFilter extends ZuulFilter {
 	
 	private Map<String, RateLimiter> map = Maps.newConcurrentMap();
 	
+	/**
 	@Autowired
     private SystemPublicMetrics systemPublicMetrics = null;
+	*/
 
 	@Override
 	public String filterType() {
@@ -43,16 +40,21 @@ public class RateLimitFilter extends ZuulFilter {
 	@Override
 	public boolean shouldFilter() {
 		//这里可以考虑弄个限流开启的开关，开启限流返回true，关闭限流返回false
+		/**
         Collection<Metric<?>> metrics = systemPublicMetrics.metrics();
         Optional<Metric<?>> freeMemoryMetric = metrics.stream()
-            .filter(t -> "mem.free".equals(t.getName())).findFirst();
+        	.filter(t -> "mem.free".equals(t.getName())).findFirst();
+        **/
         //如果不存在这个指标，稳妥起见，返回true，开启限流
+		/**
         if (!freeMemoryMetric.isPresent()) {
             return true;
         }
         long freeMemory = freeMemoryMetric.get().getValue().longValue();
+        **/
         //如果可用内存小于1000000KB，开启流控
-        return freeMemory < 1000000L;
+        //return freeMemory < 1000000L;
+		return true;
 	}
 	
 	@Override

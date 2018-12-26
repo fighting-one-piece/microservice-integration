@@ -11,6 +11,7 @@ import org.platform.modules.bootstrap.config.KafkaProperties;
 
 public class CKafkaStream {
 
+	@SuppressWarnings("deprecation")
 	public CKafkaStream() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(StreamsConfig.APPLICATION_ID_CONFIG, "c-stream-processing-application");

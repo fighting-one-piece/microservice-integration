@@ -30,7 +30,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
 		return executor;
 	}
 
-	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return new AsyncUncaughtExceptionHandler() {
 			@Override
@@ -40,7 +39,5 @@ public class AsyncConfiguration implements AsyncConfigurer {
 			}
 		};
 	}
-	
-	
 
 }

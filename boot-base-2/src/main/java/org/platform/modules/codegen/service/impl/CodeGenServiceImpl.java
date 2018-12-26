@@ -18,7 +18,7 @@ import org.platform.utils.file.FileUtils;
 import org.platform.utils.reflect.ReflectUtils;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring5.SpringWebFluxTemplateEngine;
 
 @Service("codeGenService")
 public class CodeGenServiceImpl implements ICodeGenService {
@@ -32,7 +32,7 @@ public class CodeGenServiceImpl implements ICodeGenService {
 	private static final String SERVICE_IMPL_SUFFIX = "ServiceImpl.java";
 	
 	@Resource(name = "templateEngine")
-	protected SpringTemplateEngine templateEngine = null;
+	protected SpringWebFluxTemplateEngine templateEngine = null;
 	
 	@Override
 	public void genGenericCode(Class<?> clazz) throws BusinessException {

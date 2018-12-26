@@ -18,10 +18,16 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 	private final Logger LOG = LoggerFactory.getLogger(JedisClusterFactory.class);
 
 	private String address = null;
+	
 	private Integer timeout = null;
+	
 	private Integer maxRedirections = null;
+	
 	private JedisCluster jedisCluster = null;
+	
+	@SuppressWarnings("rawtypes")
 	private GenericObjectPoolConfig genericObjectPoolConfig = null;
+	
 	private Pattern pattern = Pattern.compile("^.+[:]\\d{1,5}\\s*$");
 
 	@Override
@@ -79,6 +85,7 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 		this.maxRedirections = maxRedirections;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void setGenericObjectPoolConfig(GenericObjectPoolConfig genericObjectPoolConfig) {
 		this.genericObjectPoolConfig = genericObjectPoolConfig;
 	}
