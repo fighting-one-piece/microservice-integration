@@ -38,8 +38,10 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.util.ReflectionUtils.MethodCallback;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -56,6 +58,12 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 	private List<IHandlerChainService> handlerChainServiceList = new ArrayList<IHandlerChainService>();
 
 	public boolean supports(Object handler) {
+		if (handler instanceof HandlerMethod && ((HandlerMethod) handler).getClass()
+			.getSimpleName().equals("WebMvcEndpointHandlerMethod")) {
+			return false;
+		} else if (handler instanceof ResourceHttpRequestHandler) {
+			return false;
+		}
 		return true;
 	}
 
@@ -133,7 +141,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			throws Exception {
 		try {
 			String path = request.getServletPath();
-			if (path.endsWith("/favicon.ico")) return null;
 			LOG.info("url handler adapter request path: {}", path);
 			for (IHandlerChainService handlerChainService : handlerChainServiceList) {
 				Object[] preResult = handlerChainService.preHandle(request);
