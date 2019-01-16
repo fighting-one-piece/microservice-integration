@@ -148,10 +148,15 @@ public class ParameterBinder {
 				Type type = method.getGenericParameterTypes()[i];
 				if (null != type && (type instanceof ParameterizedType)) {
 					ParameterizedType parameterizedType = (ParameterizedType) type;
-					Class actualClazz = (Class) parameterizedType.getActualTypeArguments()[0];
-					if (MultipartFile.class.isAssignableFrom(actualClazz)) {
-						paramTarget[i] = ((MultipartHttpServletRequest) request).getFiles(parameterNames.get(i));
-					} 
+					Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+					if (actualTypeArgument instanceof Class) {
+						Class actualTypeArgumentClazz = (Class) actualTypeArgument;
+						if (MultipartFile.class.isAssignableFrom(actualTypeArgumentClazz)) {
+							paramTarget[i] = ((MultipartHttpServletRequest) request).getFiles(parameterNames.get(i));
+						} 
+					} else {
+						paramTarget[i] = new Gson().fromJson(extractRequestBody(request), typeClazz);
+					}
 				}
 			} else {
 				String value = getParam(params, request, parameterNames.get(i));
