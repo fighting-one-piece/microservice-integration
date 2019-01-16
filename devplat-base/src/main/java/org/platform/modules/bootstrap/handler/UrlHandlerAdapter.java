@@ -242,6 +242,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			ByteArrayOutputStream baos = (ByteArrayOutputStream) result;
 			response.getOutputStream().write(baos.toByteArray());
 			baos.close();
+		} else if (null == result || "".equals(result)) {
 		} else {
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/json");
