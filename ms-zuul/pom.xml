@@ -21,10 +21,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
 		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
-		<spring.cloud.eureka.client.version>2.0.2.RELEASE</spring.cloud.eureka.client.version>
-		<spring.cloud.zuul.version>2.0.2.RELEASE</spring.cloud.zuul.version>
-		<spring.cloud.ribbon.version>2.0.2.RELEASE</spring.cloud.ribbon.version>
-		<spring.cloud.feign.version>2.0.2.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.eureka.client.version>2.1.1.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.zuul.version>2.1.1.RELEASE</spring.cloud.zuul.version>
+		<spring.cloud.ribbon.version>2.1.1.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.1.1.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.hystrix.version>2.1.1.RELEASE</spring.cloud.hystrix.version>
+		<spring.cloud.turbine.version>2.1.1.RELEASE</spring.cloud.turbine.version>
 		<spring.cloud.security.version>2.0.1.RELEASE</spring.cloud.security.version>
 		<spring.cloud.oauth2.version>2.0.1.RELEASE</spring.cloud.oauth2.version>
 		<fastjson.version>1.2.22</fastjson.version>
@@ -55,8 +57,7 @@
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-autoconfigure</artifactId>
-		    <version>2.0.7.RELEASE</version><!--$NO-MVN-MAN-VER$-->
+		    <artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -75,12 +76,14 @@
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
 		    <version>${spring.cloud.zuul.version}</version><!--$NO-MVN-MAN-VER$-->
+		    <!--  
 		    <exclusions>
 				<exclusion>
 					<groupId>com.netflix.servo</groupId>
 		    		<artifactId>servo-core</artifactId>
 				</exclusion>
 			</exclusions>
+			-->
 		</dependency>
 		
 		<dependency>
@@ -97,6 +100,25 @@
         
         <dependency>
 		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-netflix-turbine</artifactId>
+		    <version>${spring.cloud.turbine.version}</version>
+		</dependency>
+        
+        <!--  
+        <dependency>
+		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-security</artifactId>
 		    <version>${spring.cloud.security.version}</version>
 		</dependency>
@@ -106,13 +128,16 @@
 		    <artifactId>spring-cloud-starter-oauth2</artifactId>
 		    <version>${spring.cloud.oauth2.version}</version>
 		</dependency>
+		-->
 		
 		<!-- Servo-core依赖包 -->
+		<!--  
 		<dependency>
 		    <groupId>com.netflix.servo</groupId>
 		    <artifactId>servo-core</artifactId>
-		    <version>0.12.25</version><!--$NO-MVN-MAN-VER$-->
+		    <version>0.12.25</version>
 		</dependency>
+		-->
 
 		<!-- JUnit依赖包 -->
 		<dependency>
@@ -166,6 +191,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+			<exclusions>
+	        	<exclusion>
+		            <groupId>com.fasterxml.jackson.core</groupId>
+		            <artifactId>jackson-annotations</artifactId>
+		        </exclusion>
+		    </exclusions>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
 		</dependency>
 		
 		<!-- Gson依赖包 -->
@@ -183,6 +219,7 @@
 		
 	</dependencies>
 	
+	<!-- 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -194,6 +231,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	-->
 
 	<build>
 		<finalName>api-gateway</finalName>

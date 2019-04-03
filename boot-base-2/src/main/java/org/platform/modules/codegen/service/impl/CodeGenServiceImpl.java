@@ -42,7 +42,7 @@ public class CodeGenServiceImpl implements ICodeGenService {
 		
 		String userDir = System.getProperty("user.dir");
 		String moduleDirPath = userDir + File.separator + "src" + File.separator + "main" + File.separator + "java" + 
-			File.separator + "org" + File.separator + "platform" + File.separator + "modules" + File.separator + module;
+			File.separator + "org" + File.separator + "cisiondata" + File.separator + "modules" + File.separator + module;
 		System.err.println(moduleDirPath);
 		File moduleDir = new File(moduleDirPath);
 		if (!moduleDir.exists()) moduleDir.mkdirs();
@@ -83,6 +83,7 @@ public class CodeGenServiceImpl implements ICodeGenService {
 		List<String> attriList = new ArrayList<String>();
 		List<String> columnList = new ArrayList<String>();
 		Map<String, String> attriColumn = new HashMap<String, String>();
+		Map<String, String> attriStringColumn = new HashMap<String, String>();
 		Field[] fields = ReflectUtils.getFields(clazz);
 		for (int i = 0, len = fields.length; i < len; i++) {
 			Field field = fields[i];
@@ -92,9 +93,14 @@ public class CodeGenServiceImpl implements ICodeGenService {
 			String columnName = field.getAnnotation(Column.class).name();
 			attriList.add("#{" + fieldName + "}");
 			columnList.add(columnName);
-			attriColumn.put(fieldName, columnName);
+			if (String.class.isAssignableFrom(field.getType())) {
+				attriStringColumn.put(fieldName, columnName);
+			} else {
+				attriColumn.put(fieldName, columnName);
+			}
 		}
 		context.setVariable("attriColumn", attriColumn);
+		context.setVariable("attriStringColumn", attriStringColumn);
 		context.setVariable("attri", String.join(",", attriList));
 		context.setVariable("column", String.join(",", columnList));
 		return context;
