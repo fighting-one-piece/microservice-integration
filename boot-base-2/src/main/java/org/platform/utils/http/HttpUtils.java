@@ -59,7 +59,6 @@ public class HttpUtils {
             }
         } catch (Exception e) {
         	LOG.error(e.getMessage(), e);
-            e.printStackTrace();
         } finally {
             try {
                 if (in != null) in.close();

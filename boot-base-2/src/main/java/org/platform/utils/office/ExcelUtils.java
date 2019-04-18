@@ -1,12 +1,9 @@
 package org.platform.utils.office;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +28,8 @@ public class ExcelUtils {
 	
 	private static final SimpleDateFormat SDF = DateFormatter.TIME.get();
 	
+	private static final DecimalFormat DF = new DecimalFormat("0");
+	
 	public static List<Map<String, Object>> readDatas(InputStream in, Map<Integer, String> header) {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		XSSFWorkbook workbook = null;
@@ -49,7 +48,7 @@ public class ExcelUtils {
 	    				case BOOLEAN: cellValue = cell.getBooleanCellValue(); break;
 	    				case ERROR: cellValue = cell.getErrorCellValue(); break;
 	    				case FORMULA: cellValue = cell.getCellFormula(); break;
-	    				case NUMERIC: cellValue = cell.getNumericCellValue(); break;
+	    				case NUMERIC: cellValue = DF.format(cell.getNumericCellValue()); break;
 	    				/**
 	    				case NUMERIC: {
 	    					cellValue = cell.getNumericCellValue(); 
@@ -123,23 +122,51 @@ public class ExcelUtils {
 		return null;
 	}
 	
-	public static void main(String[] args) throws Exception {
-		InputStream in = new FileInputStream(new File("F:\\result\\user.xlsx"));
-		Map<Integer, String> header = new HashMap<Integer, String>();
-		header.put(0, "name");
-		header.put(1, "idCard");
-		header.put(2, "mobilePhone");
-		header.put(3, "direction");
-		header.put(4, "city");
-		header.put(5, "reason");
-		header.put(6, "scanType");
-		header.put(7, "note");
-		List<Map<String, Object>> datas = readDatas(in, header);
-		datas.forEach(data -> {System.err.println(data);});
-		byte[] bytes = writeDatas(datas, header);
-		OutputStream out = new FileOutputStream(new File("F:\\result\\result.xlsx"));
-		out.write(bytes);
-		out.close();
+	public static byte[] writeDatas(List<Map<String, Object>> datas, Map<Integer, String> header, String delimiter) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		XSSFWorkbook workbook = null;
+		try {
+			workbook = new XSSFWorkbook();
+			XSSFSheet sheet = workbook.createSheet();
+			XSSFRow row = sheet.createRow(0);
+			Map<Integer, String> dheader = new HashMap<Integer, String>();
+			for (int i = 0, len = header.size(); i < len; i++) {
+				XSSFCell cell = row.createCell(i);
+				String[] values = header.get(i).split(delimiter);
+				cell.setCellValue(values[1]);
+				dheader.put(i, values[0]);
+			}
+			for (int i = 0, iLen = datas.size(); i < iLen; i++) {
+				row = sheet.createRow(i + 1);
+				Map<String, Object> result = datas.get(i);
+				for (int j = 0, jLen = dheader.size(); j < jLen; j++) {
+					XSSFCell cell = row.createCell(j);
+					Object cellValue = result.get(dheader.get(j));
+					if (null == cellValue) continue;
+					if (cellValue instanceof Boolean) {
+						cell.setCellValue((boolean) cellValue);
+					} else if (cellValue instanceof Date) {
+						cell.setCellValue(SDF.format((Date) cellValue));
+					} else if (cellValue instanceof Double) {
+						cell.setCellValue((double) cellValue);
+					} else {
+						cell.setCellValue(String.valueOf(cellValue));
+					}
+				}
+			}
+			workbook.write(baos);
+			return baos.toByteArray();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		} finally {
+			try {
+				if (null != baos) baos.close();
+				if (null != workbook) workbook.close();
+			} catch (IOException e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+		return null;
 	}
-
+	
 }

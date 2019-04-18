@@ -2,7 +2,6 @@ package org.platform.utils.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
@@ -27,7 +26,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -52,7 +50,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("deprecation")
 public class HttpClientUtils {
 
 	private final static Logger LOG = LoggerFactory.getLogger(HttpClientUtils.class);
@@ -66,19 +63,16 @@ public class HttpClientUtils {
     
     public static final String URL_PARAM_CONNECT_FLAG = "&";  
     
-    public static final String EMPTY = "";  
+    public final static int connectTimeout = 15000;
+    
+    public final static int socketTimeout = 5000;
 	
-	private static PoolingHttpClientConnectionManager connManager = null;
+	private static CloseableHttpClient httpClient = null;
 	
-	private static CloseableHttpClient httpclient = null;
+	private static PoolingHttpClientConnectionManager connectionManager = null;
 	
-	public final static int connectTimeout = 5000;
-	
-	public final static int soTimeout = 5000;
-	
-	public static RequestConfig defaultRequestConfig = RequestConfig.custom()
-			.setSocketTimeout(connectTimeout).setConnectTimeout(connectTimeout)
-			.setConnectionRequestTimeout(connectTimeout).build();
+	public static RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(socketTimeout)
+		.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
 	
 	static {
 		try {
@@ -90,27 +84,23 @@ public class HttpClientUtils {
 				public X509Certificate[] getAcceptedIssuers() {
 					return null;
 				}
-				public void checkClientTrusted(X509Certificate[] certs,
-						String authType) {
+				public void checkClientTrusted(X509Certificate[] certs, String authType) {
 				}
-				public void checkServerTrusted(X509Certificate[] certs,
-						String authType) {
+				public void checkServerTrusted(X509Certificate[] certs, String authType) {
 				}
 			} }, null);
 			
-			Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-					.<ConnectionSocketFactory> create()
+			Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
 					.register("http", PlainConnectionSocketFactory.INSTANCE)
 					.register("https", new SSLConnectionSocketFactory(sslContext)).build();
 			
-			connManager = new PoolingHttpClientConnectionManager(
-					socketFactoryRegistry);
+			connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
 			
-			httpclient = HttpClients.custom().setConnectionManager(connManager).build();
+			SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true)
+					.setSoKeepAlive(false).setSoLinger(1).setSoReuseAddress(true)
+					.setSoTimeout(socketTimeout).build();
 			
-			SocketConfig socketConfig = SocketConfig.custom()
-					.setTcpNoDelay(true).build();
-			connManager.setDefaultSocketConfig(socketConfig);
+			connectionManager.setDefaultSocketConfig(socketConfig);
 			
 			MessageConstraints messageConstraints = MessageConstraints.custom()
 					.setMaxHeaderCount(200).setMaxLineLength(2000).build();
@@ -120,10 +110,12 @@ public class HttpClientUtils {
 					.setUnmappableInputAction(CodingErrorAction.IGNORE)
 					.setCharset(Consts.UTF_8)
 					.setMessageConstraints(messageConstraints).build();
-			connManager.setDefaultConnectionConfig(connectionConfig);
+			connectionManager.setDefaultConnectionConfig(connectionConfig);
 			
-			connManager.setMaxTotal(200);
-			connManager.setDefaultMaxPerRoute(20);
+			connectionManager.setMaxTotal(200);
+			connectionManager.setDefaultMaxPerRoute(100);
+			
+			httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
 		} catch (KeyManagementException e) {
 			LOG.error("KeyManagementException", e);
 		} catch (NoSuchAlgorithmException e) {
@@ -138,7 +130,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static String sendGet(String url, String encode) {
-		return sendGet(url, null, encode, connectTimeout, soTimeout);
+		return sendGet(url, null, encode, connectTimeout, socketTimeout);
 	}
 	
 	/**
@@ -148,7 +140,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static String sendGet(String url, String[] headers) {
-		return sendGet(url, null, ENCODE_UTF8, connectTimeout, soTimeout, headers);
+		return sendGet(url, null, ENCODE_UTF8, connectTimeout, socketTimeout, headers);
 	}
 	
 	/**
@@ -159,7 +151,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static String sendGet(String url, String encode, String... headers) {
-		return sendGet(url, null, encode, connectTimeout, soTimeout, headers);
+		return sendGet(url, null, encode, connectTimeout, socketTimeout, headers);
 	}
 	
 	/**
@@ -170,7 +162,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static String sendGet(String url, Map<String, String> params, String encode) {
-		return sendGet(url, params, encode, connectTimeout, soTimeout);
+		return sendGet(url, params, encode, connectTimeout, socketTimeout);
 	}
 	
 	/**
@@ -193,7 +185,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static String sendGet(String url, Map<String, String> params, String encode, String... headers) {
-		return sendGet(url, params, encode, connectTimeout, soTimeout, headers);
+		return sendGet(url, params, encode, connectTimeout, socketTimeout, headers);
 	}
 	
 	/**
@@ -202,13 +194,13 @@ public class HttpClientUtils {
 	 * @param params
 	 * @param encode
 	 * @param connectTimeout
-	 * @param soTimeout
+	 * @param socketTimeout
 	 * @param headers
 	 * @return
 	 */
 	public static String sendGet(String url, Map<String, String> params, String encode, 
-			int connectTimeout, int soTimeout, String... headers) {
-		return sendGet(url, params, encode, connectTimeout, soTimeout, null, headers);
+			int connectTimeout, int socketTimeout, String... headers) {
+		return sendGet(url, params, encode, connectTimeout, socketTimeout, null, headers);
 	}
 	
 	/**
@@ -217,20 +209,14 @@ public class HttpClientUtils {
 	 * @param params
 	 * @param encode
 	 * @param connectTimeout
-	 * @param soTimeout
+	 * @param socketTimeout
 	 * @param proxy
 	 * @param headers
 	 * @return
 	 */
 	public static String sendGet(String url, Map<String, String> params, String encode, 
-			int connectTimeout, int soTimeout, HttpHost proxy, String... headers) {
+			int connectTimeout, int socketTimeout, HttpHost proxy, String... headers) {
 		String responseTxt = null;
-		RequestConfig.Builder builder = RequestConfig.custom()
-				.setSocketTimeout(connectTimeout)
-				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(connectTimeout);
-		if (null != proxy) builder.setProxy(proxy);
-		RequestConfig requestConfig = builder.build();
 		StringBuilder sb = new StringBuilder(url);
 		int i = 0;
 		if (null != params && params.size() > 0) {
@@ -242,12 +228,16 @@ public class HttpClientUtils {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
 				} catch (UnsupportedEncodingException e) {
 					LOG.warn("encode http get params error, value is " + value, e);
-					sb.append(URLEncoder.encode(value));
+					sb.append(value);
 				}
 				i++;
 			}
 		}
 		HttpGet httpGet = new HttpGet(sb.toString());
+		RequestConfig.Builder builder = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		httpGet.setConfig(requestConfig);
 		if (null != headers) {
 			for (int j = 0, len = headers.length; j < len;) {
@@ -255,33 +245,29 @@ public class HttpClientUtils {
         		j = j + 2;
         	}
 		}
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			CloseableHttpResponse response = httpclient.execute(httpGet);
-			try {
-				HttpEntity entity = response.getEntity();
-				try {
-					if (entity != null) {
-						if (null == encode || "".equals(encode)) encode = ENCODE_UTF8;
-						responseTxt = EntityUtils.toString(entity, encode);
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} catch (Exception e) {
-				LOG.error(String.format("response error, url:%s", sb.toString()), e);
-				return responseTxt;
-			} finally {
-				if (response != null) {
-					response.close();
-				}
+			response = httpClient.execute(httpGet);
+			entity = response.getEntity();
+			if (entity != null) {
+				if (null == encode || "".equals(encode)) encode = ENCODE_UTF8;
+				responseTxt = EntityUtils.toString(entity, encode);
 			}
 		} catch (SocketTimeoutException e) {
 			LOG.error(String.format("invoke timout error, url:%s", sb.toString()), e);
 		} catch (Exception e) {
 			LOG.error(String.format("invoke error, url:%s", sb.toString()), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpGet.releaseConnection();
 		}
 		return responseTxt;
@@ -293,7 +279,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url) {
-		return sendGetThenRespAndHeaders(url, null, connectTimeout, soTimeout);
+		return sendGetThenRespAndHeaders(url, null, connectTimeout, socketTimeout);
 	}
 	
 	/**
@@ -303,7 +289,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url, String[] headers) {
-		return sendGetThenRespAndHeaders(url, null, connectTimeout, soTimeout, headers);
+		return sendGetThenRespAndHeaders(url, null, connectTimeout, socketTimeout, headers);
 	}
 	
 	/**
@@ -313,7 +299,7 @@ public class HttpClientUtils {
 	 * @return
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params) {
-		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout);
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, socketTimeout);
 	}
 	
 	/**
@@ -326,7 +312,7 @@ public class HttpClientUtils {
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
 			String... headers) {
-		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout, headers);
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, socketTimeout, headers);
 	}
 	
 	/**
@@ -335,13 +321,13 @@ public class HttpClientUtils {
 	 * @param params
 	 * @param encode
 	 * @param connectTimeout
-	 * @param soTimeout
+	 * @param socketTimeout
 	 * @param headers
 	 * @return
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
-			int connectTimeout, int soTimeout, String... headers) {
-		return sendGetThenRespAndHeaders(url, params, connectTimeout, soTimeout, null, headers);
+			int connectTimeout, int socketTimeout, String... headers) {
+		return sendGetThenRespAndHeaders(url, params, connectTimeout, socketTimeout, null, headers);
 	}
 	
 	/**
@@ -350,19 +336,13 @@ public class HttpClientUtils {
 	 * @param params
 	 * @param encode
 	 * @param connectTimeout
-	 * @param soTimeout
+	 * @param socketTimeout
 	 * @return proxy
 	 * @return headers
 	 */
 	public static Map<String, Object> sendGetThenRespAndHeaders(String url, Map<String, String> params, 
-			int connectTimeout, int soTimeout, HttpHost proxy, String... headers) {
+			int connectTimeout, int socketTimeout, HttpHost proxy, String... headers) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		RequestConfig.Builder builder = RequestConfig.custom()
-				.setSocketTimeout(connectTimeout)
-				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(connectTimeout);
-		if (null != proxy) builder.setProxy(proxy);
-		RequestConfig requestConfig = builder.build();
 		StringBuilder sb = new StringBuilder(url);
 		int i = 0;
 		if (null != params && params.size() > 0) {
@@ -373,12 +353,16 @@ public class HttpClientUtils {
 				try {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
 				} catch (UnsupportedEncodingException e) {
-					sb.append(URLEncoder.encode(value));
+					sb.append(value);
 				}
 				i++;
 			}
 		}
 		HttpGet httpGet = new HttpGet(sb.toString());
+		RequestConfig.Builder builder = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		httpGet.setConfig(requestConfig);
 		if (null != headers) {
 			for (int j = 0, len = headers.length; j < len;) {
@@ -386,55 +370,48 @@ public class HttpClientUtils {
         		j = j + 2;
         	}
 		}
-		Header[] reqHeaders = httpGet.getAllHeaders();
-		for (Header reqHeader : reqHeaders) {
-			LOG.info(reqHeader.getName() + " == " + reqHeader.getValue());
-		}
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			CloseableHttpResponse response = httpclient.execute(httpGet);
-			try {
-				Map<String, String> respheaders = new HashMap<String, String>();
-				Header[] allHeaders = response.getAllHeaders();
-				for (int j = 0, len = allHeaders.length; j < len; j++) {
-					String headerName = allHeaders[j].getName();
-					String headerValue = allHeaders[j].getValue();
-					if (respheaders.containsKey(headerName)) {
-						headerValue = respheaders.get(headerName) + " ; " + headerValue;
-					}
-					respheaders.put(headerName, headerValue);
+			response = httpClient.execute(httpGet);
+			Map<String, String> respHeaders = new HashMap<String, String>();
+			Header[] allHeaders = response.getAllHeaders();
+			for (int j = 0, len = allHeaders.length; j < len; j++) {
+				String headerName = allHeaders[j].getName();
+				String headerValue = allHeaders[j].getValue();
+				if (respHeaders.containsKey(headerName)) {
+					headerValue = respHeaders.get(headerName) + " ; " + headerValue;
 				}
-				result.put("headers", respheaders);
-				HttpEntity entity = response.getEntity();
-				ByteArrayOutputStream baos = null;
-				try {
-					if (entity != null) {
-						InputStream in = entity.getContent();
-						baos = new ByteArrayOutputStream();  
-				        byte[] buff = new byte[1024];  
-				        int rc = 0;  
-				        while ((rc = in.read(buff, 0, 1024)) > 0) {  
-				        	baos.write(buff, 0, rc);  
-				        }  
-						result.put("content", baos.toByteArray());
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-						baos.close();
-					}
-				}
-			} catch (Exception e) {
-				LOG.error(String.format("response error, url:%s", sb.toString()), e);
-			} finally {
-				if (response != null) {
-					response.close();
-				}
+				respHeaders.put(headerName, headerValue);
 			}
+			result.put("headers", respHeaders);
+			entity = response.getEntity();
+			ByteArrayOutputStream baos = null;
+			if (entity != null) {
+				InputStream in = entity.getContent();
+				baos = new ByteArrayOutputStream();  
+		        byte[] buff = new byte[1024];  
+		        int rc = 0;  
+		        while ((rc = in.read(buff, 0, 1024)) > 0) {  
+		        	baos.write(buff, 0, rc);  
+		        }  
+				result.put("content", baos.toByteArray());
+			}
+			baos.close();
 		} catch (SocketTimeoutException e) {
 			LOG.error(String.format("invoke timout error, url:%s", sb.toString()), e);
 		} catch (Exception e) {
 			LOG.error(String.format("invoke error, url:%s", sb.toString()), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpGet.releaseConnection();
 		}
 		return result;
@@ -497,54 +474,49 @@ public class HttpClientUtils {
 	  * @param headers
 	  * @return
 	 */
-	public static String sendPost(String url, Map<String, String> params, int connectTimeout, 
-			String encode, HttpHost proxy, String... headers) {
+	public static String sendPost(String url, Map<String, String> params, int connectTimeout, String encode, 
+			HttpHost proxy, String... headers) {
 		String responseTxt = null;
+		if (null == encode) encode = ENCODE_UTF8;
 		HttpPost httpPost = new HttpPost(url);
+		RequestConfig.Builder builder = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
+		httpPost.setConfig(requestConfig);
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		if (null != params && params.size() > 0) {
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+		}
+		httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
+		if (null != headers) {
+			for (int i = 0, len = headers.length; i < len;) {
+				httpPost.setHeader(headers[i], headers[i + 1]);
+				i = i + 2;
+			}
+		}
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			RequestConfig.Builder builder = RequestConfig.custom()
-					.setSocketTimeout(connectTimeout)
-					.setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(connectTimeout);
-			if (null != proxy) builder.setProxy(proxy);
-			RequestConfig requestConfig = builder.build();
-			httpPost.setConfig(requestConfig);
-			if (null == encode) encode = ENCODE_UTF8;
-			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-			if (null != params && params.size() > 0) {
-				for (Map.Entry<String, String> entry : params.entrySet()) {
-					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-				}
+			response = httpClient.execute(httpPost);
+			entity = response.getEntity();
+			if (null != entity) {
+				responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
 			}
-			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
-			if (null != headers) {
-				for (int i = 0, len = headers.length; i < len;) {
-            		httpPost.setHeader(headers[i], headers[i + 1]);
-            		i = i + 2;
-            	}
-			}
-			CloseableHttpResponse response = httpclient.execute(httpPost);
-			try {
-				HttpEntity entity = response.getEntity();
-				try {
-					if (null != entity) {
-						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} finally {
-				if (response != null) {
-					response.close();
-				}
-			}
-		} catch (ClientProtocolException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpPost.releaseConnection();
 		}
 		return responseTxt;
@@ -579,48 +551,42 @@ public class HttpClientUtils {
 	public static String sendPost(String url, String params, int connectTimeout, 
 			ContentType contentType, String encode, HttpHost proxy, String... headers) {
 		String responseTxt = null;
+		if (null == encode) encode = ENCODE_UTF8;
+		RequestConfig.Builder builder = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		HttpPost httpPost = new HttpPost(url);
+		httpPost.setConfig(requestConfig);
+		StringEntity stringEntity = new StringEntity(params, encode);
+		stringEntity.setContentType(null == contentType ? "application/x-www-form-urlencoded" : contentType.getMimeType());
+		httpPost.setEntity(stringEntity);
+		if (null != headers) {
+			for (int i = 0, len = headers.length; i < len;) {
+				httpPost.setHeader(headers[i], headers[i + 1]);
+				i = i + 2;
+			}
+		}
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			RequestConfig.Builder builder = RequestConfig.custom()
-					.setSocketTimeout(connectTimeout)
-					.setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(connectTimeout);
-			if (null != proxy) builder.setProxy(proxy);
-			RequestConfig requestConfig = builder.build();
-			httpPost.setConfig(requestConfig);
-			if (null == encode) encode = ENCODE_UTF8;
-			StringEntity stringEntity = new StringEntity(params, encode);
-			stringEntity.setContentType(null == contentType ? 
-					"application/x-www-form-urlencoded" : contentType.getMimeType());
-			httpPost.setEntity(stringEntity);
-			if (null != headers) {
-				for (int i = 0, len = headers.length; i < len;) {
-            		httpPost.setHeader(headers[i], headers[i + 1]);
-            		i = i + 2;
-            	}
+			response = httpClient.execute(httpPost);
+			entity = response.getEntity();
+			if (null != entity) {
+				responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
 			}
-			CloseableHttpResponse response = httpclient.execute(httpPost);
-			try {
-				HttpEntity entity = response.getEntity();
-				try {
-					if (null != entity) {
-						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} finally {
-				if (response != null) {
-					response.close();
-				}
-			}
-		} catch (ClientProtocolException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpPost.releaseConnection();
 		}
 		return responseTxt;
@@ -651,62 +617,57 @@ public class HttpClientUtils {
 	public static Map<String, Object> sendPostThenRespAndHeaders(String url, Map<String, String> params, 
 			String encode, HttpHost proxy, String... headers) {
 		Map<String, Object> result = new HashMap<String, Object>();
+		if (null == encode) encode = ENCODE_UTF8;
+		RequestConfig.Builder builder = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout);
+		if (null != proxy) builder.setProxy(proxy);
+		RequestConfig requestConfig = builder.build();
 		HttpPost httpPost = new HttpPost(url);
+		httpPost.setConfig(requestConfig);
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		if (null != params && params.size() > 0) {
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+		}
+		httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
+		if (null != headers) {
+			for (int i = 0, len = headers.length; i < len;) {
+				httpPost.setHeader(headers[i], headers[i + 1]);
+				i = i + 2;
+			}
+		}
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			RequestConfig.Builder builder = RequestConfig.custom()
-					.setSocketTimeout(connectTimeout)
-					.setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(connectTimeout);
-			if (null != proxy) builder.setProxy(proxy);
-			RequestConfig requestConfig = builder.build();
-			httpPost.setConfig(requestConfig);
-			if (null == encode) encode = ENCODE_UTF8;
-			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-			if (null != params && params.size() > 0) {
-				for (Map.Entry<String, String> entry : params.entrySet()) {
-					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			response = httpClient.execute(httpPost);
+			Map<String, String> respHeaders = new HashMap<String, String>();
+			Header[] allHeaders = response.getAllHeaders();
+			for (int j = 0, len = allHeaders.length; j < len; j++) {
+				String headerName = allHeaders[j].getName();
+				String headerValue = allHeaders[j].getValue();
+				if (respHeaders.containsKey(headerName)) {
+					headerValue = respHeaders.get(headerName) + " ; " + headerValue;
 				}
+				respHeaders.put(headerName, headerValue);
 			}
-			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
-			if (null != headers) {
-				for (int i = 0, len = headers.length; i < len;) {
-					httpPost.setHeader(headers[i], headers[i + 1]);
-					i = i + 2;
-				}
+			result.put("headers", respHeaders);
+			entity = response.getEntity();
+			if (null != entity) {
+				result.put("content", EntityUtils.toString(entity, Charset.forName(encode)));
 			}
-			CloseableHttpResponse response = httpclient.execute(httpPost);
-			try {
-				Map<String, String> respheaders = new HashMap<String, String>();
-				Header[] allHeaders = response.getAllHeaders();
-				for (int j = 0, len = allHeaders.length; j < len; j++) {
-					String headerName = allHeaders[j].getName();
-					String headerValue = allHeaders[j].getValue();
-					if (respheaders.containsKey(headerName)) {
-						headerValue = respheaders.get(headerName) + " ; " + headerValue;
-					}
-					respheaders.put(headerName, headerValue);
-				}
-				result.put("headers", respheaders);
-				HttpEntity entity = response.getEntity();
-				try {
-					if (null != entity) {
-						result.put("content", EntityUtils.toString(entity, Charset.forName(encode)));
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} finally {
-				if (response != null) {
-					response.close();
-				}
-			}
-		} catch (ClientProtocolException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpPost.releaseConnection();
 		}
 		return result;
@@ -722,45 +683,39 @@ public class HttpClientUtils {
 	 */
 	public static String sendPostWithFile(String url, String path, String encode, String... headers) {
 		String responseTxt = null;
+		if (null == encode) encode = ENCODE_UTF8;
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(socketTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
 		HttpPost httpPost = new HttpPost(url);
+		httpPost.setConfig(requestConfig);
+		if (null != headers) {
+			for (int i = 0, len = headers.length; i < len;) {
+				httpPost.setHeader(headers[i], headers[i + 1]);
+				i = i + 2;
+			}
+		}
+		HttpEntity httpEntity = MultipartEntityBuilder.create().addBinaryBody("file", new File(path)).build();  
+		httpPost.setEntity(httpEntity);
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
 		try {
-			RequestConfig requestConfig = RequestConfig.custom()
-					.setSocketTimeout(connectTimeout)
-					.setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(connectTimeout).build();
-			httpPost.setConfig(requestConfig);
-			if (null == encode) encode = ENCODE_UTF8;
-			if (null != headers) {
-				for (int i = 0, len = headers.length; i < len;) {
-            		httpPost.setHeader(headers[i], headers[i + 1]);
-            		i = i + 2;
-            	}
+			response = httpClient.execute(httpPost);
+			entity = response.getEntity();
+			if (null != entity) {
+				responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
 			}
-			HttpEntity httpEntity = MultipartEntityBuilder.create()
-				.addBinaryBody("file", new File(path)).build();  
-			httpPost.setEntity(httpEntity);
-			CloseableHttpResponse response = httpclient.execute(httpPost);
-			try {
-				HttpEntity entity = response.getEntity();
-				try {
-					if (null != entity) {
-						responseTxt = EntityUtils.toString(entity, Charset.forName(encode));
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} finally {
-				if (response != null) {
-					response.close();
-				}
-			}
-		} catch (ClientProtocolException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (entity != null) entity.getContent().close();
+				if (response != null) {
+					EntityUtils.consumeQuietly(response.getEntity());
+					response.close();
+				}
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			httpPost.releaseConnection();
 		}
 		return responseTxt;
