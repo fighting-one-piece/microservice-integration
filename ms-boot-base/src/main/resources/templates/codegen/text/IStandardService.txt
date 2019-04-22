@@ -1,8 +1,0 @@
-package org.platform.modules.[(${module})].service;
-
-import org.platform.modules.abstr.service.IGenericService;
-import org.platform.modules.[(${module})].entity.[(${entity})];
-
-public interface I[(${entity})]Service extends IGenericService<[(${entity})], Long> {
-
-}
