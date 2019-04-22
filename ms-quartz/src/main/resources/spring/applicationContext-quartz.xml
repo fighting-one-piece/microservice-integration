@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd"
+	default-autowire="byName">
+	
+	<!-- 加载文件配置 -->
+	<!--  
+	<context:property-placeholder location="classpath*:quartz/env.local.properties" ignore-unresolvable="false"/>
+	-->
+	
+    <!--  
+    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    -->
+    <bean id="schedulerFactory" class="org.platform.modules.quartz.factory.SchedulerFactoryExtBean">
+    	<!-- Scheduler自动启动标记 -->
+    	<property name="autoStartup" value="${quartz.schedulerFactory.autoStartup}"/>  
+    	<!-- 启动延迟时间配置 -->
+    	<property name="startupDelay" value="${quartz.schedulerFactory.startupDelay}"/>  
+    	<!-- 数据源配置 -->
+		<property name="dataSource" ref="${quartz.schedulerFactory.dataSource}"/>  
+    	<!-- 事务配置 -->
+    	<property name="transactionManager" ref="${quartz.schedulerFactory.transactionManager}"/>
+    	<!-- Quartz相关配置 -->
+    	<property name="configLocation" value="classpath:quartz/quartz.properties" />  
+        <!-- 通过applicationContextSchedulerContextKey属性配置spring上下文 -->    
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>    
+        <!-- spring管理的service需要放到这里，才能够注入成功 -->
+        <!--      
+        <property name="schedulerContextAsMap">    
+            <map>    
+                <description>schedulerContextAsMap</description>    
+                <entry key="quartzService" value-ref="quartzService"/>  
+            </map>    
+        </property>
+        -->  
+        <!--  
+        <property name="triggers">              
+        	<list>                  
+        		<ref bean="defaultTaskCronTrigger" />
+        	</list>          
+        </property>
+       	-->      
+    </bean>         
+    
+    <!-- Trigger配置 -->
+    <bean id="defaultTaskCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean"> 
+    	<!-- Trigger名称 -->
+    	<property name="name" value="defaultTrigger" />       
+    	<!-- Trigger组名 -->
+		<property name="group" value="default" />               
+    	<!-- Trigger描述 -->
+		<property name="description" value="Default Task Cron Trigger" />               
+    	<!-- Trigger绑定的Job -->
+    	<property name="jobDetail" ref="defaultTaskJob"/>          
+    	<!-- Trigger的Cron表达式 -->
+    	<property name="cronExpression" value="0/15 * * * * ?"/>      
+    </bean>        
+    
+    <!-- Job实例配置 -->
+    <bean id="defaultTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">  
+    	<!-- Job实例名称 -->
+		<property name="name" value="defaultJob" />       
+    	<!-- Job实例组名 -->
+		<property name="group" value="default" />       
+    	<!-- Job实例描述 -->
+		<property name="description" value="Default Task" />      
+    	<!-- Job实例实现类 -->
+        <property name="jobClass" value="org.platform.modules.quartz.task.DefaultJob" />  
+    	<!-- Job实例持久化标记 -->
+        <property name="durability" value="true" />     
+    	<!-- Job实例恢复标记 -->
+        <property name="requestsRecovery" value="true" />  
+        <!-- 用来保存任何需要传递给Job实例的对象 -->     
+        <property name="jobDataMap">
+        	<map>
+        		<entry key="injectValue1" value = "10" />
+        		<entry key="injectValue2" value = "hello" />
+        	</map>
+        </property>
+    </bean>  
+
+</beans>
