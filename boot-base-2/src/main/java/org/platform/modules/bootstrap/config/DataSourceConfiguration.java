@@ -40,8 +40,8 @@ public class DataSourceConfiguration {
 	}
 	*/
 	
-	@Bean(name = "routingDataSouce")
-	public AbstractRoutingDataSource routingDataSouce() {
+	@Bean(name = "routingDataSource")
+	public AbstractRoutingDataSource routingDataSource() {
 		DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource();
 		Map<Object, Object> targetDataResources = new HashMap<Object, Object>();
 		targetDataResources.put(DataSource.MASTER, masterDataSource());

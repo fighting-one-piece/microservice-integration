@@ -26,8 +26,8 @@ import org.springframework.stereotype.Repository;
 @PropertySource("classpath:mybatis/mybatis.properties")
 public class MyBatisConfiguration {
 
-	@Resource(name = "routingDataSouce")
-	private AbstractRoutingDataSource routingDataSouce = null;
+	@Resource(name = "routingDataSource")
+	private AbstractRoutingDataSource routingDataSource = null;
 	
 	@Value("${mybatis.configLocation}")
 	private String configLocation = null;
@@ -44,7 +44,7 @@ public class MyBatisConfiguration {
 		VFS.addImplClass(SpringBootVFS.class);
 		SqlSessionFactoryBean sqlSessionFactoryBean = new CustomSqlSessionFactoryBean();
 		sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
-		sqlSessionFactoryBean.setDataSource(routingDataSouce);
+		sqlSessionFactoryBean.setDataSource(routingDataSource);
 		sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
 		sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(mapperLocations));
 		/**

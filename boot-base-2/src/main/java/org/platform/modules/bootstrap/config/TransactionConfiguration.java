@@ -36,14 +36,14 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 	
 	private static final String POINTCUT_EXPRESSION = "execution(* org.platform.modules.*.service.impl.*.*(..))";  
 
-	@Resource(name = "routingDataSouce")
-	private AbstractRoutingDataSource routingDataSouce = null;
+	@Resource(name = "routingDataSource")
+	private AbstractRoutingDataSource routingDataSource = null;
 	
 	@Primary
 	@Bean(name = "transactionManager")
 	@ConditionalOnMissingBean({PlatformTransactionManager.class})
 	public DataSourceTransactionManager transactionManager() {
-		return new DataSourceTransactionManager(routingDataSouce);
+		return new DataSourceTransactionManager(routingDataSource);
 	}
 	
 	@Override
