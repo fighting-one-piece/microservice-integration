@@ -1,5 +1,8 @@
 package org.platform.modules.kafka.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -33,6 +36,17 @@ public class KafkaServiceImpl implements IKafkaService {
 	public ListenableFuture<SendResult<Object, Object>> send(String topic, Object data) 
 			throws RuntimeException {
 		return kafkaTemplate.send(topic, SerializerUtils.write(data));
+	}
+	
+	@Override
+	public ListenableFuture<SendResult<Object, Object>> send(String topic, Object... datas) 
+			throws RuntimeException {
+		if (null == datas || datas.length % 2 != 0) return null;
+		Map<Object, Object> dataParams = new HashMap<Object, Object>();
+		for (int i = 0, len = datas.length; i < len;) {
+			dataParams.put(datas[i++], datas[i++]);
+		}
+		return kafkaTemplate.send(topic, SerializerUtils.write(dataParams));
 	}
 	
 	@Override

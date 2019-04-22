@@ -36,6 +36,15 @@ public interface IKafkaService {
 	/**
 	 * 发送消息
 	 * @param topic 主题
+	 * @param datas 数据
+	 * @throws BusinessException
+	 */
+	public ListenableFuture<SendResult<Object, Object>> send(String topic, Object... datas)
+			throws RuntimeException;
+	
+	/**
+	 * 发送消息
+	 * @param topic 主题
 	 * @param key
 	 * @param data 数据
 	 * @throws BusinessException
