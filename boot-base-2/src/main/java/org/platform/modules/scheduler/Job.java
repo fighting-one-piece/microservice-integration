@@ -9,9 +9,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Job {
 	
-	protected Logger LOG = LoggerFactory.getLogger(getClass());
+protected Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	public static final String P_THREAD_POOL_NUM = "P_THREAD_POOL_NUM";
 	public static final String C_THREAD_POOL_NUM = "C_THREAD_POOL_NUM";
@@ -28,6 +27,9 @@ public abstract class Job {
 	public static final String USE_PRODUCER_MODEL = "USE_PRODUCER_MODEL";
 	public static final String USE_CONSUMER_MODEL = "USE_CONSUMER_MODEL";
 	public static final String CONSUME_DELAY_SECONDS = "CONSUME_DELAY_SECONDS";
+	
+	public static final String START_INDEX = "startIndex";
+	public static final String END_INDEX = "endIndex";
 	
 	public static final int DEFAULT_P_THREAD_POOL_NUM = 5;
 	public static final int DEFAULT_C_THREAD_POOL_NUM = 10;
@@ -140,8 +142,8 @@ public abstract class Job {
 		if (useProducerModel) {
 			pThreadPoolNum = (int) getJobConf().getOrDefault(P_THREAD_POOL_NUM, DEFAULT_P_THREAD_POOL_NUM);
 			pExecutorService = new ThreadPoolExecutor(pThreadPoolNum, DEFAULT_MAX_THREAD_POOL_NUM, 
-				DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(50), 
-					Executors.defaultThreadFactory(), new AbortPolicy());
+				DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2000), 
+					Executors.defaultThreadFactory(), new CallerRunsPolicy());
 		}
 		useBlockingQueue = (boolean) getJobConf().getOrDefault(USE_BLOCKING_QUEUE, false);
 		if (useBlockingQueue) {
@@ -152,8 +154,8 @@ public abstract class Job {
 		if (useConsumerModel) {
 			cThreadPoolNum = (int) getJobConf().getOrDefault(C_THREAD_POOL_NUM, DEFAULT_C_THREAD_POOL_NUM);
 			cExecutorService = new ThreadPoolExecutor(cThreadPoolNum, DEFAULT_MAX_THREAD_POOL_NUM, 
-					DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(50), 
-						Executors.defaultThreadFactory(), new AbortPolicy());
+				DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2000), 
+					Executors.defaultThreadFactory(), new CallerRunsPolicy());
 			consumeDelaySeconds = (int) getJobConf().getOrDefault(
 				CONSUME_DELAY_SECONDS, DEFAULT_CONSUME_DELAY_SECONDS);
 		}
@@ -174,9 +176,9 @@ public abstract class Job {
 					Map<String, Object> params = new HashMap<String, Object>();
 					params.putAll(getJobConf());
 					if (useBlockingQueue) params.put("queue", queue);
-					params.put("startIndex", index);
+					params.put(START_INDEX, index);
 					index = (i == (pThreadPoolNum - 1)) ? recordTotalNumber + 1 : index + splitNumber;
-					params.put("endIndex", index);
+					params.put(END_INDEX, index);
 					pFutures.add(pExecutorService.submit(producer(params)));
 				}
 			}
