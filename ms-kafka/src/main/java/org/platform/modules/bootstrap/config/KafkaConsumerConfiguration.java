@@ -24,15 +24,19 @@ public class KafkaConsumerConfiguration {
 	@Value("${kafka.consumer.enable.auto.commit}")
 	private boolean enableAutoCommit = false;
 	@Value("${kafka.consumer.session.timeout}")
-	private String sessionTimeout = null;
+	private Integer sessionTimeout = null;
 	@Value("${kafka.consumer.auto.commit.interval}")
-	private String autoCommitInterval = null;
+	private Integer autoCommitInterval = null;
 	@Value("${kafka.consumer.group.id}")
 	private String groupId = null;
 	@Value("${kafka.consumer.auto.offset.reset}")
 	private String autoOffsetReset = null;
 	@Value("${kafka.consumer.concurrency}")
-	private int concurrency = 2;
+	private Integer concurrency = 10;
+	@Value("${kafka.consumer.max.poll.records}")
+	private String maxPollRecords = null;
+	@Value("${kafka.consumer.max.poll.interval.ms}")
+	private String maxPollIntervalMs = null;
 
 	@Bean
 	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
@@ -60,6 +64,8 @@ public class KafkaConsumerConfiguration {
 		consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommit);
 		consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
 		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeout);
+		consumerConfigs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+		consumerConfigs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalMs);
 		consumerConfigs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		consumerConfigs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
 		return consumerConfigs;
