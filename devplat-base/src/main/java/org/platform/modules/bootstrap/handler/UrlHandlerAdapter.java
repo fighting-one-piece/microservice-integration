@@ -82,7 +82,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			handlerChainServiceList.add(entry.getValue());
 		}
 		
-		new ClassScanner(new String[] { "org.cisiondata.modules" }, new ClassResourceHandler() {
+		new ClassScanner(new String[] { "org.platform.modules" }, new ClassResourceHandler() {
 			
 			public void handle(MetadataReader metadataReader) {
 				if (metadataReader.getClassMetadata().isAnnotation()) return;
