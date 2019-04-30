@@ -3,9 +3,9 @@ package org.platform.modules.bootstrap.service.impl;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.DiscardPolicy;
 import java.util.concurrent.TimeUnit;
@@ -15,12 +15,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.platform.modules.abstr.entity.RequestMessage;
 import org.platform.modules.kafka.service.IKafkaService;
+import org.platform.modules.system.service.IEmailService;
 import org.platform.utils.exception.BusinessException;
 import org.platform.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 
 @Order(3)
 @Service("messageQueueHandlerService")
@@ -29,12 +33,18 @@ public class MessageQueueHandlerServiceImpl extends AbstractHandlerChainServiceI
 	private Logger LOG = LoggerFactory.getLogger(MessageQueueHandlerServiceImpl.class);
 	
 	private static final String TOPIC = "platform-accesslog";
+	
+	@Resource(name = "emailService")
+	private IEmailService emailService = null;
 
 	@Resource(name = "kafkaService")
 	private IKafkaService kafkaService = null;
 	
+	@Value("${spring.profiles.active:development}")
+	private String activeEnvironment = null;
+	
 	private ExecutorService threadPool = new ThreadPoolExecutor(2, 5, 10, TimeUnit.SECONDS, 
-			new LinkedBlockingDeque<Runnable>(50), Executors.defaultThreadFactory(), new DiscardPolicy());
+		new ArrayBlockingQueue<Runnable>(2000), Executors.defaultThreadFactory(), new DiscardPolicy());
 
 	@Override
 	public Object[] postHandle(HttpServletRequest request, Object result) throws BusinessException {
@@ -44,7 +54,18 @@ public class MessageQueueHandlerServiceImpl extends AbstractHandlerChainServiceI
 			threadPool.submit(new Runnable() {
 				@Override
 				public void run() {
-					kafkaService.send(TOPIC, requestMessage);
+					ListenableFuture<SendResult<Object, Object>> future = kafkaService.send(TOPIC, requestMessage);
+					future.addCallback(
+						success -> {
+						}, 
+						failure -> {
+							emailService.send(activeEnvironment + "环境DevPlat项目Kafka服务异常", "请尽快处理Kafka服务异常", 
+								new String[]{"592891306@qq.com", "976889989@qq.com", "1106439835@qq.com"});
+							LOG.error("{} message {}-{}-{}-{}-{}", TOPIC, requestMessage.getIpAddress(), requestMessage.getUrl(), 
+								requestMessage.getParams(), requestMessage.getAccount(), requestMessage.getTime());
+							LOG.error(failure.getMessage(), failure);
+						}
+					);
 				}
 			});
 		} catch (Exception e) {
