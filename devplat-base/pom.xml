@@ -75,10 +75,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
-		<spring.cloud.eureka.client.version>2.0.2.RELEASE</spring.cloud.eureka.client.version>
-		<spring.cloud.ribbon.version>2.0.2.RELEASE</spring.cloud.ribbon.version>
-		<spring.cloud.feign.version>2.0.2.RELEASE</spring.cloud.feign.version>
-		<spring.cloud.hystrix.version>2.0.2.RELEASE</spring.cloud.hystrix.version>
+		<spring.cloud.eureka.client.version>2.1.1.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.ribbon.version>2.1.1.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.1.1.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.hystrix.version>2.1.1.RELEASE</spring.cloud.hystrix.version>
 	</properties>
  
 	<dependencies>
@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>org.platform</groupId>
 			<artifactId>boot-base</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- Spring Cloud依赖包 -->
@@ -128,10 +128,10 @@
 		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
-		<!-- Devplat Kafka依赖包 -->
+		<!-- MS Kafka依赖包 -->
 		<dependency>
 		    <groupId>org.platform</groupId>
-			<artifactId>devplat-kafka</artifactId>
+			<artifactId>ms-kafka</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
@@ -149,19 +149,6 @@
             <version>1.1.5</version>
         </dependency>
         
-        <!-- Swagger依赖包 -->
-        <dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger2</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger-ui</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-		
 	</dependencies>
 	
 	<dependencyManagement>

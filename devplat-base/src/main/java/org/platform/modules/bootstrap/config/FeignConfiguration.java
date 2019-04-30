@@ -1,13 +1,9 @@
 package org.platform.modules.bootstrap.config;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import feign.Contract;
 import feign.Feign;
 import feign.Logger;
 import feign.auth.BasicAuthRequestInterceptor;
@@ -21,10 +17,12 @@ public class FeignConfiguration {
         return Feign.builder();
     }
 	
+	/**
 	@Bean
 	public Contract feignContract() {
 		return new Contract.Default();
 	}
+	*/
 
 	@Bean
 	public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
@@ -36,6 +34,7 @@ public class FeignConfiguration {
 		return Logger.Level.FULL;
 	}
 	
+	/**
 	HttpMessageConverters httpMessageConverters = new HttpMessageConverters();
 
 	ObjectFactory<HttpMessageConverters> messageConvertersObjectFactory = new ObjectFactory<HttpMessageConverters>() {
@@ -44,6 +43,7 @@ public class FeignConfiguration {
 			return httpMessageConverters;
 		}
 	};
+	*/
 
 	/**
 	public Encoder feignEncoder() {

@@ -58,8 +58,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 	private List<IHandlerChainService> handlerChainServiceList = new ArrayList<IHandlerChainService>();
 
 	public boolean supports(Object handler) {
-		if (handler instanceof HandlerMethod && ((HandlerMethod) handler).getClass()
-			.getSimpleName().equals("WebMvcEndpointHandlerMethod")) {
+		if (handler instanceof HandlerMethod && ((HandlerMethod) handler).getClass().getSimpleName().equals("WebMvcEndpointHandlerMethod")) {
 			return false;
 		} else if (handler instanceof ResourceHttpRequestHandler) {
 			return false;
