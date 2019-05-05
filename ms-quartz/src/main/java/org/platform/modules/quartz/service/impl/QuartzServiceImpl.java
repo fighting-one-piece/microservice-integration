@@ -12,6 +12,7 @@ import org.platform.modules.abstr.web.ResultCode;
 import org.platform.modules.quartz.entity.CJob;
 import org.platform.modules.quartz.entity.CTrigger;
 import org.platform.modules.quartz.service.IQuartzService;
+import org.platform.utils.endecrypt.MD5Utils;
 import org.platform.utils.exception.BusinessException;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
@@ -40,51 +41,49 @@ public class QuartzServiceImpl implements IQuartzService {
 	@Resource(name = "schedulerFactoryExtBean")
 	private Scheduler scheduler = null;
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public void insert(String jobGroup, String jobName, String jobClass, String triggerGroup,
-			String triggerName, String cron) throws BusinessException {
-		LOG.info("Insert Scheduler {} - {} - {} - {} - {} - {} ", jobGroup, jobName, jobClass, 
-				triggerGroup, triggerName, cron);
-		checkParamNotNull(jobGroup, "任务组名", jobName, "任务名称", jobClass, "任务实现类", cron, "任务Cron表达式");
-		try {
-			JobKey jobKey = new JobKey(jobName, jobGroup);
-			if (scheduler.checkExists(jobKey)) {
-				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务已经存在");
-			} 
-			if (StringUtils.isBlank(triggerGroup)) triggerGroup = jobGroup;
-			if (StringUtils.isBlank(triggerName)) triggerName = jobName;
-			TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
-			if (scheduler.checkExists(triggerKey)) {
-				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务Trigger已经存在");
-			}
-			CronExpression cronExpression = new CronExpression(cron);
-			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-			CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
-					.withSchedule(cronScheduleBuilder).build();
-			Class<? extends Job> jobClazz = (Class<? extends Job>) Class.forName(jobClass);
-			JobDetail jobDetail = JobBuilder.newJob().withIdentity(jobKey).ofType(jobClazz)
-					.storeDurably(true).requestRecovery(true).build();
-			scheduler.scheduleJob(jobDetail, cronTrigger);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		} 
+	public void insert(Class<? extends Job> jobClazz, String cron) throws BusinessException {
+		insert(null, jobClazz.getSimpleName(), jobClazz, null, null, cron);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public void insert(String jobGroup, String jobName, String jobClass, Map<?, ?> jobData, String triggerGroup,
-			String triggerName, String cron) throws BusinessException {
-		LOG.info("Insert Scheduler {} - {} - {} - {} - {} - {} - {}", jobGroup, jobName, jobClass, 
-				jobData, triggerGroup, triggerName, cron);
-		checkParamNotNull(jobGroup, "任务组名", jobName, "任务名称", jobClass, "任务实现类", cron, "任务Cron表达式");
+	public void insert(Class<? extends Job> jobClazz, Map<?, ?> jobData, String cron) throws BusinessException {
+		insert(null, jobClazz.getSimpleName(), jobClazz, jobData, null, null, cron);
+	}
+	
+	@Override
+	public void insert(String jobName, Class<? extends Job> jobClazz, String triggerName, String cron) throws BusinessException {
+		insert(null, jobName, jobClazz, null, triggerName, cron);
+	}
+	
+	@Override
+	public void insert(String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData, String triggerName, String cron) throws BusinessException {
+		insert(null, jobName, jobClazz, jobData, null, triggerName, cron);
+	}
+	
+	@Override
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, 
+			String triggerGroup, String triggerName, String cron) throws BusinessException {
+		insert(jobGroup, jobName, jobClazz, null, triggerGroup, triggerName, cron);
+	}
+	
+	@Override
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData, 
+			String triggerGroup, String triggerName, String cron) throws BusinessException {
+		LOG.info("Insert Scheduler {} - {} - {} - {} - {} - {} - {}", 
+			jobGroup, jobName, jobClazz, jobData, triggerGroup, triggerName, cron);
+		checkParamNotNull(jobName, "任务名称", jobClazz, "任务实现类", cron, "任务Cron表达式");
 		try {
 			JobKey jobKey = new JobKey(jobName, jobGroup);
 			if (scheduler.checkExists(jobKey)) {
 				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务已经存在");
 			} 
+			JobBuilder jobBuilder = JobBuilder.newJob().withIdentity(jobKey).ofType(jobClazz)
+					.storeDurably(true).requestRecovery(true);
+			if (null != jobData && !jobData.isEmpty()) jobBuilder.usingJobData(new JobDataMap(jobData));
+			
 			if (StringUtils.isBlank(triggerGroup)) triggerGroup = jobGroup;
-			if (StringUtils.isBlank(triggerName)) triggerName = jobName;
+			if (StringUtils.isBlank(triggerName)) triggerName = MD5Utils.hash(cron);
 			TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
 			if (scheduler.checkExists(triggerKey)) {
 				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务Trigger已经存在");
@@ -92,11 +91,9 @@ public class QuartzServiceImpl implements IQuartzService {
 			CronExpression cronExpression = new CronExpression(cron);
 			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
 			CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
-					.withSchedule(cronScheduleBuilder).build();
-			Class<? extends Job> jobClazz = (Class<? extends Job>) Class.forName(jobClass);
-			JobDetail jobDetail = JobBuilder.newJob().withIdentity(jobKey).ofType(jobClazz)
-					.usingJobData(new JobDataMap(jobData)).storeDurably(true).requestRecovery(true).build();
-			scheduler.scheduleJob(jobDetail, cronTrigger);
+				.withSchedule(cronScheduleBuilder).build();
+			
+			scheduler.scheduleJob(jobBuilder.build(), cronTrigger);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} 

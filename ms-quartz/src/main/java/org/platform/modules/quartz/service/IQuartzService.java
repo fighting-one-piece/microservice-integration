@@ -5,34 +5,73 @@ import java.util.Map;
 
 import org.platform.modules.quartz.entity.CJob;
 import org.platform.utils.exception.BusinessException;
+import org.quartz.Job;
 
 public interface IQuartzService {
+	
+	/**
+	 * 新增Job
+	 * @param jobClazz
+	 * @param cron
+	 * @throws BusinessException
+	 */
+	public void insert(Class<? extends Job> jobClazz, String cron) throws BusinessException;
+	
+	/**
+	 * 新增Job
+	 * @param jobClazz
+	 * @param jobData
+	 * @param cron
+	 * @throws BusinessException
+	 */
+	public void insert(Class<? extends Job> jobClazz, Map<?, ?> jobData, String cron) throws BusinessException;
+	
+	/**
+	 * 新增Job
+	 * @param jobName
+	 * @param jobClazz
+	 * @param triggerName
+	 * @param cron
+	 * @throws BusinessException
+	 */
+	public void insert(String jobName, Class<? extends Job> jobClazz, String triggerName, String cron) throws BusinessException;
+	
+	/**
+	 * 新增Job
+	 * @param jobName
+	 * @param jobClazz
+	 * @param jobData
+	 * @param triggerName
+	 * @param cron
+	 * @throws BusinessException
+	 */
+	public void insert(String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData, String triggerName, String cron) throws BusinessException;
 
 	/**
 	 * 新增Job
 	 * @param jobGroup
 	 * @param jobName
-	 * @param jobClass
+	 * @param jobClazz
 	 * @param triggerGroup
 	 * @param triggerName
 	 * @param cron
 	 * @throws BusinessException
 	 */
-	public void insert(String jobGroup, String jobName, String jobClass, String triggerGroup,
-			String triggerName, String cron) throws BusinessException;
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, 
+			String triggerGroup, String triggerName, String cron) throws BusinessException;
 	
 	/**
 	 * 新增Job
 	 * @param jobGroup
 	 * @param jobName
-	 * @param jobClass
+	 * @param jobClazz
 	 * @param jobData
 	 * @param triggerGroup
 	 * @param triggerName
 	 * @param cron
 	 * @throws BusinessException
 	 */
-	public void insert(String jobGroup, String jobName, String jobClass, Map<?, ?> jobData,
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData,
 			String triggerGroup, String triggerName, String cron) throws BusinessException;
 	
 	/**

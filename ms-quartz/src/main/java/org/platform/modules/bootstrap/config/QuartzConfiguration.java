@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.platform.modules.quartz.factory.SchedulerFactoryExtBean;
+import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,9 @@ public class QuartzConfiguration {
 	@Value("${spring.quartz.wait-for-jobs-to-complete-on-shutdown}")
 	private boolean waitForJobsToCompleteOnShutdown = false;
 	
+	@Resource(name = "extAdaptableJobFactory")
+    private JobFactory jobFactory = null;
+	
 	@Resource(name = "routingDataSource")
 	private DataSource dataSource = null;
 	
@@ -42,6 +46,7 @@ public class QuartzConfiguration {
 		schedulerFactoryBean.setSchedulerName(schedulerName);
 		//更新trigger的表达式时同步数据到数据库qrtz_cron_triggers表开启
 		schedulerFactoryBean.setOverwriteExistingJobs(overwriteExistingJobs); 
+		schedulerFactoryBean.setJobFactory(jobFactory);
 		schedulerFactoryBean.setDataSource(dataSource);
 		schedulerFactoryBean.setTransactionManager(transactionManager);
 		schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(waitForJobsToCompleteOnShutdown);

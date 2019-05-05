@@ -1,10 +1,14 @@
-package org.platform.modules.quartz.task;
+package org.platform.modules.quartz.job;
 
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.platform.modules.quartz.service.IQuartzService;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -12,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+@DisallowConcurrentExecution
+@PersistJobDataAfterExecution
 public class DefaultJob extends QuartzJobBean {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultJob.class);
@@ -21,6 +27,9 @@ public class DefaultJob extends QuartzJobBean {
 	private String injectValue2 = null;
 	
 	private IQuartzService quartzService = null;
+	
+	@Resource(name = "quartzService")
+	private IQuartzService quartzInjectService = null;
 
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -28,6 +37,7 @@ public class DefaultJob extends QuartzJobBean {
 			SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
 			ApplicationContext ac = (ApplicationContext) schedulerContext.get("applicationContext");
 			quartzService = ac.getBean("quartzService", IQuartzService.class);
+			LOG.info("resource inject service: {}", quartzInjectService);
 			LOG.info("inject service: {}", quartzService);
 			LOG.info("inject value 1: {}", injectValue1);
 			LOG.info("inject value 2: {}", injectValue2);
