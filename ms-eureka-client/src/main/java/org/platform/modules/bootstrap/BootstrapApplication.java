@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
@@ -17,10 +16,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-@SpringBootApplication  
-@EnableEurekaClient
 @EnableCircuitBreaker
 @EnableDiscoveryClient
+@SpringBootApplication  
 @EnableAutoConfiguration  
 @ComponentScan(basePackages={"org.platform"})
 public class BootstrapApplication {
@@ -44,7 +42,7 @@ public class BootstrapApplication {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(BootstrapApplication.class, args);
-		LOG.info("Server Bootstrap");
+		LOG.info("Eureka Client Bootstrap");
 	}
 	
 }

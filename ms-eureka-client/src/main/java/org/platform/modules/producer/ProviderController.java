@@ -58,7 +58,6 @@ public class ProviderController {
 	@RequestMapping("/registered")
 	public String getRegistered() {
 		List<ServiceInstance> list = discoveryClient.getInstances("STORES");
-		System.out.println(discoveryClient.getLocalServiceInstance());
 		System.out.println("services size: " + discoveryClient.getServices().size());
 		for (String s : discoveryClient.getServices()) {
 			List<ServiceInstance> serviceInstances = discoveryClient.getInstances(s);
