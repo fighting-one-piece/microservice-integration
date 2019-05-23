@@ -42,7 +42,7 @@ public class CodeGenServiceImpl implements ICodeGenService {
 		
 		String userDir = System.getProperty("user.dir");
 		String moduleDirPath = userDir + File.separator + "src" + File.separator + "main" + File.separator + "java" + 
-			File.separator + "org" + File.separator + "cisiondata" + File.separator + "modules" + File.separator + module;
+			File.separator + "org" + File.separator + "platform" + File.separator + "modules" + File.separator + module;
 		System.err.println(moduleDirPath);
 		File moduleDir = new File(moduleDirPath);
 		if (!moduleDir.exists()) moduleDir.mkdirs();

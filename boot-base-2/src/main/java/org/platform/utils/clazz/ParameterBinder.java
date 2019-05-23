@@ -79,24 +79,28 @@ public class ParameterBinder {
 			}
 			if (typeClazz.isArray()) {
 				String arrayString = getParam(params, request, parameterNames.get(i));
-				String[] value = null;
-				if (arrayString == null) {
-					value = new String[0];
+				String[] array = null;
+				if (StringUtils.isBlank(arrayString)) {
+					array = new String[0];
 				} else {
-					if (arrayString.contains("\b") || !arrayString.matches("\\s*\\[.*\\]\\s*")) {
-						value = arrayString.split("\b");
-					} else {
-						JSONArray ja = JSONArray.parseArray(arrayString);
-						value = new String[ja.size()];
+					if (arrayString.contains(",") && !arrayString.matches("\\s*\\[.*\\]\\s*")) {
+						array = arrayString.split(",");
+					} else if (arrayString.contains("\b") && !arrayString.matches("\\s*\\[.*\\]\\s*")) {
+						array = arrayString.split("\b");
+					} else if (!arrayString.matches("\\s*\\[.*\\]\\s*")) {
+						array = new String[]{arrayString};
+					}  else {
+						JSONArray ja = JSONArray.parseArray(arrayString.replaceAll("＂", "\"").replaceAll("＇", "'"));
+						array = new String[ja.size()];
 						for (int j = 0; j < ja.size(); j++) {
-							value[j] = ja.getString(j);
+							array[j] = ja.getString(j);
 						}
 					}
 				}
-				Object newArray = Array.newInstance(typeClazz.getComponentType(), value.length);
-				for (int j = 0, jLen = value.length; j < jLen; j++) {
+				Object newArray = Array.newInstance(typeClazz.getComponentType(), array.length);
+				for (int j = 0, jLen = array.length; j < jLen; j++) {
 					try {
-						Array.set(newArray, j, BeanUtil.directConvert(value[j], typeClazz.getComponentType()));
+						Array.set(newArray, j, BeanUtil.directConvert(array[j], typeClazz.getComponentType()));
 					} catch (Exception e) {
 					}
 				}
