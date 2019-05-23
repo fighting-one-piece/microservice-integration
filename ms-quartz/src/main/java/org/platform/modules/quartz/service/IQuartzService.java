@@ -1,5 +1,6 @@
 package org.platform.modules.quartz.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,22 @@ public interface IQuartzService {
 	 */
 	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData,
 			String triggerGroup, String triggerName, String cron) throws BusinessException;
+	
+	/**
+	 * 新增Job
+	 * @param jobGroup
+	 * @param jobName
+	 * @param jobClazz
+	 * @param jobData
+	 * @param triggerGroup
+	 * @param triggerName
+	 * @param cron
+	 * @param startTime
+	 * @param endTime
+	 * @throws BusinessException
+	 */
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData,
+			String triggerGroup, String triggerName, String cron, Date startTime, Date endTime) throws BusinessException;
 	
 	/**
 	 * 更新Job的Cron表达式

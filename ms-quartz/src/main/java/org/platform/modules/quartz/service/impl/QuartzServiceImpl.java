@@ -1,6 +1,7 @@
 package org.platform.modules.quartz.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,6 +71,12 @@ public class QuartzServiceImpl implements IQuartzService {
 	@Override
 	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData, 
 			String triggerGroup, String triggerName, String cron) throws BusinessException {
+		insert(jobGroup, jobName, jobClazz, jobData, triggerGroup, triggerName, cron, null, null);
+	}
+	
+	@Override
+	public void insert(String jobGroup, String jobName, Class<? extends Job> jobClazz, Map<?, ?> jobData, 
+			String triggerGroup, String triggerName, String cron, Date startTime, Date endTime) throws BusinessException {
 		LOG.info("Insert Scheduler {} - {} - {} - {} - {} - {} - {}", 
 			jobGroup, jobName, jobClazz, jobData, triggerGroup, triggerName, cron);
 		checkParamNotNull(jobName, "任务名称", jobClazz, "任务实现类", cron, "任务Cron表达式");
@@ -83,15 +90,18 @@ public class QuartzServiceImpl implements IQuartzService {
 			if (null != jobData && !jobData.isEmpty()) jobBuilder.usingJobData(new JobDataMap(jobData));
 			
 			if (StringUtils.isBlank(triggerGroup)) triggerGroup = jobGroup;
-			if (StringUtils.isBlank(triggerName)) triggerName = MD5Utils.hash(cron);
+			if (StringUtils.isBlank(triggerName)) triggerName = MD5Utils.hash(String.valueOf(System.currentTimeMillis()));
 			TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
 			if (scheduler.checkExists(triggerKey)) {
 				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务Trigger已经存在");
 			}
 			CronExpression cronExpression = new CronExpression(cron);
 			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-			CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
-				.withSchedule(cronScheduleBuilder).build();
+			TriggerBuilder<CronTrigger> cronTriggerBuilder = TriggerBuilder.newTrigger()
+				.withIdentity(triggerKey).withSchedule(cronScheduleBuilder);
+			if (null != startTime) cronTriggerBuilder.startAt(startTime);
+			if (null != endTime) cronTriggerBuilder.endAt(endTime);
+			CronTrigger cronTrigger = cronTriggerBuilder.build();
 			
 			scheduler.scheduleJob(jobBuilder.build(), cronTrigger);
 		} catch (Exception e) {
