@@ -7,7 +7,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ public class ReflectUtils {
         if (!(parameterizedType instanceof ParameterizedType)) {
             parameterizedType = clazz.getSuperclass().getGenericSuperclass();
         }
-        if (!(parameterizedType instanceof  ParameterizedType)) {
+        if (!(parameterizedType instanceof ParameterizedType)) {
             return null;
         }
         Type[] actualTypeArguments = ((ParameterizedType) parameterizedType).getActualTypeArguments();
@@ -93,7 +95,7 @@ public class ReflectUtils {
     	Field field = getFieldByFieldName(object, fieldName);
     	if (null == field || Modifier.isStatic(field.getModifiers())) return;
     	try {
-    		value = convertValueByFileType(field.getType(), value);
+    		value = convertValueByFieldType(field.getType(), value);
 	        if (field.isAccessible()) {
 	            field.set(object, value);
 	        } else {
@@ -106,12 +108,19 @@ public class ReflectUtils {
         }
     }
     
-    public static Object convertValueByFileType(Class<?> type, Object value) {
+    private static Calendar calendar = Calendar.getInstance();
+    
+    private static final SimpleDateFormat SDF1 = DateFormatter.TIME.get();
+    private static final SimpleDateFormat SDF2 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    
+    public static Object convertValueByFieldType(Class<?> type, Object value) {
     	Object finalValue = value;
     	if (String.class.isAssignableFrom(type)) {
     		finalValue = String.valueOf(value);
 		} else if (Boolean.class.isAssignableFrom(type)) {
     		finalValue = Boolean.parseBoolean(String.valueOf(value));
+		} else if (Short.class.isAssignableFrom(type)) {
+    		finalValue = Short.parseShort(String.valueOf(value));
 		} else if (Integer.class.isAssignableFrom(type)) {
     		finalValue = Integer.parseInt(String.valueOf(value));
 		} else if (Long.class.isAssignableFrom(type)) {
@@ -122,9 +131,19 @@ public class ReflectUtils {
 			finalValue = Double.parseDouble(String.valueOf(value));
 		} else if (Date.class.isAssignableFrom(type)) {
 			try {
-				finalValue = DateFormatter.TIME.get().parse(String.valueOf(value));
+				if (value instanceof Long) {
+					calendar.setTimeInMillis((long) value); 
+					finalValue = SDF1.parse(SDF1.format(calendar.getTime()));
+				} else if (value instanceof String) {
+					String valueString = String.valueOf(value);
+					if (valueString.indexOf("CST") == -1) {
+						finalValue = SDF1.parse(valueString);
+					} else {
+						finalValue = SDF2.parse(valueString);
+					}
+				}
 			} catch (ParseException e) {
-				LOG.error(e.getMessage(), e);
+				LOG.error("date {} parse error!", finalValue);
 			}
 		} 
     	return finalValue;
@@ -249,7 +268,7 @@ public class ReflectUtils {
 				String finalValue = String.valueOf(value);
 				Class<?> type = field.getType();
 				if (Date.class.isAssignableFrom(type)) {
-					finalValue = DateFormatter.TIME.get().format(value);
+					finalValue = SDF1.format(value);
 				} 
 				map.put(name, finalValue);
 			}
@@ -269,7 +288,7 @@ public class ReflectUtils {
 				String valueString = String.valueOf(map.get(name));
 				if (null == valueString || "".equals(valueString) 
 					|| "null".equalsIgnoreCase(valueString)) continue;
-				Object value = convertValueByFileType(field.getType(), valueString);
+				Object value = convertValueByFieldType(field.getType(), valueString);
 				field.setAccessible(true);
 				field.set(object, value);
 				field.setAccessible(false);
