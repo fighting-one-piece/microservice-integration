@@ -7,7 +7,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>OAuth Server Project</name>
+	<name>MS OAuth Server Project</name>
 	<url>http://maven.apache.org</url>
 
 	<profiles>
@@ -74,17 +74,15 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
-		<spring.boot.redis.version>1.4.6.RELEASE</spring.boot.redis.version>
+		<spring.boot.version>2.1.1.RELEASE</spring.boot.version>
 		<spring.boot.security.version>1.5.9.RELEASE</spring.boot.security.version>
-		<spring.cloud.version>Camden.SR7</spring.cloud.version>
-		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
-		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
-		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
-		<spring.cloud.starter.feign.version>1.4.0.RELEASE</spring.cloud.starter.feign.version>
-		<spring.cloud.starter.hystrix.version>1.4.0.RELEASE</spring.cloud.starter.hystrix.version>
-		<spring.cloud.starter.security.version>1.2.1.RELEASE</spring.cloud.starter.security.version>
-		<spring.cloud.starter.oauth2.version>1.2.1.RELEASE</spring.cloud.starter.oauth2.version>
+		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
+		<spring.cloud.eureka.client.version>2.1.1.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.ribbon.version>2.1.1.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.1.1.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.hystrix.version>2.1.1.RELEASE</spring.cloud.hystrix.version>
+		<spring.cloud.starter.security.version>2.1.1.RELEASE</spring.cloud.starter.security.version>
+		<spring.cloud.starter.oauth2.version>2.1.1.RELEASE</spring.cloud.starter.oauth2.version>
 	</properties>
  
 	<dependencies>
@@ -110,36 +108,46 @@
 		</dependency>
 		
         <!-- Spring Cloud依赖包 -->
-        <!--  
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
+       	<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		    <version>${spring.cloud.eureka.client.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-		-->
-
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		    <version>${spring.cloud.ribbon.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<!--  
-			<version>${spring.cloud.starter.eureka.version}</version>
-			-->
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		    <version>${spring.cloud.feign.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-security</artifactId>
-		    <!--  
 		    <version>${spring.cloud.starter.security.version}</version>
-			-->
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-starter-oauth2</artifactId>
-		    <!--  
 		    <version>${spring.cloud.starter.oauth2.version}</version>
-			-->
 		</dependency>
         
         <dependency>
