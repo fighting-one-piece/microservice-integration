@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>2.1.1.RELEASE</version>
 		<relativePath />
 	</parent>
 	
@@ -29,14 +29,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
-		<spring.cloud.version>Camden.SR7</spring.cloud.version>
-		<spring.cloud.starter.zuul.version>1.4.0.RELEASE</spring.cloud.starter.zuul.version>
-		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
-		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
-		<spring.cloud.starter.ribbon.version>1.4.0.RELEASE</spring.cloud.starter.ribbon.version>
-		<spring.cloud.starter.security.version>1.2.1.RELEASE</spring.cloud.starter.security.version>
-		<spring.cloud.starter.oauth2.version>1.2.1.RELEASE</spring.cloud.starter.oauth2.version>
-		<fastjson.version>1.2.22</fastjson.version>
+		<spring.cloud.version>Finchley.RELEASE</spring.cloud.version>
+		<spring.cloud.eureka.client.version>2.1.1.RELEASE</spring.cloud.eureka.client.version>
+		<spring.cloud.ribbon.version>2.1.1.RELEASE</spring.cloud.ribbon.version>
+		<spring.cloud.feign.version>2.1.1.RELEASE</spring.cloud.feign.version>
+		<spring.cloud.hystrix.version>2.1.1.RELEASE</spring.cloud.hystrix.version>
 	</properties>
 
 	<dependencies>
@@ -67,50 +64,40 @@
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
-		<dependency>
-	        <groupId>org.springframework.cloud</groupId>
-	        <artifactId>spring-cloud-starter-turbine</artifactId>
-	    </dependency>
-
 		<!-- Spring Cloud依赖包 -->
-		<!--
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>${spring.cloud.starter.config.version}</version>
-		</dependency>
-		-->
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		    <version>${spring.cloud.eureka.client.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-ribbon</artifactId>
-        </dependency>
-        
-        <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-hystrix</artifactId>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		    <version>${spring.cloud.ribbon.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
-        </dependency>
-        
-        <!--  
-        <dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		    <version>${spring.cloud.feign.version}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-        -->
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+		    <version>${spring.cloud.hystrix.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
         
 		<dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-netflix-turbine</artifactId>
+            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
         </dependency>
 		
 		<!-- JUnit依赖包 -->
