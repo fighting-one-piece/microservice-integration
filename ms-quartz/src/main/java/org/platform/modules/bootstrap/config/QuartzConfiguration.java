@@ -4,7 +4,15 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.platform.modules.quartz.factory.SchedulerFactoryExtBean;
+import org.platform.modules.quartz.listener.CustomSchedulerListener;
+import org.platform.modules.quartz.listener.GlobalCustomJobListener;
+import org.platform.modules.quartz.listener.GlobalCustomTriggerListener;
+import org.quartz.ListenerManager;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +21,8 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 @Configuration
 public class QuartzConfiguration {
+	
+	private Logger LOG = LoggerFactory.getLogger(QuartzConfiguration.class);
 	
 	@Value("${spring.quartz.auto-startup}")
 	private boolean autoStartup = false;
@@ -53,6 +63,20 @@ public class QuartzConfiguration {
         schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContext"); //注入applicationContext
         return schedulerFactoryBean;
 	}	
+	
+	@Bean("scheduler")
+	public Scheduler scheduler() {
+		Scheduler scheduler = schedulerFactoryExtBean().getScheduler();
+		try {
+	    	ListenerManager listenerManager = scheduler.getListenerManager();
+	    	listenerManager.addSchedulerListener(new CustomSchedulerListener());
+	    	listenerManager.addJobListener(new GlobalCustomJobListener());
+	    	listenerManager.addTriggerListener(new GlobalCustomTriggerListener());
+		} catch (SchedulerException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return scheduler;
+	}
 	
 }
 

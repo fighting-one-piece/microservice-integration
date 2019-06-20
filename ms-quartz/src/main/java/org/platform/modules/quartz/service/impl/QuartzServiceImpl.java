@@ -39,7 +39,7 @@ public class QuartzServiceImpl implements IQuartzService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(QuartzServiceImpl.class);
 	
-	@Resource(name = "schedulerFactoryExtBean")
+	@Resource(name = "scheduler")
 	private Scheduler scheduler = null;
 	
 	@Override
@@ -96,7 +96,8 @@ public class QuartzServiceImpl implements IQuartzService {
 				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务Trigger已经存在");
 			}
 			CronExpression cronExpression = new CronExpression(cron);
-			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
+			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder
+				.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();
 			TriggerBuilder<CronTrigger> cronTriggerBuilder = TriggerBuilder.newTrigger()
 				.withIdentity(triggerKey).withSchedule(cronScheduleBuilder);
 			if (null != startTime) cronTriggerBuilder.startAt(startTime);
