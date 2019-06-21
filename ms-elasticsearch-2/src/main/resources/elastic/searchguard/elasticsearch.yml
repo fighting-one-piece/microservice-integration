@@ -1,0 +1,22 @@
+ # transport配置
+ searchguard.ssl.transport.enabled: true
+ searchguard.ssl.transport.keystore_filepath: keystore.jks
+ searchguard.ssl.transport.keystore_password: 123456
+ searchguard.ssl.transport.truststore_filepath: truststore.jks
+ searchguard.ssl.transport.truststore_password: 123456
+ searchguard.ssl.transport.enforce_hostname_verification: false
+ searchguard.ssl.transport.resolve_hostname: false
+
+
+# https配置
+# searchguard.ssl.http.enabled: true
+# searchguard.ssl.http.keystore_filepath: keystore.jks
+# searchguard.ssl.http.keystore_password: 123456
+# searchguard.ssl.http.truststore_filepath: truststore.jks
+# searchguard.ssl.http.truststore_password: 123456
+
+ searchguard.allow_all_from_loopback: true
+
+#配置管理员证书 下面的配置一定要和客户端证书一致 否则不能写入search-guard配置
+ searchguard.authcz.admin_dn:
+  - "CN=kirk, OU=client, O=client, L=Test, C=DE"
