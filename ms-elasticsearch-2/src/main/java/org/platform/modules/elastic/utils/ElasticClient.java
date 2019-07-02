@@ -1,13 +1,16 @@
 package org.platform.modules.elastic.utils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -70,21 +73,37 @@ public class ElasticClient {
 				String[] ipAndPort = clusterNode.split(":");
 				esServerAddress.add(new EsServerAddress(ipAndPort[0], Integer.parseInt(ipAndPort[1])));
 			}
-			String storePath = ElasticClient.class.getClassLoader().getResource(
-					properties.getProperty("es.searchGuard.store-path")).getPath();
-			storePath = storePath.startsWith("/") ? storePath.substring(1) : storePath;
-			String keystoreJks = properties.getProperty("es.searchGuard.keystore-jks");
+			String tmpDir = System.getProperty("java.io.tmpdir");
+		    LOG.info("tmp dir: {}", tmpDir);
+		    String tmpKeystoreJks = tmpDir + File.separator + "keystore.jks";
+		    String tmpTruststoreJks = tmpDir + File.separator + "truststore.jks";
+		    InputStream keystoreJksIn = null, truststoreJksIn = null;
+		    OutputStream keystoreJksOut = null, truststoreJksOut = null;
+		    try {
+		    	keystoreJksIn = ElasticClient.class.getClassLoader().getResourceAsStream(properties.getProperty("es.searchGuard.keystore-jks"));
+		    	truststoreJksIn = ElasticClient.class.getClassLoader().getResourceAsStream(properties.getProperty("es.searchGuard.truststore-jks"));
+		    	keystoreJksOut = new FileOutputStream(tmpKeystoreJks);
+		    	truststoreJksOut = new FileOutputStream(tmpTruststoreJks);
+		    	IOUtils.copy(keystoreJksIn, keystoreJksOut);
+		    	IOUtils.copy(truststoreJksIn, truststoreJksOut);
+		    } catch (Exception e) {
+		    	LOG.error(e.getMessage(), e);
+		    } finally {
+		    	if (null != keystoreJksIn) keystoreJksIn.close();
+		    	if (null != truststoreJksIn) truststoreJksIn.close();
+		    	if (null != keystoreJksOut) keystoreJksOut.close();
+		    	if (null != truststoreJksOut) truststoreJksOut.close();
+		    }
 			String keystorePassword = properties.getProperty("es.searchGuard.keystore-password");
-			String truststoreJks = properties.getProperty("es.searchGuard.truststore-jks");
 			String truststorePassword = properties.getProperty("es.searchGuard.truststore-password");
 			boolean enforceHostnameVerification = Boolean.parseBoolean(
 				properties.getProperty("es.searchGuard.enforce-hostname-verification", "false"));
 			Settings settings = Settings.builder().put("cluster.name", clusterName)
 					.put("shield.user", "guest:@#guest123").put("client.transport.sniff", true)
 					.put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLED, true)
-		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_FILEPATH, storePath + File.separator + keystoreJks)
+		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_FILEPATH, tmpKeystoreJks)
 		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_PASSWORD, keystorePassword)
-		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_TRUSTSTORE_FILEPATH, storePath + File.separator + truststoreJks)
+		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_TRUSTSTORE_FILEPATH, tmpTruststoreJks)
 		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_TRUSTSTORE_PASSWORD, truststorePassword)
 		            .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, enforceHostnameVerification)
 					.build();
