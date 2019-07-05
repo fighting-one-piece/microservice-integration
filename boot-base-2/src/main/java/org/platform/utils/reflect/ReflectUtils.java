@@ -24,7 +24,7 @@ public class ReflectUtils {
 	private static Logger LOG = LoggerFactory.getLogger(ReflectUtils.class);
 
 	@SuppressWarnings("unchecked")
-	public static <T> Class<T> getParameterizedType(Class<?> clazz, int index) {
+	public static <T> Class<T> getParameterizedType(Class<?> clazz) {
         Type parameterizedType = clazz.getGenericSuperclass();
         if (!(parameterizedType instanceof ParameterizedType)) {
             parameterizedType = clazz.getSuperclass().getGenericSuperclass();
