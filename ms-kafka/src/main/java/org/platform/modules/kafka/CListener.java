@@ -16,5 +16,17 @@ public class CListener {
 		LOG.info("kafka的key: " + record.key());
 		LOG.info("kafka的value: " + record.value().toString());
     }
+	
+	@KafkaListener(topics = {"test"}, containerFactory = "kafkaListenerContainerFactory1")
+    public void listen1(ConsumerRecord<?, ?> record) {
+		LOG.info("c1 kafka的key: " + record.key());
+		LOG.info("c1 kafka的value: " + record.value().toString());
+    }
+	
+	@KafkaListener(topics = {"test"}, containerFactory = "kafkaListenerContainerFactory2")
+    public void listen2(ConsumerRecord<?, ?> record) {
+		LOG.info("c2 kafka的key: " + record.key());
+		LOG.info("c2 kafka的value: " + record.value().toString());
+    }
 
 }

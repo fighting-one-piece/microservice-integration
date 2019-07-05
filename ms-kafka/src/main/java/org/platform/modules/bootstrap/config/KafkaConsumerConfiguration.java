@@ -29,6 +29,10 @@ public class KafkaConsumerConfiguration {
 	private Integer autoCommitInterval = null;
 	@Value("${kafka.consumer.group.id}")
 	private String groupId = null;
+	@Value("${kafka.consumer1.group.id:${kafka.consumer.group.id}}")
+	private String groupId1 = null;
+	@Value("${kafka.consumer2.group.id:${kafka.consumer.group.id}}")
+	private String groupId2 = null;
 	@Value("${kafka.consumer.auto.offset.reset}")
 	private String autoOffsetReset = null;
 	@Value("${kafka.consumer.concurrency}")
@@ -43,7 +47,7 @@ public class KafkaConsumerConfiguration {
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
 		factory.setConsumerFactory(consumerFactory());
 		factory.setConcurrency(concurrency);
-		factory.getContainerProperties().setPollTimeout(1500);
+		factory.getContainerProperties().setPollTimeout(4500);
 		factory.getContainerProperties().setAckOnError(false);
 		factory.getContainerProperties().setAckMode(AckMode.RECORD);
 		/**
@@ -52,8 +56,42 @@ public class KafkaConsumerConfiguration {
 		return factory;
 	}
 	
+	@Bean
+	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory1() {
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
+		factory.setConsumerFactory(consumerFactory1());
+		factory.setConcurrency(concurrency);
+		factory.getContainerProperties().setPollTimeout(4500);
+		factory.getContainerProperties().setAckOnError(false);
+		factory.getContainerProperties().setAckMode(AckMode.RECORD);
+		return factory;
+	}
+	
+	@Bean
+	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory2() {
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
+		factory.setConsumerFactory(consumerFactory2());
+		factory.setConcurrency(concurrency);
+		factory.getContainerProperties().setPollTimeout(4500);
+		factory.getContainerProperties().setAckOnError(false);
+		factory.getContainerProperties().setAckMode(AckMode.RECORD);
+		return factory;
+	}
+	
 	public ConsumerFactory<String, String> consumerFactory() {
 		return new DefaultKafkaConsumerFactory<String, String>(consumerConfigs());
+	}
+	
+	public ConsumerFactory<String, String> consumerFactory1() {
+		Map<String, Object> consumerConfigs = consumerConfigs();
+		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, groupId1);
+		return new DefaultKafkaConsumerFactory<String, String>(consumerConfigs);
+	}
+	
+	public ConsumerFactory<String, String> consumerFactory2() {
+		Map<String, Object> consumerConfigs = consumerConfigs();
+		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, groupId2);
+		return new DefaultKafkaConsumerFactory<String, String>(consumerConfigs);
 	}
 
 	public Map<String, Object> consumerConfigs() {
