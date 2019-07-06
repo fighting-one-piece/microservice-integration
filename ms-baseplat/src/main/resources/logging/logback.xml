@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<!--在控制台显示日志颜色-->  
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>  
+    <conversionRule conversionWord="wtpc"  
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>  
+    <conversionRule conversionWord="ewtpc"  
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/> 
+
+
+	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
+	<property name="LOG_HOME" value="logs" />
+	<property name="MAX_HISTORY" value="30" />
+	<property name="PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n" />
+	<!--控制台格式配置-->  
+    <property name="PATTERN_CONSOLE_LOG" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%ewtpc}}"/>  
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${PATTERN_CONSOLE_LOG}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="SYS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!-- 日志文件最大的大小 -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 文件最大保存历史数量 -->
+			<maxHistory>${MAX_HISTORY}</maxHistory>
+			<!-- 最大不能超过10GB -->
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+	</appender>
+	
+	<appender name="DEBUG_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.%i.d.log</fileNamePattern>
+			<!-- 日志文件最大的大小 -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 文件最大保存历史数量 -->
+			<maxHistory>${MAX_HISTORY}</maxHistory>
+			<!-- 最大不能超过10GB -->
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+		<!--日志文件最大的大小 -->
+		<!--  
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		-->
+		<!--过滤 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+		    <level>DEBUG</level>  
+		    <onMatch>ACCEPT</onMatch>  
+		    <onMismatch>DENY</onMismatch>  
+		</filter>
+	</appender>
+	
+	<appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.%i.i.log</fileNamePattern>
+			<!-- 日志文件最大的大小 -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 文件最大保存历史数量 -->
+			<maxHistory>${MAX_HISTORY}</maxHistory>
+			<!-- 最大不能超过10GB -->
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+		<!--日志文件最大的大小 -->
+		<!--  
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		-->
+		<!--过滤 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+		    <level>INFO</level>  
+		    <onMatch>ACCEPT</onMatch>  
+		    <onMismatch>DENY</onMismatch>  
+		</filter>
+	</appender>
+	
+	<appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_HOME}/sys.%d{yyyy-MM-dd}.%i.e.log</fileNamePattern>
+			<!-- 日志文件最大的大小 -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 文件最大保存历史数量 -->
+			<maxHistory>${MAX_HISTORY}</maxHistory>
+			<!-- 最大不能超过10GB -->
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+		<!--日志文件最大的大小 -->
+		<!--  
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		-->
+		<!--过滤 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+		    <level>ERROR</level>  
+		    <onMatch>ACCEPT</onMatch>  
+		    <onMismatch>DENY</onMismatch>  
+		</filter>
+	</appender>
+	
+	<springProfile name="dev">
+		<logger name="org.platform" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="org.springframework" level="INFO">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="java.sql" level="INFO">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+		<logger name="com.ibatis" level="INFO">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+	</springProfile>
+
+	<springProfile name="development">
+		<logger name="org.platform" level="DEBUG">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="org.springframework" level="INFO">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<logger name="java.sql" level="INFO">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+		<logger name="com.ibatis" level="INFO">
+	    	<appender-ref ref="CONSOLE" />
+	    </logger>
+	</springProfile>
+
+	<springProfile name="test">
+		<logger name="org.platform" level="INFO">
+			<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+		</logger>
+		<logger name="org.springframework" level="INFO">
+			<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+		</logger>
+		<logger name="java.sql" level="INFO">
+	    	<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+	    </logger>
+		<logger name="com.ibatis" level="INFO">
+	    	<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+	    </logger>
+	</springProfile>
+
+	<springProfile name="production">
+		<logger name="org.platform" level="INFO">
+			<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+		</logger>
+		<logger name="org.springframework" level="INFO">
+			<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+		</logger>
+		<logger name="java.sql" level="INFO">
+	    	<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+	    </logger>
+		<logger name="com.ibatis" level="INFO">
+	    	<appender-ref ref="SYS_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+	    </logger>
+	</springProfile>
+
+	<!-- 
+	<include resource="src/main/resources/logging/logback-${spring.profiles.active}.xml"/> 
+	-->
+
+</configuration>  

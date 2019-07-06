@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.platform.modules.user.dao.UserDAO">
+
+	<resultMap type="User" id="userResultMap">
+		<id property="id" column="ID" />
+		<result property="account" column="ACCOUNT" />
+		<result property="password" column="PASSWORD" />
+		<result property="salt" column="SALT" />
+		<result property="nickName" column="NICK_NAME" />
+		<result property="realName" column="REAL_NAME" />
+		<result property="idCard" column="ID_CARD" />
+		<result property="mobilePhone" column="MOBILE_PHONE" />
+		<result property="email" column="EMAIL" />
+		<result property="createTime" column="CREATE_TIME" />
+		<result property="expireTime" column="EXPIRE_TIME" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+
+	<resultMap type="User" id="userAttributesResultMap">
+		<id property="id" column="ID" />
+		<result property="account" column="ACCOUNT" />
+		<result property="password" column="PASSWORD" />
+		<result property="salt" column="SALT" />
+		<result property="nickName" column="NICK_NAME" />
+		<result property="realName" column="REAL_NAME" />
+		<result property="idCard" column="ID_CARD" />
+		<result property="mobilePhone" column="MOBILE_PHONE" />
+		<result property="email" column="EMAIL" />
+		<result property="createTime" column="CREATE_TIME" />
+		<result property="expireTime" column="EXPIRE_TIME" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+		<collection property="attributes" column="ID" ofType="UserAttribute"
+			javaType="ArrayList" select="readAttributesByUserId">
+		</collection>
+	</resultMap>
+
+	<resultMap type="UserAttribute" id="userAttributeResultMap">
+		<id property="id" column="ID" />
+		<result property="userId" column="USER_ID" />
+		<result property="key" column="KEY" />
+		<result property="value" column="VALUE" />
+		<result property="type" column="TYPE" />
+	</resultMap>
+
+	<sql id="columnClause">
+		ID, ACCOUNT, PASSWORD, SALT, NICK_NAME, REAL_NAME, ID_CARD,
+		MOBILE_PHONE, EMAIL, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG
+	</sql>
+
+	<sql id="columnClauseWithAttributes">
+		U.ID, U.ACCOUNT, U.PASSWORD, U.SALT, U.NICK_NAME, U.REAL_NAME, U.ID_CARD
+		U.MOBILE_PHONE, U.EMAIL, U.CREATE_TIME, U.EXPIRE_TIME, U.DELETE_FLAG,
+		UA.USER_ID, UA.KEY, UA.VALUE, UA.TYPE
+	</sql>
+
+	<sql id="whereClause">
+		<where>
+			<if test="condition.id != null">
+				AND ID = #{condition.id}
+			</if>
+			<if test="condition.account != null and condition.account != ''">
+				AND ACCOUNT = #{condition.account}
+			</if>
+			<if test="condition.password != null and condition.password != ''">
+				AND PASSWORD = #{condition.password}
+			</if>
+			<if test="condition.nickName != null and condition.nickName != ''">
+				AND NICK_NAME = #{condition.nickName}
+			</if>
+			<if test="condition.realName != null and condition.realName != ''">
+				AND REAL_NAME = #{condition.realName}
+			</if>
+			<if test="condition.idCard != null and condition.idCard != ''">
+				AND ID_CARD = #{condition.idCard}
+			</if>
+			<if test="condition.mobilePhone != null and condition.mobilePhone != ''">
+				AND MOBILE_PHONE = #{condition.mobilePhone}
+			</if>
+			<if test="condition.expireTime != null">
+				AND EXPIRE_TIME = #{condition.expireTime}
+			</if>
+			<if test="condition.deleteFlag != null">
+				AND DELETE_FLAG = #{condition.deleteFlag}
+			</if>
+		</where>
+	</sql>
+
+	<insert id="insert" keyProperty="id" parameterType="User">
+		INSERT INTO T_USER(ACCOUNT, PASSWORD, SALT, NICK_NAME, REAL_NAME, 
+		ID_CARD, MOBILE_PHONE, EMAIL, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG)
+		VALUES(#{account},#{password},#{salt},#{nickName},#{realName},#{idCard},
+		#{mobilePhone}, #{email},#{createTime},#{expireTime},#{deleteFlag})
+	</insert>
+
+	<update id="update" parameterType="User">
+		UPDATE T_USER
+		<set>
+			<if test="password != null">
+				PASSWORD = #{password},
+			</if>
+			<if test="nickName != null">
+				NICK_NAME = #{nickName},
+			</if>
+			<if test="realName != null">
+				REAL_NAME = #{realName},
+			</if>
+			<if test="idCard != null">
+				ID_CARD = #{idCard},
+			</if>
+			<if test="mobilePhone != null">
+				MOBILE_PHONE = #{mobilePhone},
+			</if>
+			<if test="expireTime != null">
+				EXPIRE_TIME = #{expireTime},
+			</if>
+			<if test="deleteFlag != null">
+				DELETE_FLAG = #{deleteFlag},
+			</if>
+		</set>
+		WHERE ACCOUNT=#{account}
+	</update>
+
+	<select id="readDataByPK" resultMap="userAttributesResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_USER WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultMap="userAttributesResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_USER
+		<include refid="whereClause" />
+	</select>
+
+	<select id="readDataListByCondition" resultMap="userAttributesResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_USER
+		<include refid="whereClause" />
+	</select>
+
+	<select id="readDataPaginationByCondition" resultMap="userAttributesResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_USER
+        ]]>
+	</select>
+
+	<select id="readAttributesByUserId" resultMap="userAttributeResultMap">
+		SELECT * FROM T_USER_ATTRIBUTE WHERE USER_ID = #{ID}
+	</select>
+
+</mapper>

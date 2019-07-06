@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.platform.modules.user.dao.RoleResourceDAO">
+
+	<resultMap type="RoleResource" id="roleResourceResultMap">
+		<id property="id" column="ID"></id>
+		<result property="resourceId" column="RESOURCE_ID" />
+		<result property="roleId" column="ROLE_ID" />
+		<result property="priority" column="PRIORITY" />
+	</resultMap>
+	
+	<sql id="columnClause">
+		ID,ROLE_ID,RESOURCE_ID,PRIORITY
+	</sql>
+	
+	<sql id="whereQClause">
+		<where>
+			<if test="condition.id != null ">
+				ID = #{condition.id}
+			</if>
+			<if test="condition.resourceId != null">
+				AND RESOURCE_ID = #{condition.resourceId}
+			</if>
+			<if test="condition.roleId != null">
+				AND ROLE_ID = #{condition.roleId}
+			</if>
+			<if test="condition.priority != null">
+				AND PRIORITY = #{condition.priority}
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="whereMClause">
+		<where>
+			<if test="id != null ">
+				ID = #{id}
+			</if>
+			<if test="resourceId != null">
+				AND RESOURCE_ID = #{resourceId}
+			</if>
+			<if test="roleId != null">
+				AND ROLE_ID = #{roleId}
+			</if>
+			<if test="priority != null">
+				AND PRIORITY = #{priority}
+			</if>
+		</where>
+	</sql>
+	
+	<insert id="insert" keyProperty="id" parameterType="RoleResource">
+		INSERT INTO T_ROLE_RESOURCE(ROLE_ID,RESOURCE_ID,PRIORITY) 
+		VALUES(#{roleId},#{resourceId},#{priority})
+	</insert>
+
+	<update id="update" parameterType="RoleResource">
+		UPDATE T_ROLE_RESOURCE
+		<set>
+			<if test="resourceId != null">
+				RESOURCE_ID = #{resourceId},
+			</if>
+			<if test="roleId != null">
+				ROLE_ID = #{roleId},
+			</if>
+			<if test="priority != null">
+				PRIORITY = #{priority},
+			</if>
+		</set>
+		<where>
+			<if test="id != null ">
+				ID = #{id}
+			</if>
+		</where>
+	</update>
+	
+	<delete id="deleteByPK" parameterType="Long">
+		DELETE FROM T_ROLE_RESOURCE WHERE ID = #{id}
+	</delete>
+	
+	<delete id="delete" parameterType="RoleResource">
+		DELETE FROM T_ROLE_RESOURCE <include refid="whereMClause" />
+	</delete>
+	
+	<select id="readDataByPK" resultMap="roleResourceResultMap">
+		SELECT <include refid="columnClause" />
+		FROM T_ROLE_RESOURCE WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultMap="roleResourceResultMap">
+		SELECT <include refid="columnClause" />
+		FROM T_ROLE_RESOURCE
+		<include refid="whereQClause" />
+	</select>
+	
+	<select id="readDataListByCondition" resultMap="roleResourceResultMap">
+		SELECT <include refid="columnClause" />
+		FROM T_ROLE_RESOURCE
+		<include refid="whereQClause" />
+	</select>
+	
+	<select id="readDataPaginationByCondition" resultMap="roleResourceResultMap">
+		SELECT <include refid="columnClause" />
+		FROM T_ROLE_RESOURCE
+		<include refid="whereMClause" />
+	</select>
+	
+</mapper>
