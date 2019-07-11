@@ -17,7 +17,7 @@ public class DataSourceContextHolder {
 
     public static void setDataSource(String value) {
     	if (null == value || "".equals(value)) value = DataSource.MASTER;
-    	if ("slave".equals(value)) value = obtainSlaveDataSource();
+    	if (DataSource.SLAVE.equals(value)) value = obtainSlaveDataSource();
         context.set(value);
     }
 

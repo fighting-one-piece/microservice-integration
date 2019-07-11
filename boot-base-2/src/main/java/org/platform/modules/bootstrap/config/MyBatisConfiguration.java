@@ -40,7 +40,7 @@ public class MyBatisConfiguration {
 	
 	/** SqlSeesion配置 */
 	@Bean(name = "sqlSessionFactory")
-	public SqlSessionFactory sqlSessionFactoryBean() throws Exception {
+	public SqlSessionFactory sqlSessionFactory() throws Exception {
 		VFS.addImplClass(SpringBootVFS.class);
 		SqlSessionFactoryBean sqlSessionFactoryBean = new CustomSqlSessionFactoryBean();
 		sqlSessionFactoryBean.setVfs(SpringBootVFS.class);

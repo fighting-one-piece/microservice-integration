@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.platform.modules.bootstrap.config.ds.DataSource;
 import org.platform.modules.bootstrap.config.ds.DynamicRoutingDataSource;
+import org.platform.utils.spring.SpringBeanFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -26,29 +27,18 @@ public class DataSourceConfiguration {
 		return DataSourceBuilder.create().type(dataSourceType).build();
 	}
 	
-	/**
-	@Bean(name = "slave1DataSource")
-	@ConfigurationProperties(prefix = "datasource.slave1")
-	public javax.sql.DataSource slave1DataSource(){
-		return DataSourceBuilder.create().type(dataSourceType).build();
+	@Bean("slaveDataSources")
+	public Map<String, javax.sql.DataSource> slaveDataSources() {
+		return SpringBeanFactory.getBeansOfType(javax.sql.DataSource.class);
 	}
-	
-	@Bean(name = "slave2DataSource")
-	@ConfigurationProperties(prefix = "datasource.slave2")
-	public javax.sql.DataSource slave2DataSource(){
-		return DataSourceBuilder.create().type(dataSourceType).build();
-	}
-	*/
 	
 	@Bean(name = "routingDataSource")
 	public AbstractRoutingDataSource routingDataSource() {
 		DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource();
 		Map<Object, Object> targetDataResources = new HashMap<Object, Object>();
 		targetDataResources.put(DataSource.MASTER, masterDataSource());
-		/**
-		targetDataResources.put(DataSource.SLAVE1, slave1DataSource());
-		targetDataResources.put(DataSource.SLAVE2, slave2DataSource());
-		*/
+		Map<String, javax.sql.DataSource> slaveDataSources = slaveDataSources();
+		if (null != slaveDataSources) targetDataResources.putAll(slaveDataSources);
 		routingDataSource.setDefaultTargetDataSource(masterDataSource());
 		routingDataSource.setTargetDataSources(targetDataResources);
 		return routingDataSource;
