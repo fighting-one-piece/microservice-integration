@@ -34,8 +34,6 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 @AutoConfigureAfter(DataSourceConfiguration.class)
 public class TransactionConfiguration implements TransactionManagementConfigurer {
 	
-	private static final String POINTCUT_EXPRESSION = "execution(* org.platform.modules.*.service.impl.*.*(..))";  
-
 	@Resource(name = "routingDataSource")
 	private AbstractRoutingDataSource routingDataSource = null;
 	
@@ -98,7 +96,7 @@ public class TransactionConfiguration implements TransactionManagementConfigurer
 	@Bean  
     public DefaultPointcutAdvisor defaultPointcutAdvisor() {  
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();  
-        pointcut.setExpression(POINTCUT_EXPRESSION);  
+        pointcut.setExpression("@within(org.springframework.stereotype.Service)");  
         return new DefaultPointcutAdvisor(pointcut, transactionInterceptor());  
     } 
 	

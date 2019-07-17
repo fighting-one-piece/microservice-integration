@@ -7,6 +7,7 @@ import java.util.Set;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.platform.modules.abstr.web.ResultCode;
 import org.platform.modules.bootstrap.annotation.ServiceAspectExclude;
 import org.platform.modules.bootstrap.config.ds.DataSource;
@@ -22,7 +23,7 @@ public class ServiceLayerAspect {
 
 	private Logger LOG = LoggerFactory.getLogger(ServiceLayerAspect.class);
 
-	private static final String EXECUTION = "execution(* org.platform.modules.*.service.impl.*.*(..))";
+	public static final String EXECUTION = "execution(* org.platform.modules.*.service.impl.*.*(..))";
 	
 	private static Set<Integer> notPrintStackTraceResultCode = new HashSet<Integer>();
 	
@@ -61,7 +62,12 @@ public class ServiceLayerAspect {
 	}
 	*/
 
-	@Around(EXECUTION)
+	@Pointcut("within(@org.springframework.stereotype.Service *)")  
+    public void pointcutService(){}  
+	
+//	@Around("pointcutService()")  
+	@Around("@within(org.springframework.stereotype.Service)")
+//	@Around("within(@org.springframework.stereotype.Service *)")
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 		ServiceAspectExclude serviceAspectExclude = proceedingJoinPoint.getTarget()
 			.getClass().getAnnotation(ServiceAspectExclude.class);

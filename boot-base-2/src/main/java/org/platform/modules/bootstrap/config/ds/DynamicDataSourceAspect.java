@@ -13,17 +13,19 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.platform.utils.spring.SpringBeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Order(1)
 public class DynamicDataSourceAspect {
 
 	public static final Logger LOG = LoggerFactory.getLogger(DynamicDataSourceAspect.class);
 
-private static final String EXECUTION = "execution(* org.cisiondata.modules.*.service.impl.*.*(..))";
+	public static final String EXECUTION = "execution(* org.cisiondata.modules.*.service.impl.*.*(..))";
 	
-	@Before(EXECUTION)
+	@Before("@within(org.springframework.stereotype.Service)")
 	public void before(JoinPoint joinPoint) {
 		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method targetMethod = methodSignature.getMethod();
@@ -46,7 +48,7 @@ private static final String EXECUTION = "execution(* org.cisiondata.modules.*.se
         }
 	}
 	
-	@After(EXECUTION)
+	@After("@within(org.springframework.stereotype.Service)")
 	public void after(JoinPoint joinPoint) {
 		DataSourceContextHolder.clearDataSource();
 	}
