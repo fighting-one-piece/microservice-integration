@@ -1,0 +1,1 @@
+curl -X POST 'http://client_id_1:client_secret_1@localhost:16000/oauth/token' -d 'grant_type=password&username=username1&passord=password1'

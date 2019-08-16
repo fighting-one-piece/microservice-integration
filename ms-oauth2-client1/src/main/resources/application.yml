@@ -1,0 +1,37 @@
+server:
+  port: 16001
+spring:
+  application:
+    name: oauth2-client1
+  security:
+    user:
+      name: eureka
+      password: eureka
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 15
+    lease-expiration-duration-in-seconds: 45
+    metadataMap:
+      instanceId: ${spring.application.name}:${random.value}
+  client:
+    fetch-registry: true
+    healthcheck.enabled: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 30
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@eureka-server-1:10001/eureka,http://${spring.security.user.name}:${spring.security.user.password}@eureka-server-2:10002/eureka
+      
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://192.168.0.126:16000/users/current
+    client:
+      id: client_id_1
+      client-secret: client_secret_1
+      access-token-uri: http://192.168.0.126:16000/oauth/token
+      grant-type: client_credentials,password
+      scope: read
+
+

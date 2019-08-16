@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.platform.modules.oauth.dao.ClientDAO">
+
+	<resultMap type="Client" id="clientResultMap">
+		<id property="id" column="ID" />
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientSecret" column="CLIENT_SECRET" />
+		<result property="resourceIds" column="RESOURCE_IDS" />
+		<result property="scope" column="SCOPE" />
+		<result property="authorities" column="AUTHORITIES" />
+		<result property="authorizedGrantTypes" column="AUTHORIZED_GRANT_TYPES" />
+		<result property="accessTokenValidity" column="ACCESS_TOKEN_VALIDITY" />
+		<result property="refreshTokenValidity" column="REFRESH_TOKEN_VALIDITY" />
+		<result property="autoapprove" column="AUTOAPPROVE" />
+		<result property="webServerRedirectUri" column="WEB_SERVER_REDIRECT_URI" />
+		<result property="additionalInformation" column="ADDITIONAL_INFORMATION" />
+		<result property="createTime" column="CREATE_TIME" />
+		<result property="expireTime" column="EXPIRE_TIME" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+
+	<sql id="columnClause">
+		ID, CLIENT_ID, CLIENT_SECRET, RESOURCE_IDS, SCOPE, AUTHORITIES, AUTHORIZED_GRANT_TYPES, ACCESS_TOKEN_VALIDITY, 
+		REFRESH_TOKEN_VALIDITY, AUTOAPPROVE, WEB_SERVER_REDIRECT_URI, ADDITIONAL_INFORMATION, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG
+	</sql>
+
+	<sql id="whereClause">
+		<where>
+			<if test="condition.clientId != null and condition.clientId != ''">
+				AND CLIENT_ID = #{condition.clientId}
+			</if>
+			<if test="condition.clientSecret != null and condition.clientSecret != ''">
+				AND CLIENT_SECRET = #{condition.clientSecret}
+			</if>
+			<if test="condition.deleteFlag != null">
+				AND DELETE_FLAG = #{condition.deleteFlag}
+			</if>
+		</where>
+	</sql>
+
+	<insert id="insert" keyProperty="id" parameterType="Client">
+		INSERT INTO T_CLIENT(CLIENT_ID, CLIENT_SECRET, RESOURCE_IDS, SCOPE, AUTHORITIES, AUTHORIZED_GRANT_TYPES, ACCESS_TOKEN_VALIDITY, 
+		REFRESH_TOKEN_VALIDITY, AUTOAPPROVE, WEB_SERVER_REDIRECT_URI, ADDITIONAL_INFORMATION, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG)
+		VALUES(#{clientId},#{clientSecret},#{resourceIds},#{scope},#{authorities},#{authorizedGrantTypes},#{accessTokenValidity},
+		#{refreshTokenValidity},#{autoapprove},#{webServerRedirectUri},#{additionalInformation},#{createTime},#{expireTime},#{deleteFlag})
+	</insert>
+
+	<update id="update" parameterType="Client">
+		UPDATE T_CLIENT
+		<set>
+			<if test="clientSecret != null">
+				CLIENT_SECRET = #{clientSecret},
+			</if>
+			<if test="resourceIds != null">
+				RESOURCE_IDS = #{resourceIds},
+			</if>
+			<if test="scope != null">
+				SCOPE = #{scope},
+			</if>
+			<if test="deleteFlag != null">
+				DELETE_FLAG = #{deleteFlag},
+			</if>
+		</set>
+		WHERE CLIENT_ID=#{clientId}
+	</update>
+
+	<select id="readDataByPK" resultMap="clientResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_CLIENT WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultMap="clientResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_CLIENT
+		<include refid="whereClause" />
+	</select>
+
+
+	<select id="readDataListByCondition" resultMap="clientResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_CLIENT
+		<include refid="whereClause" />
+	</select>
+
+	<select id="readDataPaginationByCondition" resultMap="clientResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_CLIENT
+        ]]>
+	</select>
+
+</mapper>

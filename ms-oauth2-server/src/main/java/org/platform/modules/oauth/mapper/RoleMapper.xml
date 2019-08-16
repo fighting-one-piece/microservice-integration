@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.platform.modules.oauth.dao.RoleDAO">
+
+	<resultMap type="Role" id="roleResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="name" column="NAME"/>
+        <result property="identity" column="IDENTITY"/> 
+        <result property="desc" column="DESCRIPTION"/> 
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, NAME, IDENTITY, DESCRIPTION, DELETE_FLAG</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    	<if test="condition.id != null">
+    			AND ID = #{condition.id}
+    		</if>
+    		<if test="condition.name != null">
+    			AND NAME = #{condition.name}
+    		</if>
+    		<if test="condition.identity != null">
+    			AND IDENTITY = #{condition.identity}
+    		</if>
+    		<if test="condition.desc != null">
+    			AND DESCRIPTION = #{condition.desc}
+    		</if>
+    		<if test="condition.deleteFlag != null">
+    			AND DELETE_FLAG = #{condition.deleteFlag}
+    		</if>
+    	</where>
+    </sql>
+    
+    <insert id="insert" keyProperty="id" parameterType="Role">
+	    INSERT INTO T_ROLE(NAME, IDENTITY, DESCRIPTION, DELETE_FLAG) 
+	    VALUES(#{name},#{identity},#{desc},#{deleteFlag})  
+    </insert>
+    
+    <update id="update" parameterType="Role">
+	    UPDATE T_ROLE
+		<set>
+			<if test="name != null">
+				NAME = #{name},
+			</if>
+			<if test="identity != null">
+				IDENTITY = #{identity},
+			</if>
+			<if test="desc != null">
+				DESCRIPTION = #{desc},
+			</if>
+			<if test="deleteFlag != null">
+				DELETE_FLAG = #{deleteFlag},
+			</if>
+		</set>
+		WHERE ID = #{id} 
+    </update>
+    
+    <select id="readDataByPK" resultMap="roleResultMap">  
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM T_ROLE WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="roleResultMap">  
+	    SELECT 
+	    <include refid="columnClause"/>
+	    FROM T_ROLE
+	    <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="roleResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ROLE
+        <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="roleResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_ROLE
+        ]]>   
+    </select>
+    
+    <select id="readDataListByUserId" parameterType="Long" resultMap="roleResultMap">  
+        SELECT r.* FROM T_ROLE r, T_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = #{userId};
+    </select>
+    
+    <select id="readDataListByGroupId" parameterType="Long" resultMap="roleResultMap">  
+        SELECT r.* FROM T_ROLE r, T_GROUP_ROLE gr WHERE r.ID = gr.ROLE_ID AND gr.GROUP_ID = #{groupId};
+    </select>
+    
+</mapper>
