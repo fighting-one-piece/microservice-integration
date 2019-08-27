@@ -15,6 +15,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.util.IntrospectorCleanupListener;
 
@@ -22,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -85,12 +84,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		
 		MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = jackson2HttpMessageConverter.getObjectMapper();
-        //不显示为null的字段
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        
+		/**
         SimpleModule simpleModule1 = new SimpleModule();
         simpleModule1.addSerializer(Integer.class, ToStringSerializer.instance);
         simpleModule1.addSerializer(Integer.TYPE, ToStringSerializer.instance);
@@ -110,10 +107,17 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         simpleModule4.addSerializer(Double.class, ToStringSerializer.instance);
         simpleModule4.addSerializer(Double.TYPE, ToStringSerializer.instance);
         objectMapper.registerModule(simpleModule4);
-
+		*/
         jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        
         converters.add(0, jackson2HttpMessageConverter);
+	}
+	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		registry.addResourceHandler("/swagger/**").addResourceLocations("classpath:/static/swagger/");
 	}
 	
 }
