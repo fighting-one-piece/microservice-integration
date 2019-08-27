@@ -27,9 +27,12 @@ public abstract class GenericServiceImpl<Entity extends Serializable, PK extends
 	
 	@SuppressWarnings("unchecked")
 	public GenericServiceImpl() {
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {
-            entityClass = (Class<Entity>) ((ParameterizedType) type).getActualTypeArguments()[0];
+		Type parameterizedType = getClass().getGenericSuperclass();
+        if (!(parameterizedType instanceof ParameterizedType)) {
+            parameterizedType = getClass().getSuperclass().getGenericSuperclass();
+        }
+        if (parameterizedType instanceof ParameterizedType) {
+            entityClass = (Class<Entity>) ((ParameterizedType) parameterizedType).getActualTypeArguments()[0];
         }
 	}
 	
