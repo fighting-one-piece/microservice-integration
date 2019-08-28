@@ -28,9 +28,6 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.search.MultiSearchRequestBuilder;
-import org.elasticsearch.action.search.MultiSearchResponse;
-import org.elasticsearch.action.search.MultiSearchResponse.Item;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -44,7 +41,6 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -55,10 +51,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.Avg;
 import org.elasticsearch.search.aggregations.metrics.sum.Sum;
-import org.elasticsearch.search.sort.SortOrder;
-import org.platform.modules.abstr.entity.QueryResult;
-import org.platform.modules.elastic.service.IElasticV2Service;
-import org.platform.modules.elastic.service.impl.ElasticV2ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -519,136 +511,6 @@ public class ElasticClientHelper {
 			AnalyzeToken analyzeToken = analyzeTokens.get(i);
 			System.out.println(analyzeToken.getTerm());
 		}
-	}
-	
-	public static void test01() {
-		Client client = ElasticClient.getInstance().getClient();
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("financial").setTypes("logistics");
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("city", "成都"));
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("orderTime", "2015/1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("orderTime", "2015-1"));
-		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("endTime", "2015/1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("endTime", "2015-1"));
-//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("sourceFile", "台湾"));
-		searchRequestBuilder.setQuery(boolQueryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setSize(1000).setExplain(false);
-		searchRequestBuilder.addSort("updateTime", SortOrder.DESC);
-		SearchResponse response = searchRequestBuilder.execute().actionGet();
-		SearchHit[] hits = response.getHits().getHits();
-		for (int i = 0, len = hits.length; i < len; i++) {
-			System.out.println(hits[i].getSource());
-		}
-	}
-	
-	public static void test02() {
-		List<String> qqNumList1 = new ArrayList<String>();
-		long qqNum1 = 561243625L;
-		for (int i = 0; i < 100; i++) {
-			qqNumList1.add(String.valueOf(qqNum1 + i));
-		}
-		
-		List<String> qqNumList2 = new ArrayList<String>();
-		long qqNum2 = 471246431L;
-		for (int i = 0; i < 100; i++) {
-			qqNumList2.add(String.valueOf(qqNum2 + i));
-		}
-		
-		List<String> qqNumList3 = new ArrayList<String>();
-		long qqNum3 = 621247490;
-		for (int i = 0; i < 100; i++) {
-			qqNumList3.add(String.valueOf(qqNum3 + i));
-		}
-		
-		Client client = ElasticClient.getInstance().getClient();
-		long startTime1 = System.currentTimeMillis();
-		MultiSearchRequestBuilder msrb = client.prepareMultiSearch();
-		for (int i = 0, len = qqNumList1.size(); i < len; i++) {
-			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList1.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-			searchRequestBuilder.setSize(100).setExplain(false);
-			msrb.add(searchRequestBuilder);
-		}
-		MultiSearchResponse msr = msrb.execute().actionGet();
-		Item[] items = msr.getResponses();
-//		System.out.println("items size: " + items.length);
-		for (int i = 0, len = items.length; i < len; i++) {
-			Item item = items[i];
-			SearchResponse sr = item.getResponse();
-			System.out.println("total hits: " + sr.getHits().getTotalHits());
-		}
-		long endTime1 = System.currentTimeMillis();
-		System.out.println("multi query spend time " + (endTime1 - startTime1) / 1000);
-		long startTime2 = System.currentTimeMillis();
-		for (int i = 0, len = qqNumList2.size(); i < len; i++) {
-			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList2.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-			searchRequestBuilder.setSize(100).setExplain(false);
-			SearchResponse sr = searchRequestBuilder.execute().actionGet();
-			System.out.println("total hits: " + sr.getHits().getTotalHits());
-		}
-		long endTime2 = System.currentTimeMillis();
-		System.out.println("single query spend time " + (endTime2 - startTime2) / 1000);
-		long startTime3 = System.currentTimeMillis();
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
-		BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
-		for (int i = 0, len = qqNumList3.size(); i < len; i++) {
-			queryBuilder.should(QueryBuilders.termQuery("qqNum", qqNumList3.get(i)));
-		}
-		searchRequestBuilder.setQuery(queryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
-		searchRequestBuilder.setSize(100).setExplain(false);
-		SearchResponse sr = searchRequestBuilder.execute().actionGet();
-		System.out.println("total hits: " + sr.getHits().getTotalHits());
-		long endTime3 = System.currentTimeMillis();
-		System.out.println("one query spend time " + (endTime3 - startTime3) / 1000);
-		client.close();
-	}
-	
-	public static String test03(String scrollId) {
-		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
-				.prepareSearch("financial").setTypes("logistics");
-		searchRequestBuilder.setExplain(false);
-		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("name", "*王*"));
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
-		searchRequestBuilder.setSize(5);
-		SearchResponse response = searchRequestBuilder.execute().actionGet();
-		LOG.info("scrollId: " + response.getScrollId());
-		if (StringUtils.isNotBlank(scrollId)) {
-			response = ElasticClient.getInstance().getClient().prepareSearchScroll(scrollId)
-					.setScroll(TimeValue.timeValueMinutes(3)).execute().actionGet();
-		}
-		System.err.println("total hits: " + response.getHits().getTotalHits());
-		SearchHit[] hits = response.getHits().getHits();
-		for (int i = 0, len = hits.length; i < len; i++) {
-			SearchHit hit = hits[i];
-			System.err.println(hit.getSource());
-		}
-		return response.getScrollId();
-	}
-	
-	public static void test04(String scrollId) {
-		IElasticV2Service elasticService = new ElasticV2ServiceImpl();
-		QueryResult<Map<String, Object>> qr = elasticService.readDataList("financial", "logistics", null, "张", 0, scrollId);
-		System.err.println("total hits: " + qr.getTotalRowNum());
-		for (Map<String, Object> map : qr.getResultList()) {
-			System.err.println(map);
-		}
-	}
-	
-	public static void main(String[] args) {
-		test03(null);
-//		test03("cXVlcnlUaGVuRmV0Y2g7MTA7MzMwNzI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3MzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc1OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3NzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzg6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3OTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDgwOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwODE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
-//		test03("cXVlcnlUaGVuRmV0Y2g7MTA7MzMwNzI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3MzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc1OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3NzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzg6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3OTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDgwOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwODE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
-//		test03("cXVlcnlUaGVuRmV0Y2g7MTA7MzMwNzI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3MzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc1OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3NzpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDc0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwNzg6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzA3OTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMDgwOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMwODE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
-//		test04(null);
-//		test04("cXVlcnlUaGVuRmV0Y2g7MTA7MzMxNDY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE1MDpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQzOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDc6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0NTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0ODpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ5OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNTE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
-//		test04("cXVlcnlUaGVuRmV0Y2g7MTA7MzMxNDY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE1MDpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQzOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDc6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0NTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0ODpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ5OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNTE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
-//		test04("cXVlcnlUaGVuRmV0Y2g7MTA7MzMxNDY6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE1MDpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQzOlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDc6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0NTpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ0OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNDI6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTszMzE0ODpUMmFhSzl0VVFLeURXT0JTNU1sMkdBOzMzMTQ5OlQyYWFLOXRVUUt5RFdPQlM1TWwyR0E7MzMxNTE6VDJhYUs5dFVRS3lEV09CUzVNbDJHQTswOw");
 	}
 
 }
