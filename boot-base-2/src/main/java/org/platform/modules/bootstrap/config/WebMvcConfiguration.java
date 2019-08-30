@@ -2,15 +2,19 @@ package org.platform.modules.bootstrap.config;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.platform.modules.abstr.web.filter.XssStringJsonSerializer;
 import org.platform.modules.bootstrap.filter.XSSFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.ErrorPage;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,6 +28,7 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.util.IntrospectorCleanupListener;
 
+import com.alibaba.druid.support.http.StatViewServlet;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,19 +92,27 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		return filterRegistrationBean;
 	}
 	
-	/**
+	@Value("${datasource.master.username}")
+	private String username = null;
+	
+	@Value("${datasource.master.password}")
+	private String password = null;
+	
 	@Bean
-	public ServletRegistrationBean demoServlet(){
-		DemoServlet demoServlet = new DemoServlet();
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		registrationBean.setServlet(demoServlet);
+	public ServletRegistrationBean<StatViewServlet> statViewServlet(){
+		StatViewServlet statViewServlet = new StatViewServlet();
+		ServletRegistrationBean<StatViewServlet> registrationBean = new ServletRegistrationBean<>();
+		registrationBean.setServlet(statViewServlet);
+		Map<String, String> initParameters = new HashMap<String, String>();
+		initParameters.put("loginUsername", username);
+		initParameters.put("loginPassword", password);
+		registrationBean.setInitParameters(initParameters);
 		List<String> urlMappings = new ArrayList<String>();
-		urlMappings.add("/demoservlet");//访问，可以添加多个
+		urlMappings.add("/druid/*");
 		registrationBean.setUrlMappings(urlMappings);
 		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
-	**/
 	
 	@Bean
 	public ObjectMapper objectMapper() {
