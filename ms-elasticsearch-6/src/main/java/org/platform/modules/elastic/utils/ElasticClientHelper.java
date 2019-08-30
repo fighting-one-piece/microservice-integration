@@ -16,11 +16,9 @@ import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -31,6 +29,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
@@ -43,15 +42,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.metrics.avg.AvgAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
-import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +85,8 @@ public class ElasticClientHelper {
 		Client client = ElasticClient.getInstance().getClient();
 		try {
 			DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-			ActionFuture<DeleteIndexResponse> response = 
-					client.admin().indices().delete(deleteIndexRequest);
+			ActionFuture<AcknowledgedResponse> response = 
+				client.admin().indices().delete(deleteIndexRequest);
 			System.out.println(response.get().isAcknowledged());
 		} catch (Exception e) {
 			LOG.error("delete index error.", e);
@@ -111,7 +102,7 @@ public class ElasticClientHelper {
 	public static void createIndexType(String index, String type, XContentBuilder builder) {
 		Client client = ElasticClient.getInstance().getClient();
 		PutMappingRequest mapping = Requests.putMappingRequest(index).type(type).source(builder);
-		PutMappingResponse response = client.admin().indices().putMapping(mapping).actionGet();
+		AcknowledgedResponse response = client.admin().indices().putMapping(mapping).actionGet();
 		System.out.println(response.isAcknowledged());
 	}
 	
@@ -125,7 +116,7 @@ public class ElasticClientHelper {
 		Client client = ElasticClient.getInstance().getClient();
 		PutMappingRequest mapping = Requests.putMappingRequest(index)
 				.type(type).source(readSource(fileName));
-		PutMappingResponse response = client.admin().indices().putMapping(mapping).actionGet();
+		AcknowledgedResponse response = client.admin().indices().putMapping(mapping).actionGet();
 		System.out.println(response.isAcknowledged());
 	}
 	
@@ -522,61 +513,7 @@ public class ElasticClientHelper {
 		}
 	}
 	
-	public static String test01(String scrollId) {
-		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
-				.prepareSearch("accesslog-201806").setTypes("pocommunication");
-		RangeQueryBuilder queryBuilder = QueryBuilders.rangeQuery("time_local");
-		queryBuilder.from("2018-06-21 14:00:00").to("2018-06-21 15:00:00");
-//		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("request_url", "*"));
-		searchRequestBuilder.setQuery(queryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
-		searchRequestBuilder.setExplain(false);
-		searchRequestBuilder.setSize(10);
-		searchRequestBuilder.addSort("time_local", SortOrder.DESC);
-		SearchResponse response = searchRequestBuilder.execute().actionGet();
-		LOG.info("scrollId: " + response.getScrollId());
-		if (StringUtils.isNotBlank(scrollId)) {
-			response = ElasticClient.getInstance().getClient().prepareSearchScroll(scrollId)
-					.setScroll(TimeValue.timeValueMinutes(3)).execute().actionGet();
-		}
-		System.err.println("total hits: " + response.getHits().getTotalHits());
-		SearchHit[] hits = response.getHits().getHits();
-		for (int i = 0, len = hits.length; i < len; i++) {
-			SearchHit hit = hits[i];
-			System.err.println(hit.getSourceAsMap());
-		}
-		return response.getScrollId();
-	}
-	
-	public static void test02() {
-		SearchRequestBuilder searchRequestBuilder = ElasticClient.getInstance().getClient()
-				.prepareSearch("accesslog-201806").setTypes("pocommunication");
-		searchRequestBuilder.setQuery(QueryBuilders.wildcardQuery("request_url", "/api/v1/thirdpart/*"));
-		SumAggregationBuilder sumAggregationBuilder = AggregationBuilders.sum("sumAgg").field("userId");
-		AvgAggregationBuilder avgAggregationBuilder = AggregationBuilders.avg("avgAgg").field("userId");
-		searchRequestBuilder.addAggregation(sumAggregationBuilder);
-		searchRequestBuilder.addAggregation(avgAggregationBuilder);
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setExplain(false);
-		SearchResponse response = searchRequestBuilder.execute().actionGet();
-		Aggregations aggregations = response.getAggregations();
-		Map<String, Aggregation> map = aggregations.getAsMap();
-		for (Map.Entry<String, Aggregation> entry : map.entrySet()) {
-			System.err.println(entry.getKey());
-			Aggregation aggregation = entry.getValue();
-			System.err.println(aggregation);
-			System.err.println(aggregation.getName());
-			System.err.println(aggregation.getType());
-			System.err.println(aggregation.toString());
-			System.err.println(aggregation.getMetaData());
-		}
-		InternalSum sum = response.getAggregations().get("sumAgg");
-		System.err.println(sum.getValue());
-	}
-	
 	public static void main(String[] args) {
-		test02();
 	}
 
 }
