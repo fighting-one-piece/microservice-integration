@@ -11,7 +11,12 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig.Builder;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
+import org.elasticsearch.client.RestClientBuilder.RequestConfigCallback;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -56,6 +61,13 @@ public class ElasticSearchConfiguration {
 
 	@Value("${es.searchGuard.enforce-hostname-verification:false}")
 	private Boolean enforceHostnameVerification = null;
+	
+	private static final int connectTimeOut = 1000;
+	private static final int socketTimeOut = 30000; 
+	private static final int connectionRequestTimeOut = 500;
+	 
+	private static final int maxConnectTotal = 100;
+	private static final int maxConnectPerRoute = 100;
 	
 	@Bean(name = "transportClient")
     public TransportClient transportClient() {
@@ -123,7 +135,29 @@ public class ElasticSearchConfiguration {
 			String[] ipAndPort = clusterRestNode.split(":");
 			httpHosts[i] = new HttpHost(ipAndPort[0], Integer.parseInt(ipAndPort[1]), "http");
 		}
-		return new RestHighLevelClient(RestClient.builder(httpHosts));
+		RestClientBuilder restClientBuilder = RestClient.builder(httpHosts);
+		restClientBuilder.setRequestConfigCallback(new RequestConfigCallback() {
+
+			@Override
+			public Builder customizeRequestConfig(Builder requestConfigBuilder) {
+				requestConfigBuilder.setConnectTimeout(connectTimeOut);
+				requestConfigBuilder.setSocketTimeout(socketTimeOut);
+				requestConfigBuilder.setConnectionRequestTimeout(connectionRequestTimeOut);
+				return requestConfigBuilder;
+			}
+			
+		});
+		restClientBuilder.setHttpClientConfigCallback(new HttpClientConfigCallback() {
+
+			@Override
+			public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+				httpClientBuilder.setMaxConnTotal(maxConnectTotal);
+				httpClientBuilder.setMaxConnPerRoute(maxConnectPerRoute);
+				return httpClientBuilder;
+			}
+			
+		});
+		return new RestHighLevelClient(restClientBuilder);
 	}
 	
 }

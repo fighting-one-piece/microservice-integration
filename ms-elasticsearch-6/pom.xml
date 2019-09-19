@@ -89,7 +89,6 @@
 		<spring.cloud.hystrix.version>2.1.1.RELEASE</spring.cloud.hystrix.version>
 		<elasticsearch.version>6.8.2</elasticsearch.version>
 		<elasticsearch.rest.version>6.8.2</elasticsearch.rest.version>
-		<jedis.version>2.9.0</jedis.version>
 		<commons.io.version>2.6</commons.io.version>
 	</properties>
  
@@ -230,14 +229,7 @@
 		    <version>6.8.2-25.6</version>
 		</dependency>
 		
-		<!-- Redis客户端库 -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis.version}</version><!--$NO-MVN-MAN-VER$-->
-		</dependency>
-		
-		<!--  -->
+		<!-- IKAnalyzer依赖包 -->
 		<dependency>
 		    <groupId>com.janeluo</groupId>
 		    <artifactId>ikanalyzer</artifactId>
