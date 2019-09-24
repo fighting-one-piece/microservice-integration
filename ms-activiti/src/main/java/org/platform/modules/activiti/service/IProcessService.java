@@ -1,5 +1,6 @@
 package org.platform.modules.activiti.service;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -70,5 +71,13 @@ public interface IProcessService {
 	 * @throws RuntimeException
 	 */
 	public List<HistoricTaskInstance> readProcessInstanceHistoryTaskList(String processInstanceId) throws RuntimeException;
+	
+	/**
+	 * 读取流程追踪图
+	 * @param processInstanceId
+	 * @param output
+	 * @throws RuntimeException
+	 */
+	public void readProcessTrackingImage(String processInstanceId, OutputStream output) throws RuntimeException;
 	
 }

@@ -81,6 +81,7 @@
 		<commons.dbcp.version>1.4</commons.dbcp.version>
 		<logback.version>1.1.7</logback.version>
 		<activiti.engine.version>7.1.0.M3.1</activiti.engine.version>
+		<activiti.image.version>6.0.0</activiti.image.version>
 	</properties>
 
 	<dependencies>
@@ -190,6 +191,12 @@
 		    <groupId>org.activiti</groupId>
 		    <artifactId>activiti-spring</artifactId>
 		    <version>${activiti.engine.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.activiti</groupId>
+		    <artifactId>activiti-image-generator</artifactId>
+		    <version>${activiti.image.version}</version>
 		</dependency>
 		
 	</dependencies>

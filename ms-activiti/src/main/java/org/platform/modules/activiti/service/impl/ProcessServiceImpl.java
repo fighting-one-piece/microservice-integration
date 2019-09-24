@@ -1,19 +1,32 @@
 package org.platform.modules.activiti.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.RepositoryServiceImpl;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.image.ProcessDiagramGenerator;
+import org.activiti.image.impl.DefaultProcessDiagramGenerator;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.platform.modules.activiti.service.IProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +108,56 @@ public class ProcessServiceImpl implements IProcessService {
 	public List<HistoricTaskInstance> readProcessInstanceHistoryTaskList(String processInstanceId) throws RuntimeException {
 		return historyService.createHistoricTaskInstanceQuery()
 			.processInstanceId(processInstanceId).orderByTaskCreateTime().asc().list();
+	}
+	
+	@Override
+	public void readProcessTrackingImage(String processInstanceId, OutputStream output) throws RuntimeException {
+		// 获取历史流程实例
+		HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+			.processInstanceId(processInstanceId).singleResult();
+		// 获取历史流程定义
+		ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) 
+			repositoryService).getDeployedProcessDefinition(historicProcessInstance.getProcessDefinitionId());
+		// 历史活动实例
+		List<HistoricActivityInstance> historicActivityInstanceList = historyService.createHistoricActivityInstanceQuery()
+			.processInstanceId(processInstanceId).orderByHistoricActivityInstanceId().asc().list();
+		// 已执行历史节点
+		List<String> executedHistoricActivityIdList = new ArrayList<String>();
+		historicActivityInstanceList.forEach(historicActivityInstance -> {
+				LOG.info("historic activity name {}", historicActivityInstance.getActivityName());
+				executedHistoricActivityIdList.add(historicActivityInstance.getActivityId());
+			});
+		BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionEntity.getId());
+		// 已执行Flow
+		List<String> executedFlowIdList = getExecutedFlowIdList(bpmnModel, historicActivityInstanceList);
+		ProcessDiagramGenerator processDiagramGenerator = new DefaultProcessDiagramGenerator();
+		InputStream input = processDiagramGenerator.generateDiagram(bpmnModel, "png", executedHistoricActivityIdList, 
+			executedFlowIdList, "宋体", "宋体", "宋体", null, 1.0d);
+		try {
+			IOUtils.copyLarge(input, output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static List<String> getExecutedFlowIdList(BpmnModel bpmnModel, List<HistoricActivityInstance> historicActivityInstanceList) {
+		List<String> executedFlowIdList = new ArrayList<String>();
+		for(int i = 0, len = historicActivityInstanceList.size(); i < len - 1; i++) {
+			HistoricActivityInstance historicActivityInstance = historicActivityInstanceList.get(i);
+			FlowNode flowNode = (FlowNode) bpmnModel.getFlowElement(historicActivityInstance.getActivityId());
+			List<SequenceFlow> sequenceFlowList = flowNode.getOutgoingFlows();
+			if(sequenceFlowList.size() > 1) {
+				HistoricActivityInstance nextHistoricActivityInstance = historicActivityInstanceList.get(i+1);
+				sequenceFlowList.forEach(sequenceFlow -> {
+					if (sequenceFlow.getTargetFlowElement().getId().equals(nextHistoricActivityInstance.getActivityId())) {
+						executedFlowIdList.add(sequenceFlow.getId());
+					}
+				});
+			} else {
+				executedFlowIdList.add(sequenceFlowList.get(0).getId());
+			}
+		}
+		return executedFlowIdList;
 	}
 	
 	public void readProcessInstanceState1(String processInstanceId){
