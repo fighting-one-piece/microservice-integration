@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.platform.modules.abstr.dao.GenericDAO;
 import org.platform.modules.abstr.entity.Query;
-import org.platform.modules.abstr.entity.QueryResult;
 import org.springframework.dao.DataAccessException;
 
 public class GenericDAOImpl<Entity extends Serializable, PK extends Serializable> implements GenericDAO<Entity, PK> {
@@ -67,12 +66,12 @@ public class GenericDAOImpl<Entity extends Serializable, PK extends Serializable
 	}
 	
 	@Override
-	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
+	public List<Entity> readDataPaginationByQuery(Query query) throws DataAccessException {
 		return null;
 	}
-
+	
 	@Override
-	public QueryResult<Entity> readDataPaginationByCondition(Query query) throws DataAccessException {
+	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
 		return null;
 	}
 

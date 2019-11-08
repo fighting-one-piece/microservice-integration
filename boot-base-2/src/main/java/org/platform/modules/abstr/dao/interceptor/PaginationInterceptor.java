@@ -50,39 +50,47 @@ public class PaginationInterceptor implements Interceptor {
 	    if(judgeSQL.startsWith("INSERT") || judgeSQL.startsWith("UPDATE") || judgeSQL.startsWith("DELETE")) {
 	    	return invocation.proceed();
 	    }
+	    Object offsetObj = null, limitObj = null;
 	    Object parameterObject = boundSql.getParameterObject();
-	    Map<String, Object> condition = null;
 	    if (parameterObject instanceof Query) {
-	    	condition = ((Query) parameterObject).getCondition();
+	    	Query query = (Query) parameterObject;
+	    	if (!query.isPagination()) return invocation.proceed();
+	    	offsetObj = query.getCondition().get(Query.OFFSET);
+	    	limitObj = query.getCondition().get(Query.LIMIT);
 	    } else if (parameterObject instanceof Map) {
-	    	condition = (Map<String, Object>) parameterObject;
+	    	Map<String, Object> parameters = (Map<String, Object>) parameterObject;
+	    	if (null != parameters && !parameters.isEmpty()) {
+	    		if (!parameters.containsKey(Query.IS_PAGINATION)) return invocation.proceed();
+	 	    	Object paginationParam = parameters.get(Query.IS_PAGINATION);
+	 	    	if (null == paginationParam || !((Boolean) paginationParam)) return invocation.proceed();
+	    	}
+	    	offsetObj = parameters.get(Query.OFFSET);
+	    	limitObj = parameters.get(Query.LIMIT);
 	    }
-	    if (null != condition && !condition.isEmpty()) {
-	    	if (!condition.containsKey(Query.IS_PAGINATION)) return invocation.proceed();
-	    	Object pv = condition.get(Query.IS_PAGINATION);
-	    	if (null == pv || !((Boolean) pv)) return invocation.proceed();
-            //获取MyBatis配置信息
-            Configuration configuration = (Configuration) ReflectUtils.getValueByFieldName(delegate, "configuration");
-            String dialectValue = configuration.getVariables().getProperty("dialect");
-            if (null == dialectValue) {
-            	throw new RuntimeException("the value of the dialect is not find");
-            }
-            Object offsetObj = condition.get(Query.OFFSET);
-            Object limitObj = condition.get(Query.LIMIT);
-            if (null == offsetObj || null == limitObj) {
-            	throw new RuntimeException("offset or limit not find");
-            }
-            Dialect.Type dialectType = Dialect.Type.valueOf(dialectValue.toUpperCase());;
-    		Dialect dialect = getDialect(dialectType);
-	    	LOG.debug("dialectType: {} offset: {} limit: {}", dialectType, offsetObj, limitObj);
-            String pageSql = dialect.obtainPageSql(sql, (Integer) offsetObj, (Integer) limitObj);
-            //利用反射设置当前BoundSql对应的sql属性为我们建立好的分页Sql语句
-            ReflectUtils.setValueByFieldName(boundSql, "sql", pageSql);
-            LOG.debug("生成分页SQL : {}", boundSql.getSql());
-            MappedStatement mappedStatement = (MappedStatement)ReflectUtils.getValueByFieldName(delegate, "mappedStatement");
-            //拦截到的prepare方法参数是一个Connection对象
-            setTotalRowNum(condition, mappedStatement, (Connection) invocation.getArgs()[0]);
-	    }
+	    if (null == offsetObj || null == limitObj) throw new RuntimeException("offset or limit is null");
+	    //获取MyBatis配置信息
+        Configuration configuration = (Configuration) ReflectUtils.getValueByFieldName(delegate, "configuration");
+        String dialectValue = configuration.getVariables().getProperty("dialect");
+        if (null == dialectValue) throw new RuntimeException("the value of the dialect is null");
+        Dialect.Type dialectType = Dialect.Type.valueOf(dialectValue.toUpperCase());;
+		Dialect dialect = getDialect(dialectType);
+    	LOG.debug("dialectType: {} offset: {} limit: {}", dialectType, offsetObj, limitObj);
+        String paginationSql = dialect.obtainPageSql(sql, (Integer) offsetObj, (Integer) limitObj);
+        //利用反射设置当前BoundSql对应的sql属性为我们建立好的分页Sql语句
+        ReflectUtils.setValueByFieldName(boundSql, "sql", paginationSql);
+        LOG.debug("生成分页SQL : {}", boundSql.getSql());
+        MappedStatement mappedStatement = (MappedStatement) ReflectUtils.getValueByFieldName(delegate, "mappedStatement");
+        //拦截到的prepare方法参数是一个Connection对象
+        Connection connection = (Connection) invocation.getArgs()[0];
+        if (parameterObject instanceof Query) {
+        	Query query = (Query) parameterObject;
+        	Long totalRowNum = execCountQuery(connection, mappedStatement, query);
+        	query.setTotalRowNum(totalRowNum);
+        } else if (parameterObject instanceof Map) {
+        	Map<String, Object> parameters = (Map<String, Object>) parameterObject;
+        	Long totalRowNum = execCountQuery(connection, mappedStatement, parameters);
+        	if (null != totalRowNum) parameters.put(Query.TOTAL_ROW_NUM, totalRowNum);
+        }
 		return invocation.proceed();
 	}
 
@@ -116,30 +124,36 @@ public class PaginationInterceptor implements Interceptor {
 	}
 
 	/**
-     * 设置总记录数
-     * @param condition Mapper映射语句对应的参数对象
-     * @param mappedStatement Mapper映射语句
+     * 总记录数查询
      * @param connection 当前的数据库连接
+     * @param mappedStatement Mapper映射语句
+     * @param parameters Mapper映射语句对应的参数对象
      */
-    private void setTotalRowNum(Map<String, Object> condition, MappedStatement mappedStatement, Connection connection) {
-       BoundSql boundSql = mappedStatement.getBoundSql(condition);
+    @SuppressWarnings("unchecked")
+	private Long execCountQuery(Connection connection, MappedStatement mappedStatement, Object parameters) {
+       BoundSql boundSql = mappedStatement.getBoundSql(parameters);
        //通过查询Sql语句获取到对应的计算总记录数的sql语句
        String countSql = obtainCountSql(boundSql.getSql());
-       if (null == countSql)  return;
+       if (null == countSql)  return null;
        //通过BoundSql获取对应的参数映射
        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
        //利用Configuration、查询记录数的Sql语句countSql、参数映射关系parameterMappings和参数对象page建立查询记录数对应的BoundSql对象。
-       BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(), countSql, parameterMappings, condition);
+       BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(), countSql, parameterMappings, parameters);
+       Map<String, Object> additionalParameters = (Map<String, Object>) ReflectUtils.getValueByFieldName(boundSql, "additionalParameters");
+       for (Map.Entry<String, Object> additionalParameter : additionalParameters.entrySet()) {
+    	   countBoundSql.setAdditionalParameter(additionalParameter.getKey(), additionalParameter.getValue());
+       }
        //通过mappedStatement、参数对象page和BoundSql对象countBoundSql建立一个用于设定参数的ParameterHandler对象
-       ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, condition, countBoundSql);
+       ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, parameters, countBoundSql);
        //通过connection建立一个countSql对应的PreparedStatement对象。
        PreparedStatement pstmt = null;
        ResultSet rs = null;
+       Long totalRowNum = 0L;
        try {
            pstmt = connection.prepareStatement(countSql);
            parameterHandler.setParameters(pstmt);
            rs = pstmt.executeQuery();
-           if (rs.next()) condition.put(Query.TOTAL_ROW_NUM, rs.getLong(1));
+           if (rs.next()) totalRowNum = rs.getLong(1);
        } catch (SQLException e) {
            LOG.error(e.getMessage(), e);
        } finally {
@@ -150,6 +164,7 @@ public class PaginationInterceptor implements Interceptor {
               LOG.error(e.getMessage(), e);
            }
        }
+       return totalRowNum;
     }
 
     /**
@@ -158,7 +173,7 @@ public class PaginationInterceptor implements Interceptor {
      * @return
      */
     private String obtainCountSql(String sql) {
-    	StringBuilder sb = new StringBuilder();
+    	StringBuilder sb = new StringBuilder(100);
     	sb.append("SELECT COUNT(1) FROM (").append(sql).append(") as countSQL");
     	return sb.toString();
     }

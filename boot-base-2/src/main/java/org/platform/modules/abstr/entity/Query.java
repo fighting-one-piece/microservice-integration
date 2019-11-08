@@ -37,6 +37,8 @@ public class Query implements Serializable {
 	private int currentPageNum = 0;
 	/** 每页行数*/
 	private int rowNumPerPage = Integer.MAX_VALUE;
+	/** 总行数*/
+	private long totalRowNum = 0;
 	/** 排序属性*/
 	private String orderProperty = null;
 	/** 排序类型*/
@@ -109,6 +111,14 @@ public class Query implements Serializable {
 		this.rowNumPerPage = rowNumPerPage;
 		condition.put(OFFSET, (this.currentPageNum - 1) * this.rowNumPerPage);
 		condition.put(LIMIT, this.rowNumPerPage);
+	}
+	
+	public long getTotalRowNum() {
+		return totalRowNum;
+	}
+
+	public void setTotalRowNum(long totalRowNum) {
+		this.totalRowNum = totalRowNum;
 	}
 
 	public Map<String, Object> getCondition() {

@@ -18,7 +18,6 @@ import org.platform.modules.abstr.dao.IEntityDAO;
 import org.platform.modules.abstr.entity.CEntity;
 import org.platform.modules.abstr.entity.CEntityData;
 import org.platform.modules.abstr.entity.Query;
-import org.platform.modules.abstr.entity.QueryResult;
 import org.platform.modules.abstr.utils.EntityUtils;
 import org.platform.modules.abstr.utils.Kind;
 import org.springframework.dao.DataAccessException;
@@ -383,66 +382,13 @@ public class EntityDAOImpl<Entity extends Serializable, PK extends Serializable>
 	}
 	
 	@Override
-	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
+	public List<Entity> readDataPaginationByQuery(Query query) throws DataAccessException {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public QueryResult<Entity> readDataPaginationByCondition(Query query) throws DataAccessException {
-		Map<String, Object> dataAttributes = query.getDataAttributes();
-		List<Set<Long>> idList = new ArrayList<Set<Long>>();
-		for (Map.Entry<String, Object> entry : dataAttributes.entrySet()) {
-			String attribute = entry.getKey();
-			Query entityDataQuery = genEntityDataQuery(attribute, entry.getValue());
-			List<CEntityData> entityDatas = centityDataDAO.readDataListByCondition(entityDataQuery);
-			Set<Long> thingIds = new HashSet<Long>();
-			for (CEntityData entityData : entityDatas) {
-				Long entityId = entityData.getEntityId();
-				if (thingIds.contains(entityId)) continue;
-				thingIds.add(entityId);
-			}
-			if (thingIds.size() > 0) idList.add(thingIds);
-		}
-		if ((dataAttributes.size() > 0 && idList.size() == 0) || dataAttributes.size() != idList.size()) {
-			return new QueryResult<Entity>();
-		}
-//		if (query.getConditions().containsKey("ids")) {
-//			List<Long> ids = (List<Long>) query.getConditions().get("ids");
-//			if (null != ids && ids.size() > 0) idList.add(new HashSet<Long>(ids));
-//		}
-		Set<Long> ids = new HashSet<Long>();
-		if (idList.size() > 0) {
-			for (Long id : idList.get(0)) {
-				boolean flag = true;
-				for (Set<Long> tmpIds : idList) {
-					if (!tmpIds.contains(id)) {
-						flag = false;
-						break;
-					}
-				}
-				if (flag) ids.add(id);
-			}
-		}
-		if (idList.size() > 0 && ids.size() == 0) return new QueryResult<Entity>();
-		if (ids.size() > 0) query.addCondition("ids", new ArrayList<Long>(ids));
-		query.setPagination(true);
-		QueryResult<CEntity> qr = new QueryResult<CEntity>();
-		if (null == query.getDataOrderAttribute()) {
-			query.addCondition(Query.TABLE, entityTable());
-			qr = centityDAO.readDataPaginationByCondition(query);
-		} else {
-			query.addCondition(Query.E_TABLE, entityTable());
-			query.addCondition(Query.D_TABLE, entityDataTable());
-			qr = centityDAO.readDataPaginationByConditionWithOrder(query);
-		}
-		List<Entity> entities = new ArrayList<Entity>();
-		for (CEntity centity : qr.getResultList()) {
-			CEntity t = readEntityById(centity.getId());
-			Object entity = EntityUtils.convertEntityToObject(t, entityClass);
-			entities.add((Entity) entity);
-		}
-		return new QueryResult<Entity>(qr.getTotalRowNum(), entities);
+	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException {
+		return null;
 	}
 	
 	@Override

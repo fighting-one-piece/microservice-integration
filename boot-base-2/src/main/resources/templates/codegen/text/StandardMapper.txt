@@ -87,6 +87,12 @@
 		<include refid="whereQClause" />
 	</select>
 	
+	<select id="readDataPaginationByQuery" resultMap="[(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]ResultMap">
+		SELECT <include refid="columnClause" />
+		FROM [(${table})]
+		<include refid="whereQClause" />
+	</select>
+	
 	<select id="readDataPaginationByCondition" resultMap="[(${#strings.toLowerCase(#strings.substring(entity,0,1))})][(${#strings.substring(entity,1,#strings.length(entity))})]ResultMap">
 		SELECT <include refid="columnClause" />
 		FROM [(${table})]

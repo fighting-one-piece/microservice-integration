@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.platform.modules.abstr.entity.Query;
-import org.platform.modules.abstr.entity.QueryResult;
 import org.springframework.dao.DataAccessException;
 
 public interface GenericDAO <Entity extends Serializable, PK extends Serializable> {
@@ -91,6 +90,14 @@ public interface GenericDAO <Entity extends Serializable, PK extends Serializabl
 	 * @throws DataAccessException
 	 */
 	public List<Entity> readDataListByCondition(Map<String, Object> condition) throws DataAccessException;
+	
+	/**
+	 * 根据Query读取实体对象分页列表
+	 * @param query
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public List<Entity> readDataPaginationByQuery(Query query) throws DataAccessException;
 
 	/**
 	 * 根据条件读取实体对象分页列表
@@ -99,14 +106,6 @@ public interface GenericDAO <Entity extends Serializable, PK extends Serializabl
 	 * @throws DataAccessException
 	 */
 	public List<Entity> readDataPaginationByCondition(Map<String, Object> condition) throws DataAccessException;
-	
-	/**
-	 * 根据条件读取实体对象分页列表
-	 * @param query
-	 * @return
-	 * @throws DataAccessException
-	 */
-	public QueryResult<Entity> readDataPaginationByCondition(Query query) throws DataAccessException;
 	
 	/**
 	 * 根据条件读取数据数量
