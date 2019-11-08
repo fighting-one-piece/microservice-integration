@@ -66,6 +66,8 @@ public class PaginationInterceptor implements Interceptor {
 	    	}
 	    	offsetObj = parameters.get(Query.OFFSET);
 	    	limitObj = parameters.get(Query.LIMIT);
+	    } else {
+	    	return invocation.proceed();
 	    }
 	    if (null == offsetObj || null == limitObj) throw new RuntimeException("offset or limit is null");
 	    //获取MyBatis配置信息
