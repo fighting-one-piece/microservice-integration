@@ -1,5 +1,6 @@
 package org.platform.utils.endecrypt;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
@@ -28,6 +29,14 @@ import org.platform.utils.file.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Caused by: java.security.InvalidKeyException: IOException : algid parse error, not a sequence
+ * private key 转成 pkcs8
+ * openssl pkcs8 -topk8 -inform PEM -in private.key -outform pem -nocrypt -out pkcs8.pem 
+ * pkcs8 转成 pkcs1
+ * openssl pkcs8 -in pkcs8.pem -nocrypt -out pri_key.pem
+ *
+ */
 public class RSAUtils {
 	
 	private static Logger LOG = LoggerFactory.getLogger(RSAUtils.class);
@@ -42,6 +51,8 @@ public class RSAUtils {
 	
 	private static final String TRANSFORMATION = "RSA/None/NoPadding";
 	private static final String PROVIDER = "BC";
+	
+	private static final int KEY_LENGTH = 1024;
 
 	private static PublicKey publicKey = null;
 	private static PrivateKey privateKey = null;
@@ -158,7 +169,24 @@ public class RSAUtils {
 	public static byte[] encrypt(String input) throws Exception {
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		return cipher.doFinal(input.getBytes());
+		int inputLength = input.length(), segmentLength = KEY_LENGTH / 8 - 11;
+		if (inputLength <= segmentLength) return cipher.doFinal(input.getBytes());
+		byte[] inputBytes = input.getBytes(), segmentEncryptBytes = null;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int segment = 0, offset = 0;
+		while (inputLength - offset > 0) {
+			if (inputLength - offset > segmentLength) {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, segmentLength);
+			} else {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, inputLength - offset);
+			}
+			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
+			segment += 1;
+			offset = segment * segmentLength;
+		}
+		byte[] encryptBytes = baos.toByteArray();
+		if (null != baos) baos.close();
+		return encryptBytes;
 	}
 	
 	/**
@@ -180,7 +208,24 @@ public class RSAUtils {
 	public static byte[] encryptNoPadding(String input) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION, PROVIDER);
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		return cipher.doFinal(input.getBytes());
+		int inputLength = input.length(), segmentLength = KEY_LENGTH / 8 - 11;
+		if (inputLength <= segmentLength) return cipher.doFinal(input.getBytes());
+		byte[] inputBytes = input.getBytes(), segmentEncryptBytes = null;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int segment = 0, offset = 0;
+		while (inputLength - offset > 0) {
+			if (inputLength - offset > segmentLength) {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, segmentLength);
+			} else {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, inputLength - offset);
+			}
+			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
+			segment += 1;
+			offset = segment * segmentLength;
+		}
+		byte[] encryptBytes = baos.toByteArray();
+		if (null != baos) baos.close();
+		return encryptBytes;
 	}
 	
 	/**
@@ -199,10 +244,27 @@ public class RSAUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] decrypt(String input) throws Exception {
+	public static byte[] decrypt(byte[] input) throws Exception {
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(input.getBytes());
+		int inputLength = input.length, segmentLength = KEY_LENGTH / 8;
+		if (inputLength <= segmentLength) return cipher.doFinal(input);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] segmentEncryptBytes = null;
+		int segment = 0, offset = 0;
+		while (inputLength - offset > 0) {
+			if (inputLength - offset > segmentLength) {
+				segmentEncryptBytes = cipher.doFinal(input, offset, segmentLength);
+			} else {
+				segmentEncryptBytes = cipher.doFinal(input, offset, inputLength - offset);
+			}
+			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
+			segment += 1;
+			offset = segment * segmentLength;
+		}
+		byte[] decryptBytes = baos.toByteArray();
+		if (null != baos) baos.close();
+		return decryptBytes;
 	}
 	
 	/**
@@ -211,10 +273,8 @@ public class RSAUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] decrypt(byte[] input) throws Exception {
-		Cipher cipher = Cipher.getInstance(ALGORITHM);
-		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(input);
+	public static byte[] decrypt(String input) throws Exception {
+		return decrypt(input.getBytes());
 	}
 	
 	/**
@@ -233,10 +293,27 @@ public class RSAUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] decryptNoPadding(String input) throws Exception {
+	public static byte[] decryptNoPadding(byte[] input) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION, PROVIDER);
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(input.getBytes());
+		int inputLength = input.length, segmentLength = KEY_LENGTH / 8;
+		if (inputLength <= segmentLength) return cipher.doFinal(input);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] segmentEncryptBytes = null;
+		int segment = 0, offset = 0;
+		while (inputLength - offset > 0) {
+			if (inputLength - offset > segmentLength) {
+				segmentEncryptBytes = cipher.doFinal(input, offset, segmentLength);
+			} else {
+				segmentEncryptBytes = cipher.doFinal(input, offset, inputLength - offset);
+			}
+			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
+			segment += 1;
+			offset = segment * segmentLength;
+		}
+		byte[] decryptBytes = baos.toByteArray();
+		if (null != baos) baos.close();
+		return decryptBytes;
 	}
 	
 	/**
@@ -245,10 +322,8 @@ public class RSAUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] decryptNoPadding(byte[] input) throws Exception {
-		Cipher cipher = Cipher.getInstance(TRANSFORMATION, PROVIDER);
-		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(input);
+	public static byte[] decryptNoPadding(String input) throws Exception {
+		return decryptNoPadding(input.getBytes());
 	}
 	
 	/**
