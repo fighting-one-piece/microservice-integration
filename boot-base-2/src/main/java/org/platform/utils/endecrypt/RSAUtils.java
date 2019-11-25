@@ -52,7 +52,8 @@ public class RSAUtils {
 	private static final String TRANSFORMATION = "RSA/None/NoPadding";
 	private static final String PROVIDER = "BC";
 	
-	private static final int KEY_LENGTH = 1024;
+	private static final int MAX_ENCRYPT_SEG = 117;
+    private static final int MAX_DECRYPT_SEG = 128;
 
 	private static PublicKey publicKey = null;
 	private static PrivateKey privateKey = null;
@@ -169,23 +170,24 @@ public class RSAUtils {
 	public static byte[] encrypt(String input) throws Exception {
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		int inputLength = input.length(), segmentLength = KEY_LENGTH / 8 - 11;
-		if (inputLength <= segmentLength) return cipher.doFinal(input.getBytes());
-		byte[] inputBytes = input.getBytes(), segmentEncryptBytes = null;
+		byte[] inputBytes = input.getBytes();
+		int inputLength = inputBytes.length;
+		if (inputLength <= MAX_ENCRYPT_SEG) return cipher.doFinal(inputBytes);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] segmentEncryptBytes;
 		int segment = 0, offset = 0;
 		while (inputLength - offset > 0) {
-			if (inputLength - offset > segmentLength) {
-				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, segmentLength);
+			if (inputLength - offset > MAX_ENCRYPT_SEG) {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, MAX_ENCRYPT_SEG);
 			} else {
 				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, inputLength - offset);
 			}
 			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
 			segment += 1;
-			offset = segment * segmentLength;
+			offset = segment * MAX_ENCRYPT_SEG;
 		}
 		byte[] encryptBytes = baos.toByteArray();
-		if (null != baos) baos.close();
+		baos.close();
 		return encryptBytes;
 	}
 	
@@ -208,20 +210,21 @@ public class RSAUtils {
 	public static byte[] encryptNoPadding(String input) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION, PROVIDER);
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		int inputLength = input.length(), segmentLength = KEY_LENGTH / 8 - 11;
-		if (inputLength <= segmentLength) return cipher.doFinal(input.getBytes());
-		byte[] inputBytes = input.getBytes(), segmentEncryptBytes = null;
+		byte[] inputBytes = input.getBytes();
+		int inputLength = inputBytes.length;
+		if (inputLength <= MAX_ENCRYPT_SEG) return cipher.doFinal(inputBytes);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] segmentEncryptBytes = null;
 		int segment = 0, offset = 0;
 		while (inputLength - offset > 0) {
-			if (inputLength - offset > segmentLength) {
-				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, segmentLength);
+			if (inputLength - offset > MAX_ENCRYPT_SEG) {
+				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, MAX_ENCRYPT_SEG);
 			} else {
 				segmentEncryptBytes = cipher.doFinal(inputBytes, offset, inputLength - offset);
 			}
 			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
 			segment += 1;
-			offset = segment * segmentLength;
+			offset = segment * MAX_ENCRYPT_SEG;
 		}
 		byte[] encryptBytes = baos.toByteArray();
 		if (null != baos) baos.close();
@@ -247,20 +250,20 @@ public class RSAUtils {
 	public static byte[] decrypt(byte[] input) throws Exception {
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		int inputLength = input.length, segmentLength = KEY_LENGTH / 8;
-		if (inputLength <= segmentLength) return cipher.doFinal(input);
+		int inputLength = input.length;
+		if (inputLength <= MAX_DECRYPT_SEG) return cipher.doFinal(input);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] segmentEncryptBytes = null;
+		byte[] segmentDecryptBytes = null;
 		int segment = 0, offset = 0;
 		while (inputLength - offset > 0) {
-			if (inputLength - offset > segmentLength) {
-				segmentEncryptBytes = cipher.doFinal(input, offset, segmentLength);
+			if (inputLength - offset > MAX_DECRYPT_SEG) {
+				segmentDecryptBytes = cipher.doFinal(input, offset, MAX_DECRYPT_SEG);
 			} else {
-				segmentEncryptBytes = cipher.doFinal(input, offset, inputLength - offset);
+				segmentDecryptBytes = cipher.doFinal(input, offset, inputLength - offset);
 			}
-			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
+			baos.write(segmentDecryptBytes, 0, segmentDecryptBytes.length);
 			segment += 1;
-			offset = segment * segmentLength;
+			offset = segment * MAX_DECRYPT_SEG;
 		}
 		byte[] decryptBytes = baos.toByteArray();
 		if (null != baos) baos.close();
@@ -296,20 +299,20 @@ public class RSAUtils {
 	public static byte[] decryptNoPadding(byte[] input) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION, PROVIDER);
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		int inputLength = input.length, segmentLength = KEY_LENGTH / 8;
-		if (inputLength <= segmentLength) return cipher.doFinal(input);
+		int inputLength = input.length;
+		if (inputLength <= MAX_DECRYPT_SEG) return cipher.doFinal(input);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] segmentEncryptBytes = null;
 		int segment = 0, offset = 0;
 		while (inputLength - offset > 0) {
-			if (inputLength - offset > segmentLength) {
-				segmentEncryptBytes = cipher.doFinal(input, offset, segmentLength);
+			if (inputLength - offset > MAX_DECRYPT_SEG) {
+				segmentEncryptBytes = cipher.doFinal(input, offset, MAX_DECRYPT_SEG);
 			} else {
 				segmentEncryptBytes = cipher.doFinal(input, offset, inputLength - offset);
 			}
 			baos.write(segmentEncryptBytes, 0, segmentEncryptBytes.length);
 			segment += 1;
-			offset = segment * segmentLength;
+			offset = segment * MAX_DECRYPT_SEG;
 		}
 		byte[] decryptBytes = baos.toByteArray();
 		if (null != baos) baos.close();
