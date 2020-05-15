@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import javax.annotation.Resource;
 
 import org.apache.http.entity.ContentType;
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.bootstrap.config.WechatpayConfiguration;
 import org.platform.modules.recharge.entity.RechargeMode;
 import org.platform.modules.recharge.entity.RechargeRecord;

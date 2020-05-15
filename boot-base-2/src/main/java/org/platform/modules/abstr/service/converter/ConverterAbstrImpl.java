@@ -13,22 +13,22 @@ import org.platform.utils.reflect.ReflectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO extends Serializable>
-	implements IConverter<Entity, EntityDTO> {
+public abstract class ConverterAbstrImpl<Entity1 extends Serializable, Entity2 extends Serializable>
+	implements IConverter<Entity1, Entity2> {
 
 	protected Logger LOG = LoggerFactory.getLogger(getClass());
 
-	protected Class<Entity> entityClass = null;
+	protected Class<Entity1> entity1Class = null;
 
-	protected Class<EntityDTO> entityDTOClass = null;
+	protected Class<Entity2> entity2Class = null;
 
 	@SuppressWarnings("unchecked")
 	public ConverterAbstrImpl() {
 		Type type = getClass().getGenericSuperclass();
         if (type instanceof ParameterizedType) {
         	Type[] parameterizedType = ((ParameterizedType) type).getActualTypeArguments();
-            entityClass = (Class<Entity>) parameterizedType[0];
-            entityDTOClass = (Class<EntityDTO>) parameterizedType[1];
+            entity1Class = (Class<Entity1>) parameterizedType[0];
+            entity2Class = (Class<Entity2>) parameterizedType[1];
         }
 	}
 
@@ -41,12 +41,12 @@ public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO 
 	public Object convertObject(Object object) {
 		Object objectTo = null;
 		try {
-			if (entityClass.isAssignableFrom(object.getClass())) {
-				objectTo = entityDTOClass.newInstance();
-				convertEntity2DTO((Entity) object, (EntityDTO) objectTo);
-			} else if (entityDTOClass.isAssignableFrom(object.getClass())) {
-				objectTo = entityClass.newInstance();
-				convertDTO2Entity((EntityDTO) object, (Entity) objectTo);
+			if (entity1Class.isAssignableFrom(object.getClass())) {
+				objectTo = entity2Class.newInstance();
+				convertEntity1ToEntity2((Entity1) object, (Entity2) objectTo);
+			} else if (entity2Class.isAssignableFrom(object.getClass())) {
+				objectTo = entity1Class.newInstance();
+				convertEntity2ToEntity1((Entity2) object, (Entity1) objectTo);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -55,29 +55,25 @@ public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO 
 	}
 
 	@Override
-	public void convertEntity2DTO(Entity entity, EntityDTO entityDTO) {
-		if (null == entity || null == entityDTO) {
-			return;
-		}
+	public void convertEntity1ToEntity2(Entity1 entity1, Entity2 entity2) {
+		if (null == entity1 || null == entity2) return;
 		try {
-			convert(entity, entityDTO);
+			convert(entity1, entity2);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void convertEntityCollection2DTOCollection(
-			Collection<Entity> entityCollection, Collection<EntityDTO> entityDTOCollection) {
-		if (null == entityCollection || null == entityDTOCollection) {
-			return;
-		}
-		EntityDTO entityDTO = null;
-		for (Entity entity : entityCollection) {
+	public void convertEntity1CollectionToEntity2Collection(
+			Collection<Entity1> entity1Collection, Collection<Entity2> entity2Collection) {
+		if (null == entity1Collection || null == entity2Collection) return;
+		Entity2 entity2 = null;
+		for (Entity1 entity1 : entity1Collection) {
 			try {
-				entityDTO = entityDTOClass.newInstance();
-				convertEntity2DTO(entity, entityDTO);
-				entityDTOCollection.add(entityDTO);
+				entity2 = entity2Class.newInstance();
+				convertEntity1ToEntity2(entity1, entity2);
+				entity2Collection.add(entity2);
 			} catch (InstantiationException e) {
 				LOG.error(e.getMessage(), e);
 			} catch (IllegalAccessException e) {
@@ -87,29 +83,25 @@ public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO 
 	}
 
 	@Override
-	public void convertDTO2Entity(EntityDTO entityDTO, Entity entity) {
-		if (null == entityDTO || null == entity) {
-			return;
-		}
+	public void convertEntity2ToEntity1(Entity2 entity2, Entity1 entity1) {
+		if (null == entity2 || null == entity1) return;
 		try {
-			convert(entityDTO, entity);
+			convert(entity2, entity1);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void convertDTOCollection2EntityCollection(
-			Collection<EntityDTO> entityDTOCollection, Collection<Entity> entityCollection) {
-		if (null == entityDTOCollection || null == entityCollection) {
-			return;
-		}
-		Entity entity = null;
-		for (EntityDTO entityDTO : entityDTOCollection) {
+	public void convertEntity2CollectionToEntity1Collection(
+			Collection<Entity2> entity2Collection, Collection<Entity1> entity1Collection) {
+		if (null == entity2Collection || null == entity1Collection) return;
+		Entity1 entity1 = null;
+		for (Entity2 entity2 : entity2Collection) {
 			try {
-				entity = entityClass.newInstance();
-				convertDTO2Entity(entityDTO, entity);
-				entityCollection.add(entity);
+				entity1 = entity1Class.newInstance();
+				convertEntity2ToEntity1(entity2, entity1);
+				entity1Collection.add(entity1);
 			} catch (InstantiationException e) {
 				LOG.error(e.getMessage(), e);
 			} catch (IllegalAccessException e) {

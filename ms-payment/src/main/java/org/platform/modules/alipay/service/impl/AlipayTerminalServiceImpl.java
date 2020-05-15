@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.alipay.service.IAlipayService;
 import org.platform.modules.alipay.utils.AlipayUtils;
 import org.platform.modules.bootstrap.config.AlipayConfiguration;

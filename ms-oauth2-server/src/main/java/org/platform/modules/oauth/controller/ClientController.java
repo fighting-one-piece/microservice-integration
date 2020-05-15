@@ -2,8 +2,8 @@ package org.platform.modules.oauth.controller;
 
 import javax.annotation.Resource;
 
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.ResultCode;
+import org.platform.modules.abstr.entity.Result;
 import org.platform.modules.oauth.entity.Client;
 import org.platform.modules.oauth.service.IClientService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +21,8 @@ public class ClientController {
 	
 	//@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
-	public WebResult insertClient(@RequestBody Client client) {
-		WebResult webResult = new WebResult();
+	public Result insertClient(@RequestBody Client client) {
+		Result webResult = new Result();
 		try {
 			clientService.insert(client);
 			webResult.setResultCode(ResultCode.SUCCESS);
@@ -35,8 +35,8 @@ public class ClientController {
 	
 	//@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, headers = "Accept=application/json")
-	public WebResult updateClient(@PathVariable Long id, @RequestBody Client client) {
-		WebResult webResult = new WebResult();
+	public Result updateClient(@PathVariable Long id, @RequestBody Client client) {
+		Result webResult = new Result();
 		try {
 			client.setId(id);
 			clientService.update(client);
@@ -50,8 +50,8 @@ public class ClientController {
 	
 	//@PreAuthorize("hasRole('CLIENT-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public WebResult readClient(@PathVariable Long id) {
-		WebResult webResult = new WebResult();
+	public Result readClient(@PathVariable Long id) {
+		Result webResult = new Result();
 		try {
 			webResult.setCode(ResultCode.SUCCESS.getCode());
 			webResult.setData(clientService.readDataByPK(id, false));

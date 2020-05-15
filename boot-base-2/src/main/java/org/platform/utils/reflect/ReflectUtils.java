@@ -24,7 +24,7 @@ public class ReflectUtils {
 	private static Logger LOG = LoggerFactory.getLogger(ReflectUtils.class);
 
 	@SuppressWarnings("unchecked")
-	public static <T> Class<T> getParameterizedType(Class<?> clazz) {
+	public static <T> Class<T> getParameterizedType(Class<?> clazz, int index) {
         Type parameterizedType = clazz.getGenericSuperclass();
         if (!(parameterizedType instanceof ParameterizedType)) {
             parameterizedType = clazz.getSuperclass().getGenericSuperclass();
@@ -113,7 +113,8 @@ public class ReflectUtils {
     private static final SimpleDateFormat SDF1 = DateFormatter.TIME.get();
     private static final SimpleDateFormat SDF2 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     
-    public static Object convertValueByFieldType(Class<?> type, Object value) {
+    @SuppressWarnings("unchecked")
+	public static Object convertValueByFieldType(Class<?> type, Object value) {
     	Object finalValue = value;
     	if (String.class.isAssignableFrom(type)) {
     		finalValue = String.valueOf(value);
@@ -145,7 +146,16 @@ public class ReflectUtils {
 			} catch (ParseException e) {
 				LOG.error("date {} parse error!", finalValue);
 			}
-		} 
+		} else {
+			if (value instanceof Map) {
+				try {
+					finalValue = type.newInstance();
+				} catch (Exception e) {
+					LOG.error("object instance error!", e.getMessage());
+				} 
+				convertObjectMapToObject((Map<String, Object>) value, finalValue);
+			}
+		}
     	return finalValue;
     }
     
@@ -245,7 +255,7 @@ public class ReflectUtils {
 					if (!fieldType.equals(value.getClass())) continue;
 				}
 				field.setAccessible(true);
-				field.set(object, value);
+				field.set(object, convertValueByFieldType(fieldType, value));
 				field.setAccessible(false);
 			}
 		} catch (Exception e) {
@@ -288,13 +298,13 @@ public class ReflectUtils {
 				String valueString = String.valueOf(map.get(name));
 				if (null == valueString || "".equals(valueString) 
 					|| "null".equalsIgnoreCase(valueString)) continue;
-				Object value = convertValueByFieldType(field.getType(), valueString);
 				field.setAccessible(true);
-				field.set(object, value);
+				field.set(object, convertValueByFieldType(field.getType(), valueString));
 				field.setAccessible(false);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} 
     }
+    
 }

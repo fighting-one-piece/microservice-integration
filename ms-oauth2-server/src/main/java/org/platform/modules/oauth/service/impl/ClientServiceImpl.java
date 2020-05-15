@@ -4,8 +4,8 @@ import javax.annotation.Resource;
 
 import org.platform.modules.abstr.dao.GenericDAO;
 import org.platform.modules.abstr.entity.Query;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.abstr.service.impl.GenericServiceImpl;
-import org.platform.modules.abstr.web.ResultCode;
 import org.platform.modules.oauth.dao.ClientDAO;
 import org.platform.modules.oauth.entity.Client;
 import org.platform.modules.oauth.service.IClientService;

@@ -8,7 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.bootstrap.annotation.ServiceAspectExclude;
 import org.platform.modules.bootstrap.config.ds.DataSource;
 import org.platform.modules.bootstrap.config.ds.DataSourceContextHolder;

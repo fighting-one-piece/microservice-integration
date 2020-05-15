@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.ResultCode;
+import org.platform.modules.abstr.entity.Result;
 import org.platform.utils.exception.BusinessException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,13 +22,13 @@ public class CHandlerExceptionResolver implements HandlerExceptionResolver {
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, 
 			Object handler, Exception exception) {
-		WebResult result = new WebResult();
+		Result result = new Result();
 		if (exception instanceof BusinessException) {
 			BusinessException be = (BusinessException) exception;
 			result.setCode(be.getCode());
 			result.setFailure(be.getMessage());
 		} else {
-			result.setResultCode(ResultCode.FAILURE);
+			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(exception.getMessage());
 		}
 		Map<String, Object> exceptionParamMap = new HashMap<String, Object>();  

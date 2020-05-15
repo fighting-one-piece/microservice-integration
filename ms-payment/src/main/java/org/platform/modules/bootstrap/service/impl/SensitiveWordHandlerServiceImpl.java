@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.utils.exception.BusinessException;
 import org.platform.utils.redis.RedisClusterUtils;
 import org.springframework.core.annotation.Order;

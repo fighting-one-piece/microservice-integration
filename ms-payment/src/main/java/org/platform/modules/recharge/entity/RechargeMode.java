@@ -126,7 +126,7 @@ public class RechargeMode extends PKAutoEntity<Long> {
 				Object value = params.get(field.getName());
 				if (null == value) continue;
 				field.setAccessible(true);
-				value = ReflectUtils.convertValueByFileType(field.getType(), value);
+				value = ReflectUtils.convertValueByFieldType(field.getType(), value);
 				field.set(this, value);
 				field.setAccessible(false);
 	        }

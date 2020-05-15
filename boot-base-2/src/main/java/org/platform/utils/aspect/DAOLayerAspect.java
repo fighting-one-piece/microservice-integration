@@ -3,7 +3,7 @@ package org.platform.utils.aspect;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.utils.exception.BusinessException;
 import org.platform.utils.exception.DataException;
 import org.slf4j.Logger;

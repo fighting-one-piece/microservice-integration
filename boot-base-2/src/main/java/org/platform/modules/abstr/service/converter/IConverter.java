@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /** 对象转换*/
-public interface IConverter<Entity extends Serializable, EntityDTO extends Serializable> {
+public interface IConverter<Entity1 extends Serializable, Entity2 extends Serializable> {
 
 	/**
 	 * 转换对象(双向)
@@ -15,31 +15,32 @@ public interface IConverter<Entity extends Serializable, EntityDTO extends Seria
 
 	/**
 	 * 转换对象
-	 * @param entity
-	 * @param entityDTO
+	 * @param entity1
+	 * @param entity2
 	 */
-	public void convertEntity2DTO(Entity entity, EntityDTO entityDTO) ;
+	public void convertEntity1ToEntity2(Entity1 entity1, Entity2 entity2);
 
 	/**
 	 * 转换对象
-	 * @param entityDTO
-	 * @param entity
+	 * @param entity2
+	 * @param entity1
 	 */
-	public void convertDTO2Entity(EntityDTO entityDTO, Entity entity) ;
+	public void convertEntity2ToEntity1(Entity2 entity2, Entity1 entity1);
 
 	/**
 	 * 转换对象
-	 * @param entityCollection
-	 * @param entityDTOCollection
+	 * @param entity1Collection
+	 * @param entity2Collection
 	 */
-	public void convertEntityCollection2DTOCollection(
-			Collection<Entity> entityCollection, Collection<EntityDTO> entityDTOCollection) ;
+	public void convertEntity1CollectionToEntity2Collection(
+			Collection<Entity1> entity1Collection, Collection<Entity2> entity2Collection);
 
 	/**
 	 * 转换对象
-	 * @param entityDTOCollection
-	 * @param entityCollection
+	 * @param entity2Collection
+	 * @param entity1Collection
 	 */
-	public void convertDTOCollection2EntityCollection(
-			Collection<EntityDTO> entityDTOCollection, Collection<Entity> entityCollection) ;
+	public void convertEntity2CollectionToEntity1Collection(
+			Collection<Entity2> entity2Collection, Collection<Entity1> entity1Collection);
+	
 }

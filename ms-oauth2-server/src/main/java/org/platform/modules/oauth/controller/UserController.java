@@ -5,8 +5,8 @@ import java.security.Principal;
 import javax.annotation.Resource;
 
 import org.platform.modules.abstr.entity.Query;
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.ResultCode;
+import org.platform.modules.abstr.entity.Result;
 import org.platform.modules.oauth.entity.User;
 import org.platform.modules.oauth.service.IUserService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +29,8 @@ public class UserController {
 	
 	//@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
-	public WebResult insertUser(@RequestBody User user) {
-		WebResult webResult = new WebResult();
+	public Result insertUser(@RequestBody User user) {
+		Result webResult = new Result();
 		try {
 			userService.insert(user);
 			webResult.setResultCode(ResultCode.SUCCESS);
@@ -43,8 +43,8 @@ public class UserController {
 	
 	//@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, headers = "Accept=application/json")
-	public WebResult insertUser(@PathVariable("id") Long id, @RequestBody User user) {
-		WebResult webResult = new WebResult();
+	public Result insertUser(@PathVariable("id") Long id, @RequestBody User user) {
+		Result webResult = new Result();
 		try {
 			user.setId(id);
 			userService.update(user);
@@ -58,8 +58,8 @@ public class UserController {
 	
 	//@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public WebResult readUserById(@PathVariable("id") Long id) {
-		WebResult webResult = new WebResult();
+	public Result readUserById(@PathVariable("id") Long id) {
+		Result webResult = new Result();
 		try {
 			webResult.setCode(ResultCode.SUCCESS.getCode());
 			webResult.setData(userService.readDataByPK(id, false));
@@ -72,8 +72,8 @@ public class UserController {
 	
 	//@PreAuthorize("hasRole('USER-ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public WebResult readAllUsers() {
-		WebResult webResult = new WebResult();
+	public Result readAllUsers() {
+		Result webResult = new Result();
 		try {
 			webResult.setCode(ResultCode.SUCCESS.getCode());
 			webResult.setData(userService.readDataListByCondition(new Query(), false));

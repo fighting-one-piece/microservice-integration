@@ -3,7 +3,7 @@ package org.platform.utils.param;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.utils.exception.BusinessException;
 
 public class ParamsUtils {

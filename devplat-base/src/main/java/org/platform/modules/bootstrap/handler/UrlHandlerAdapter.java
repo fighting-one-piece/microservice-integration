@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.platform.modules.abstr.annotation.ApiV1RestController;
 import org.platform.modules.abstr.annotation.ApiV2RestController;
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.ResultCode;
+import org.platform.modules.abstr.entity.Result;
 import org.platform.modules.bootstrap.handler.UrlMappingStorage.Mapper;
 import org.platform.modules.bootstrap.service.IHandlerChainService;
 import org.platform.utils.clazz.ClassScanner;
@@ -151,9 +150,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 				}
 			}
 			Object result = null;
-			if (path.startsWith("/ext/api/")) {
-				result = handleExternalRequest(path, request, response);
-			} else if (path.startsWith("/api/")) {
+			if (path.startsWith("/api/")) {
 				result = handleNormalRequest(path, request, response);
 			} else {
 				result = handleNormalRequest(path, request, response);
@@ -163,31 +160,31 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			}
 			writeResponse(response, result);
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage()));
+			if (e.getCause() != null) e = (Exception) e.getCause();
+			writeResponse(response, wrapperFailureResult(ResultCode.SYSTEM_IS_BUSY, e.getMessage()));
 		}
 		return null;
 	}
 
-	private WebResult wrapperFailureWebResult(int code, String failure) {
-		return new WebResult().buildFailure(code, failure);
+	private Result wrapperFailureResult(int code, String failure) {
+		return Result.buildFailure(code, failure);
 	}
 
-	private WebResult wrapperFailureWebResult(ResultCode resultCode, String failure) {
-		return wrapperFailureWebResult(resultCode.getCode(), failure);
+	private Result wrapperFailureResult(ResultCode resultCode, String failure) {
+		return wrapperFailureResult(resultCode.getCode(), failure);
 	}
 
 	private Object handleNormalRequest(String path, HttpServletRequest request, HttpServletResponse response)
 			throws UnsupportedEncodingException {
-		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/ext", "");
+		String interfaceUrl = path.replaceAll("/+", "/");
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, request.getMethod());
 		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
+			return wrapperFailureResult(ResultCode.URL_MAPPING_ERROR,
 					"No mapping found for HTTP request with URI " + path);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
+			return wrapperFailureResult(ResultCode.URL_MAPPING_ERROR,
 					"No mapping found for HTTP request with URI " + path);
 		}
 		try {
@@ -195,43 +192,11 @@ public class UrlHandlerAdapter implements HandlerAdapter, InitializingBean {
 			Object[] params = parameterBinder.bindParameters(omp, omp.getParams(), request, response);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
+		} catch (BusinessException be) {
+			return wrapperFailureResult(be.getCode(), be.getMessage());
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			if (e.getCause() != null)
-				e = (Exception) e.getCause();
-			return wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage());
-		}
-	}
-
-	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
-			throws UnsupportedEncodingException {
-		return handleExternalRequest(interfaceUrl, new HashMap<String, String>(), request, response);
-	}
-
-	private Object handleExternalRequest(String interfaceUrl, Map<String, String> paramMap, HttpServletRequest request,
-			HttpServletResponse response) throws UnsupportedEncodingException {
-		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl);
-		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
-					"No mapping found for HTTP request with URI " + interfaceUrl);
-		}
-		Method method = omp.getMethod();
-		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
-					"No mapping found for HTTP request with URI " + interfaceUrl);
-		}
-		try {
-			ParameterBinder parameterBinder = new ParameterBinder();
-			paramMap.putAll(omp.getParams());
-			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
-			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
-			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			if (e.getCause() != null) {
-				e = (Exception) e.getCause();
-			}
-			return wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage());
+			if (e.getCause() != null) e = (Exception) e.getCause();
+			return wrapperFailureResult(ResultCode.SYSTEM_IS_BUSY, e.getMessage());
 		}
 	}
 

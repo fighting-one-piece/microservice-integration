@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.platform</groupId>
 			<artifactId>boot-base</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- Spring Cloud依赖包 -->
@@ -118,6 +118,13 @@
 			<groupId>com.taobao</groupId>
 			<artifactId>alipay</artifactId>
 			<version>0.0.1</version>
+		</dependency>
+		
+		<!-- Stripe依赖包 -->
+		<dependency>
+		    <groupId>com.stripe</groupId>
+		    <artifactId>stripe-java</artifactId>
+		    <version>16.5.0</version>
 		</dependency>
 		
 		<!-- JDOM依赖包 -->

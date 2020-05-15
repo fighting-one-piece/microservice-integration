@@ -1,6 +1,6 @@
 package org.platform.utils.exception;
 
-import org.platform.modules.abstr.web.ResultCode;
+import org.platform.modules.abstr.entity.ResultCode;
 
 /** 业务访问异常*/
 public class BusinessException extends GenericException {

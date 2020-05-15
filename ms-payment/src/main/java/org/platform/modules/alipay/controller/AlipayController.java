@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.platform.modules.abstr.annotation.ApiV1RestController;
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.Result;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.alipay.service.IAlipayService;
 import org.platform.utils.exception.BusinessException;
 import org.slf4j.Logger;
@@ -38,19 +38,19 @@ public class AlipayController {
 	
 	/** 阿里支付充值 */
 	@RequestMapping(value = "/recharge/alipay/terminal", method = RequestMethod.POST)
-	public WebResult rechargeAlipayTerminal(String identity) {
-		WebResult webResult = new WebResult();
+	public Result rechargeAlipayTerminal(String identity) {
+		Result result = new Result();
 		try {
-			webResult.setCode(ResultCode.SUCCESS.getCode());
-			webResult.setData(alipayTerminalService.mreadPaymentRequest(identity));
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(alipayTerminalService.mreadPaymentRequest(identity));
 		} catch (BusinessException be) {
-			webResult.setCode(ResultCode.FAILURE.getCode());
-			webResult.setFailure(be.getDefaultMessage());
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(be.getDefaultMessage());
 		} catch (Exception e) {
-			webResult.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
-			webResult.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
-		return webResult;
+		return result;
 	}
 
 	/** 验证阿里支付充值结果 */

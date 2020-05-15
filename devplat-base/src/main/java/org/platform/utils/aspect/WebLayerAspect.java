@@ -5,8 +5,8 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.ResultCode;
+import org.platform.modules.abstr.entity.Result;
 import org.platform.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class WebLayerAspect {
 		try {
 			return proceedingJoinPoint.proceed();
 		} catch (BusinessException be) {
-			WebResult webResult = new WebResult();
+			Result webResult = new Result();
 			webResult.setCode(ResultCode.FAILURE.getCode());
 			webResult.setFailure(be.getMessage());
 			return webResult;

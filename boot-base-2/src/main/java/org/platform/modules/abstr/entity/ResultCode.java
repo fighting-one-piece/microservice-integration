@@ -1,4 +1,4 @@
-package org.platform.modules.abstr.web;
+package org.platform.modules.abstr.entity;
 
 public enum ResultCode {
 

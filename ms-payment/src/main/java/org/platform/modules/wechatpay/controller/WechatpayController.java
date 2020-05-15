@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.platform.modules.abstr.annotation.ApiV1RestController;
-import org.platform.modules.abstr.web.ResultCode;
-import org.platform.modules.abstr.web.WebResult;
+import org.platform.modules.abstr.entity.Result;
+import org.platform.modules.abstr.entity.ResultCode;
 import org.platform.modules.wechatpay.service.IWechatpayService;
 import org.platform.utils.exception.BusinessException;
 import org.platform.utils.image.ZXingImageUtils;
@@ -44,19 +44,19 @@ public class WechatpayController {
 	
 	/** 微信支付充值 */
 	@RequestMapping(value = "/recharge/wechatpay/terminal", method = RequestMethod.POST)
-	public WebResult rechargeWechatpayTerminal(String identity) {
-		WebResult webResult = new WebResult();
+	public Result rechargeWechatpayTerminal(String identity) {
+		Result result = new Result();
 		try {
-			webResult.setCode(ResultCode.SUCCESS.getCode());
-			webResult.setData("");
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData("");
 		} catch (BusinessException be) {
-			webResult.setCode(ResultCode.FAILURE.getCode());
-			webResult.setFailure(be.getDefaultMessage());
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(be.getDefaultMessage());
 		} catch (Exception e) {
-			webResult.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
-			webResult.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
-		return webResult;
+		return result;
 	}
 	
 	/** 验证微信支付充值结果 */
