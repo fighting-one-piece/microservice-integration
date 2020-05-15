@@ -29,7 +29,7 @@
 		<spring.cloud.turbine.version>2.1.1.RELEASE</spring.cloud.turbine.version>
 		<spring.cloud.security.version>2.0.1.RELEASE</spring.cloud.security.version>
 		<spring.cloud.oauth2.version>2.0.1.RELEASE</spring.cloud.oauth2.version>
-		<fastjson.version>1.2.22</fastjson.version>
+		<fastjson.version>1.2.25</fastjson.version>
 	</properties>
 
 	<dependencies>
