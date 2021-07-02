@@ -58,7 +58,7 @@
 		<hadoop.version>2.7.2</hadoop.version>
 		<hbase.version>1.2.3</hbase.version>
 		<titan.version>1.0.0</titan.version>
-		<elasticsearch.version>1.5.2</elasticsearch.version>
+		<elasticsearch.version>6.8.15</elasticsearch.version>
 		<kafka.version>0.10.0.0</kafka.version>
 	</properties>
  
