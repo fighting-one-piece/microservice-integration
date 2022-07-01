@@ -59,7 +59,7 @@
 		<hbase.version>1.2.3</hbase.version>
 		<titan.version>1.0.0</titan.version>
 		<elasticsearch.version>1.5.2</elasticsearch.version>
-		<kafka.version>0.10.0.0</kafka.version>
+		<kafka.version>0.10.2.2</kafka.version>
 	</properties>
  
 	<dependencies>
